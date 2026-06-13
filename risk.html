@@ -77,11 +77,15 @@
   /* ===== RESULT ===== */
   #result{padding:40px 24px 40px;text-align:center}
   #result img{height:22px;margin:0 auto 24px;display:block;opacity:.85}
-  .lvbadge{font-size:12.5px;color:var(--text-mute);letter-spacing:.1em;font-weight:600;margin-bottom:6px}
-  .lvname{font-size:46px;font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:18px}
-  .segs{display:flex;gap:7px;max-width:300px;margin:0 auto 10px}
-  .seg{flex:1;height:12px;border-radius:6px;background:var(--surface-2);transition:background .5s,box-shadow .5s}
-  .seg.on{box-shadow:0 0 14px -3px currentColor}
+  .lvbadge{font-size:12.5px;color:var(--text-mute);letter-spacing:.1em;font-weight:600;margin-bottom:12px}
+  .lvname{display:flex;align-items:baseline;justify-content:center;gap:9px;margin-bottom:7px}
+  .lvname .lvlabel{font-size:17px;font-weight:700;letter-spacing:.06em;color:var(--text-dim)}
+  .lvname #lvNum{font-size:60px;font-weight:800;line-height:1}
+  .lvname .lvmax{font-size:23px;font-weight:700;color:var(--text-mute)}
+  .lvsub{font-size:13px;color:var(--text-dim);font-weight:600;margin-bottom:18px}
+  .segs{display:flex;gap:5px;max-width:330px;margin:0 auto 12px}
+  .seg{flex:1;height:10px;border-radius:5px;background:var(--surface-2);transition:background .4s,box-shadow .4s}
+  .seg.on{box-shadow:0 0 12px -3px currentColor}
   .lvtag{font-size:14px;font-weight:700;margin-bottom:24px}
   .rbody{text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;color:var(--text-dim);font-size:15px;line-height:1.85;white-space:pre-line;margin-bottom:24px;box-shadow:var(--shadow)}
   .cta-line{font-size:15px;font-weight:700;margin-bottom:14px}
@@ -146,8 +150,9 @@
 
   <section id="result" class="screen">
     <img src="assets/clavis-logo.png" alt="CLAVIS" />
-    <div class="lvbadge">RESULT · 위험레벨</div>
-    <div class="lvname" id="lvName">LEVEL 3</div>
+    <div class="lvbadge">RESULT · 관계 위험도</div>
+    <div class="lvname"><span class="lvlabel">LEVEL</span><span id="lvNum">7</span><span class="lvmax">/ 10</span></div>
+    <div class="lvsub" id="lvSub"></div>
     <div class="segs" id="segs"></div>
     <div class="lvtag" id="lvTag"></div>
     <div class="rbody" id="rbody"></div>
@@ -238,17 +243,21 @@ function runLoading(){
   const iv=setInterval(()=>{ i=(i+1)%LOAD_STEPS.length; stepEl.style.opacity="0"; setTimeout(()=>{ stepEl.textContent=LOAD_STEPS[i]; stepEl.style.opacity="1"; },180); },1600);
   clearTimeout(window._loadT); window._loadT=setTimeout(()=>{ clearInterval(iv); showResult(); },7000);
 }
+const RISK_COLORS=["#6FB573","#8CBD6A","#AEC064","#CEBE5F","#E2AD4F","#E69248","#E67B43","#E2663E","#DB553C","#D14741"];
 function showResult(){
   let sum=0,max=0; QUESTIONS.forEach((q,qi)=>{ sum+=q.opts[answers[qi]][1]; max+=Math.max(...q.opts.map(o=>o[1])); });
-  const ratio=sum/max; let lv=Math.min(5,Math.max(1,Math.floor(ratio*5)+1)); if(ratio>=1) lv=5;
-  const L=LEVELS[lv-1];
-  document.getElementById("lvName").textContent=L.name; document.getElementById("lvName").style.color=L.color;
-  document.getElementById("lvTag").textContent=L.tag; document.getElementById("lvTag").style.color=L.color;
-  document.getElementById("rbody").textContent=L.body;
-  document.getElementById("ctaLine").textContent=L.cta;
+  const ratio = max ? sum/max : 0;
+  const lv = Math.min(10, Math.max(1, Math.round(ratio*10)));   // 1~10 레벨
+  const color = RISK_COLORS[lv-1];
+  const band = LEVELS[Math.min(LEVELS.length-1, Math.ceil(lv/2)-1)]; // 10단계 → 5밴드 설명
+  const numEl=document.getElementById("lvNum"); numEl.textContent=lv; numEl.style.color=color;
+  document.getElementById("lvSub").textContent=`위험도 10단계 중 현재 ${lv}단계`;
+  const tagEl=document.getElementById("lvTag"); tagEl.textContent=band.tag; tagEl.style.color=color;
+  document.getElementById("rbody").textContent=band.body;
+  document.getElementById("ctaLine").textContent=band.cta;
   document.getElementById("consultBtn").href=CONSULT_URL;
   const segs=document.getElementById("segs"); segs.innerHTML="";
-  for(let i=1;i<=5;i++){ const d=document.createElement("div"); d.className="seg"; if(i<=lv){ d.classList.add("on"); d.style.background=LEVELS[i-1].color; d.style.color=LEVELS[i-1].color; } segs.appendChild(d); }
+  for(let i=1;i<=10;i++){ const d=document.createElement("div"); d.className="seg"; if(i<=lv){ d.classList.add("on"); d.style.background=RISK_COLORS[i-1]; d.style.color=RISK_COLORS[i-1]; } segs.appendChild(d); }
   go("result");
 }
 function restart(){ idx=0; answers.forEach((a,i)=>answers[i]=null); go("intro"); }
