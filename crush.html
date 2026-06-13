@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>썸 / 짝사랑 성사율 계산하기 | CLAVIS</title>
+<link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" as="style" crossorigin
+  href="https://fastly.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" />
+<style>
+  :root{
+    --bg:#f6eef0; --bg-2:#f1e6e9; --card:#ffffff; --card-bd:#ecdde1;
+    --ink:#23171b; --ink-2:#6a5a60; --muted:#a8979d; --line:#ead7db;
+    --rose:#d76b86; --rose-2:#e591a4; --rose-soft:rgba(215,107,134,.12);
+    --sel:#241319; --sel-ink:#fbeef1;
+    --btn:#241319; --btn-ink:#fbeef1; --btn-off:#ecdde1; --btn-off-ink:#b6a6ab;
+    --shadow:0 22px 50px -28px rgba(80,30,45,.35);
+    --serif:"Cormorant Garamond",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .app{position:relative;max-width:480px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+  .wm{font-size:14px;font-weight:800;color:var(--ink);display:inline-flex;align-items:baseline;gap:6px}
+  .wm i{font-family:var(--serif);font-style:italic;font-weight:600;font-size:14px;letter-spacing:.14em;color:var(--rose)}
+  .screen{display:none;flex:1;flex-direction:column}
+  .screen.active{display:flex;animation:fade .5s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;border:none;cursor:pointer;background:var(--btn);color:var(--btn-ink);font-family:inherit;font-weight:700;font-size:16px;padding:17px 24px;border-radius:14px;transition:transform .15s,background .2s,opacity .2s}
+  .btn:hover{background:#34202a}
+  .btn:active{transform:scale(.985)}
+  .btn:disabled{background:var(--btn-off);color:var(--btn-off-ink);cursor:not-allowed}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink-2);font-weight:600}
+  .btn.ghost:hover{background:#fff}
+
+  #intro{justify-content:center;align-items:center;text-align:center;padding:54px 28px}
+  #intro .logo{height:30px;margin-bottom:30px;opacity:.92}
+  #intro .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--rose);background:var(--rose-soft);border:1px solid rgba(215,107,134,.28);padding:7px 14px;border-radius:999px;margin-bottom:24px}
+  #intro h1{font-size:36px;font-weight:800;letter-spacing:-.025em;line-height:1.2;margin-bottom:18px;text-align:center}
+  #intro h1 .em{font-weight:800;color:var(--rose)}
+  #intro .quote{font-family:var(--serif);font-style:italic;font-size:23px;margin:0 0 10px}
+  #intro .sub{color:var(--muted);font-size:14.5px;margin-bottom:40px;line-height:1.7}
+  #intro .cta{max-width:340px;width:100%}
+
+  .qhead{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 78%,rgba(246,238,240,0));padding:18px 22px 14px}
+  .qhead-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .xclose{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink-2);font-size:13px;cursor:pointer;display:grid;place-items:center}
+  .qhead-sub{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+  .qhead-sub .diag{font-size:12.5px;color:var(--ink-2);font-weight:600}
+  .qhead-sub .step{font-size:11.5px;letter-spacing:.16em;color:var(--rose);font-weight:700}
+  .progress-track{height:3px;background:var(--line);border-radius:999px;overflow:hidden}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--rose),var(--rose-2));border-radius:999px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+  #quiz-body{padding:14px 22px 26px;flex:1}
+  .qcard{animation:fade .35s ease both}
+  .qnum{font-family:var(--serif);font-style:italic;font-size:32px;font-weight:600;color:var(--rose);line-height:1;margin-bottom:10px}
+  .qtitle{font-size:23px;font-weight:800;line-height:1.36;letter-spacing:-.02em;margin-bottom:8px}
+  .qhint{font-size:13px;color:var(--muted);margin-bottom:22px}
+  .options{display:flex;flex-direction:column;gap:9px}
+  .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--card-bd);color:var(--ink-2);padding:16px 18px;border-radius:14px;font-family:inherit;font-size:15px;font-weight:500;line-height:1.45;transition:border-color .16s,background .16s,color .16s,box-shadow .16s}
+  .opt:hover{border-color:#e2c9cf;box-shadow:0 8px 18px -14px rgba(80,30,45,.3)}
+  .opt .olabel{flex:1}
+  .opt .oradio{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1.8px solid #d8c4ca;position:relative;transition:.16s}
+  .opt.selected{background:var(--sel);border-color:var(--sel);color:var(--sel-ink);box-shadow:var(--shadow)}
+  .opt.selected .oradio{border-color:var(--rose-2)}
+  .opt.selected .oradio::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--rose-2)}
+  .qfoot{display:flex;gap:11px;margin-top:26px;padding-bottom:30px}
+  .qfoot .btn{flex:1}.qfoot .btn.back{flex:0 0 84px}
+
+  #result{padding:40px 24px 44px;text-align:center}
+  #result .logo{height:24px;margin:0 auto 22px;display:block;opacity:.9}
+  .gauge{position:relative;width:216px;height:216px;margin:0 auto 14px}
+  .gauge svg{transform:rotate(-90deg);width:100%;height:100%}
+  .gauge .track{fill:none;stroke:#ecdde1;stroke-width:10}
+  .gauge .bar{fill:none;stroke:url(#g);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.4s cubic-bezier(.2,.7,.2,1)}
+  .gauge .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gauge .pct{font-family:var(--serif);font-weight:600;font-size:62px;line-height:1;display:flex;align-items:baseline}
+  .gauge .pct small{font-size:24px;color:var(--rose);font-weight:600;margin-left:2px}
+  .gauge .pl{font-size:12.5px;color:var(--muted);margin-top:8px;letter-spacing:.05em;font-weight:600}
+  #result .rtitle{font-size:23px;font-weight:800;line-height:1.45;letter-spacing:-.015em;margin:16px 0 20px}
+  #result .rtitle .em{font-family:var(--serif);font-style:italic;color:var(--rose)}
+  #result .rbody{text-align:left;background:#fff;border:1px solid var(--card-bd);border-radius:16px;padding:22px;color:var(--ink-2);font-size:14.5px;line-height:1.85;white-space:pre-line;margin-bottom:24px;box-shadow:var(--shadow)}
+  #result .cta-line{font-size:15px;font-weight:700;margin-bottom:14px}
+  #result .actions{display:flex;flex-direction:column;gap:11px}
+  #result .restart{margin-top:22px}
+  #result .restart button{background:none;border:none;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  #loading{justify-content:center;align-items:center;text-align:center;padding:54px 30px}
+  .spinner{width:54px;height:54px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--rose);animation:spin 1s linear infinite;margin-bottom:28px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .load-title{font-size:21px;font-weight:800;letter-spacing:-.01em;margin-bottom:14px}
+  .load-step{font-size:14.5px;color:var(--ink-2);min-height:22px;transition:opacity .2s;margin-bottom:26px}
+  .load-track{width:100%;max-width:280px;height:4px;background:var(--line);border-radius:999px;overflow:hidden;margin:0 auto 30px}
+  .load-fill{height:100%;width:0;background:linear-gradient(90deg,var(--rose),var(--rose-2));border-radius:999px}
+  .load-trust{max-width:330px;font-size:14px;line-height:1.75;color:var(--ink-2);background:#fff;border:1px solid var(--card-bd);border-radius:14px;padding:16px 20px}
+  .load-trust b{color:var(--rose);font-weight:700}
+  .footer{text-align:center;font-size:11px;color:var(--muted);letter-spacing:.25em;padding:14px 0 28px;opacity:.7}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(18px);background:var(--sel);color:var(--sel-ink);padding:12px 20px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:70;box-shadow:var(--shadow)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .sheet-overlay{position:fixed;inset:0;z-index:60;background:rgba(60,25,35,.4);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center}
+  .sheet-overlay.show{display:flex;animation:fade .25s ease both}
+  .sheet{width:100%;max-width:480px;background:#fff;border-radius:22px 22px 0 0;padding:14px 22px calc(26px + env(safe-area-inset-bottom));box-shadow:var(--shadow);animation:up .3s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+  .grip{width:40px;height:4px;border-radius:999px;background:var(--line);margin:4px auto 18px}
+  .sheet-title{text-align:center;font-size:16px;font-weight:700;margin-bottom:22px}
+  .sheet-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+  .share-item{display:flex;flex-direction:column;align-items:center;gap:9px;background:none;border:none;cursor:pointer;font-family:inherit;color:var(--ink-2);font-size:12px;font-weight:600;padding:6px 2px}
+  .share-ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;transition:transform .15s}
+  .share-item:active .share-ic{transform:scale(.92)}
+  .sheet-close{width:100%;background:var(--bg-2);border:1px solid var(--card-bd);color:var(--ink-2);font-family:inherit;font-size:15px;font-weight:600;padding:14px;border-radius:12px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="app">
+  <section id="intro" class="screen active">
+    <img class="logo" src="assets/clavis-logo-black.png" alt="CLAVIS" />
+    <span class="eyebrow">썸·짝사랑 시그널 데이터 진단</span>
+    <h1>썸 / 짝사랑<br><span class="em">성사율 계산하기</span></h1>
+    <p class="quote">“우리, 잘 될 수 있을까?”</p>
+    <p class="sub">상대의 반응을 입력하면<br>연인으로 발전할 확률을 계산해 드려요.</p>
+    <div class="cta"><button class="btn" onclick="startQuiz()">계산 시작&nbsp;&nbsp;→</button></div>
+  </section>
+
+  <section id="quiz" class="screen">
+    <div class="qhead">
+      <div class="qhead-top"><span class="wm">클래비스 <i>CLAVIS</i></span><button class="xclose" onclick="restart()">✕</button></div>
+      <div class="qhead-sub"><span class="diag">썸 / 짝사랑 성사율 진단</span><span class="step">STEP <b id="cur">01</b> / <span id="total">9</span></span></div>
+      <div class="progress-track"><div class="progress-fill" id="bar"></div></div>
+    </div>
+    <div id="quiz-body"></div>
+  </section>
+
+  <section id="loading" class="screen">
+    <div class="spinner"></div>
+    <div class="load-title">성사 가능성을 분석 중입니다.</div>
+    <div class="load-step" id="loadStep"></div>
+    <div class="load-track"><div class="load-fill" id="loadFill"></div></div>
+    <div class="load-trust">혼자 애태우지 말고,<br><b>결정적인 타이밍을 놓치기 전</b> 전문가의 조언을 받아보세요.</div>
+  </section>
+
+  <section id="result" class="screen">
+    <img class="logo" src="assets/clavis-logo-black.png" alt="CLAVIS" />
+    <div class="gauge">
+      <svg viewBox="0 0 216 216"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e591a4"/><stop offset="100%" stop-color="#d76b86"/></linearGradient></defs>
+        <circle class="track" cx="108" cy="108" r="96"/><circle class="bar" id="gaugeBar" cx="108" cy="108" r="96"/></svg>
+      <div class="center"><div class="pct"><span id="pctNum">0</span><small>%</small></div><div class="pl">성사 가능성</div></div>
+    </div>
+    <h2 class="rtitle" id="rtitle"></h2>
+    <div class="rbody" id="rbody"></div>
+    <p class="cta-line" id="ctaLine"></p>
+    <div class="actions">
+      <a class="btn" id="consultBtn" target="_top">코치 상담 신청하기</a>
+      <button class="btn ghost" onclick="shareResult()">친구에게 결과 공유하기</button>
+    </div>
+    <div class="restart"><button onclick="restart()">다시 측정하기</button></div>
+  </section>
+  <div class="footer">CLAVIS</div>
+</div>
+
+<div class="sheet-overlay" id="shareSheet" onclick="if(event.target===this)closeShare()">
+  <div class="sheet">
+    <div class="grip"></div>
+    <div class="sheet-title">결과 공유하기</div>
+    <div class="sheet-grid">
+      <button class="share-item" onclick="shareNative()"><span class="share-ic" style="background:#241319">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3v12M12 3l-4 4M12 3l4 4" stroke="#fbeef1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v6a2 2 0 002 2h10a2 2 0 002-2v-6" stroke="#fbeef1" stroke-width="2" stroke-linecap="round"/></svg>
+      </span><span>공유하기</span></button>
+      <button class="share-item" onclick="shareKakao()"><span class="share-ic" style="background:#FEE500">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3.5C6.86 3.5 2.7 6.79 2.7 10.85c0 2.63 1.75 4.94 4.38 6.25-.19.69-.7 2.55-.8 2.95-.13.49.18.48.38.35.16-.1 2.5-1.7 3.51-2.39.6.09 1.21.13 1.83.13 5.14 0 9.3-3.29 9.3-7.35S17.14 3.5 12 3.5z"/></svg>
+      </span><span>카카오톡</span></button>
+      <button class="share-item" onclick="shareInstagram()"><span class="share-ic" style="background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5.5" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#fff" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.3" fill="#fff"/></svg>
+      </span><span>인스타그램</span></button>
+      <button class="share-item" onclick="copyLink()"><span class="share-ic" style="background:var(--bg-2);border:1px solid var(--card-bd)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 12a3 3 0 003 3h3a3 3 0 100-6h-1" stroke="#23171b" stroke-width="2" stroke-linecap="round"/><path d="M15 12a3 3 0 00-3-3H9a3 3 0 100 6h1" stroke="#23171b" stroke-width="2" stroke-linecap="round"/></svg>
+      </span><span>링크 복사</span></button>
+    </div>
+    <button class="sheet-close" onclick="closeShare()">닫기</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const CONSULT_URL = "https://clavis.love/";
+const KAKAO_JS_KEY = "";
+/* ※ 아래 문항은 와이어프레임 흐름에 맞춘 '샘플'입니다. 실제 문항으로 교체하세요.
+   point = 호감 점수(클수록 성사 가능성↑). */
+const QUESTIONS = [
+  { t:"상대의 답장 속도는?", opts:[["거의 즉시 온다",3],["보통 몇 시간 내 온다",2],["하루 이상 걸릴 때가 많다",1],["읽씹·잠수가 잦다",0]]},
+  { t:"먼저 연락하는 쪽은?", opts:[["상대가 자주 먼저",3],["반반 정도",2],["주로 내가 먼저",1],["거의 항상 나",0]]},
+  { t:"대화는 보통 어떻게 흘러가나요?", opts:[["상대가 질문·이야기를 많이 한다",3],["자연스럽게 잘 오간다",2],["내가 끌고 가는 편",1],["단답으로 자주 끊긴다",0]]},
+  { t:"단둘이 만난 적이 있나요?", opts:[["여러 번 만났다",3],["한두 번 만났다",2],["곧 만날 약속이 있다",1],["아직 없다",0]]},
+  { t:"만났을 때 상대의 리액션·눈맞춤은?", opts:[["적극적이고 잘 웃는다",3],["무난하게 좋다",2],["조금 어색하다",1],["시큰둥하다",0]]},
+  { t:"상대가 내 일상·취향을 기억하나요?", opts:[["먼저 챙겨줄 만큼 잘 안다",3],["가끔 기억한다",2],["별로 모른다",1],["전혀 모른다",0]]},
+  { t:"가벼운 장난·스킨십 신호는?", opts:[["서로 자연스럽게 오간다",3],["가끔 있다",2],["주로 내가 시도한다",1],["거의 없다",0]]},
+  { t:"다음 약속(또 보자) 이야기는?", opts:[["상대가 먼저 꺼낸다",3],["자연스럽게 잡힌다",2],["내가 꺼내야 잡힌다",1],["흐지부지된다",0]]},
+  { t:"상대의 SNS·연락 반응은?", opts:[["좋아요·답장이 빠릿하다",3],["보통이다",2],["가끔 반응한다",1],["거의 무반응이다",0]]}
+];
+const TIERS = [
+  { max:20, title:`아직은 '친구',\n그 어딘가입니다.`,
+    body:`지금은 호감 신호가 약한 단계예요.\n상대는 당신을 편한 사람으로 보고 있을 가능성이 큽니다.\n조급하게 다가가면 오히려 멀어질 수 있어요.\n먼저 '이성으로서의 매력'을 만드는 게 우선입니다.`, cta:`친구에서 벗어나는 법이 궁금하다면?` },
+  { max:40, title:`관심은 있지만,\n신호가 약한 상태예요.`,
+    body:`미세한 호감은 보이지만 아직 확신은 이릅니다.\n상대도 당신을 탐색하는 중일 수 있어요.\n지금은 부담을 주지 않으면서,\n자연스러운 접점을 늘려가는 게 핵심입니다.`, cta:`애매한 썸을 진전시키고 싶다면?` },
+  { max:60, title:`썸의 초입,\n지금이 골든타임입니다.`,
+    body:`서로를 의식하기 시작한 단계예요.\n여기서 어떻게 행동하느냐에 따라\n연인으로 발전할 수도, 흐지부지될 수도 있습니다.\n지금이 가장 결정적인 타이밍이에요.`, cta:`이 타이밍을 놓치고 싶지 않다면?` },
+  { max:80, title:`거의 다 왔어요,\n한 끗 차이입니다.`,
+    body:`상대도 당신에게 분명한 호감을 느끼고 있어요.\n이제 필요한 건 자연스러운 '결정적 한 마디'.\n무리하지 않아도, 흐름만 잘 타면\n연인이 되는 건 시간 문제입니다.`, cta:`고백 타이밍을 확실히 잡고 싶다면?` },
+  { max:100, title:`이미 서로\n마음이 통하는 중입니다.`,
+    body:`사실상 마음은 거의 정해진 상태예요.\n말만 꺼내지 않았을 뿐, 서로 통하고 있습니다.\n용기 내어 한 걸음만 다가가면,\n자연스럽게 연인으로 이어질 거예요.`, cta:`마지막 한 걸음을 확실히 하고 싶다면?` }
+];
+
+let idx=0; const answers=QUESTIONS.map(()=>null);
+function go(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); document.getElementById(id).classList.add("active"); window.scrollTo({top:0,behavior:"instant"}); }
+function startQuiz(){ idx=0; go("quiz"); render(); }
+function pad(n){ return (n<10?"0":"")+n; }
+function render(){ const q=QUESTIONS[idx],total=QUESTIONS.length;
+  document.getElementById("cur").textContent=pad(idx+1); document.getElementById("total").textContent=total;
+  document.getElementById("bar").style.width=(idx/total*100)+"%";
+  let h=`<div class="qcard"><div class="qnum">Q${idx+1}</div><div class="qtitle">${q.t}</div><div class="qhint">하나만 선택하세요</div><div class="options">`;
+  q.opts.forEach((o,i)=>{ h+=`<button class="opt ${answers[idx]===i?'selected':''}" onclick="pick(${i})"><span class="olabel">${o[0]}</span><span class="oradio"></span></button>`; });
+  h+=`</div><div class="qfoot">${idx>0?'<button class="btn ghost back" onclick="prev()">이전</button>':''}<button class="btn" id="nextBtn" onclick="next()">${idx===total-1?'결과 보기':'다음  →'}</button></div></div>`;
+  document.getElementById("quiz-body").innerHTML=h; updateNext();
+}
+function pick(i){ answers[idx]=i; document.querySelectorAll("#quiz-body .opt").forEach((el,j)=>el.classList.toggle("selected",j===i)); updateNext(); }
+function updateNext(){ document.getElementById("nextBtn").disabled=answers[idx]===null; }
+function next(){ if(answers[idx]===null) return; if(idx<QUESTIONS.length-1){ idx++; render(); window.scrollTo({top:0,behavior:"instant"}); } else finish(); }
+function prev(){ if(idx>0){ idx--; render(); window.scrollTo({top:0,behavior:"instant"}); } }
+const LOAD_STEPS=["상대의 답장과 연락 신호를 읽고 있어요","만남과 호감의 시그널을 해석하고 있어요","마음의 거리를 가늠하고 있어요","연인으로 발전할 확률을 계산하고 있어요"];
+function finish(){ go("loading"); runLoading(); }
+function runLoading(){
+  const stepEl=document.getElementById("loadStep"), fill=document.getElementById("loadFill");
+  let i=0; stepEl.style.opacity="1"; stepEl.textContent=LOAD_STEPS[0];
+  fill.style.transition="none"; fill.style.width="0%";
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ fill.style.transition="width 7s linear"; fill.style.width="100%"; }));
+  const iv=setInterval(()=>{ i=(i+1)%LOAD_STEPS.length; stepEl.style.opacity="0"; setTimeout(()=>{ stepEl.textContent=LOAD_STEPS[i]; stepEl.style.opacity="1"; },180); },1600);
+  clearTimeout(window._loadT); window._loadT=setTimeout(()=>{ clearInterval(iv); showResult(); },7000);
+}
+function showResult(){
+  let sum=0,max=0; QUESTIONS.forEach((q,qi)=>{ sum+=q.opts[answers[qi]][1]; max+=Math.max(...q.opts.map(o=>o[1])); });
+  let pct=Math.round(sum/max*100); pct=Math.max(5,Math.min(99,pct));
+  const T=TIERS.find(t=>pct<=t.max)||TIERS[TIERS.length-1];
+  document.getElementById("rtitle").innerHTML=`<span class="em">${T.title.replace(/\n/g,'<br>')}</span>`;
+  document.getElementById("rbody").textContent=T.body;
+  document.getElementById("ctaLine").textContent=T.cta;
+  document.getElementById("consultBtn").href=CONSULT_URL;
+  go("result");
+  const bar=document.getElementById("gaugeBar"),r=96,c=2*Math.PI*r;
+  bar.style.strokeDasharray=c; bar.style.strokeDashoffset=c;
+  const numEl=document.getElementById("pctNum");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ bar.style.strokeDashoffset=c*(1-pct/100); }));
+  let dur=1400,start=performance.now();
+  function tick(now){ const p=Math.min(1,(now-start)/dur),e=1-Math.pow(1-p,3); numEl.textContent=Math.round(pct*e); if(p<1) requestAnimationFrame(tick); else numEl.textContent=pct; }
+  requestAnimationFrame(tick);
+}
+function restart(){ idx=0; answers.forEach((a,i)=>answers[i]=null); go("intro"); }
+
+function shareData(){ const s=document.getElementById("pctNum").textContent; return { title:"썸 / 짝사랑 성사율 계산하기 | CLAVIS", text:`나의 썸·짝사랑 성사율은 ${s}%! 당신도 측정해보세요.`, url:location.href }; }
+function shareResult(){ document.getElementById("shareSheet").classList.add("show"); document.body.style.overflow="hidden"; }
+function closeShare(){ document.getElementById("shareSheet").classList.remove("show"); document.body.style.overflow=""; }
+async function shareNative(){ const d=shareData(); if(navigator.share){ try{ await navigator.share(d); closeShare(); return; }catch(e){ if(e&&e.name==="AbortError") return; } } await copyToClipboard(`${d.text} ${d.url}`); toast("이 기기는 기본 공유를 지원하지 않아 링크를 복사했어요"); closeShare(); }
+async function shareKakao(){ const d=shareData(); if(KAKAO_JS_KEY&&window.Kakao&&window.Kakao.isInitialized&&window.Kakao.isInitialized()){ try{ window.Kakao.Share.sendDefault({objectType:"text",text:`${d.title}\n${d.text}`,link:{mobileWebUrl:d.url,webUrl:d.url}}); closeShare(); return; }catch(e){} } await copyToClipboard(`${d.text} ${d.url}`); toast("링크를 복사했어요. 카카오톡에 붙여넣어 공유하세요"); closeShare(); }
+async function shareInstagram(){ const d=shareData(); if(navigator.share){ try{ await navigator.share(d); closeShare(); return; }catch(e){ if(e&&e.name==="AbortError") return; } } await copyToClipboard(`${d.text} ${d.url}`); toast("링크를 복사했어요. 인스타그램 스토리·DM에 붙여넣어 공유하세요"); closeShare(); }
+async function copyToClipboard(t){ try{ await navigator.clipboard.writeText(t); return true; }catch(e){ const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(_){ } document.body.removeChild(ta); return ok; } }
+async function copyLink(){ const d=shareData(); const ok=await copyToClipboard(`${d.text} ${d.url}`); toast(ok?"링크가 복사되었습니다":"복사에 실패했습니다"); closeShare(); }
+function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
+(function loadKakao(){ if(!KAKAO_JS_KEY) return; const s=document.createElement("script"); s.src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"; s.crossOrigin="anonymous"; s.onload=()=>{ try{ if(window.Kakao&&!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY); }catch(e){} }; document.head.appendChild(s); })();
+</script>
+</body>
+</html>

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>관계 위험레벨 측정하기 | CLAVIS</title>
+<link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" as="style" crossorigin
+  href="https://fastly.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" />
+<style>
+  :root{
+    --bg:#1f1e1d;--bg-2:#262624;--surface:#2b2a28;--surface-2:#323130;--border:#3a3936;--border-2:#4a4844;
+    --text:#f5f4ef;--text-dim:#b3b0a8;--text-mute:#84817a;
+    --accent:#c89a8f;--accent-2:#d9b0a6;--on-accent:#241a16;--accent-dim:rgba(200,154,143,.15);--accent-line:rgba(200,154,143,.42);
+    --shadow:0 18px 50px -20px rgba(0,0,0,.7);--serif:"Cormorant Garamond",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;background:radial-gradient(900px 600px at 80% -10%,rgba(200,154,143,.10),transparent 60%),radial-gradient(700px 500px at 0% 110%,rgba(200,154,143,.06),transparent 55%);pointer-events:none;z-index:0}
+  .app{position:relative;z-index:1;max-width:480px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+  .wm{font-size:14px;font-weight:800;color:var(--text);display:inline-flex;align-items:baseline;gap:6px}
+  .wm i{font-family:var(--serif);font-style:italic;font-weight:600;font-size:14px;letter-spacing:.14em;color:var(--accent)}
+  .screen{display:none;flex:1;flex-direction:column}
+  .screen.active{display:flex;animation:fade .45s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;border:none;cursor:pointer;background:var(--accent);color:var(--on-accent);font-family:inherit;font-weight:700;font-size:16px;padding:17px 24px;border-radius:14px;transition:transform .15s,background .2s,opacity .2s}
+  .btn:hover{background:var(--accent-2)}
+  .btn:active{transform:scale(.985)}
+  .btn:disabled{opacity:.35;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border-2);font-weight:600}
+  .btn.ghost:hover{background:var(--surface);color:var(--text)}
+  .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--accent);background:var(--accent-dim);border:1px solid var(--accent-line);padding:7px 14px;border-radius:999px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse 2.4s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(200,154,143,.5)}70%{box-shadow:0 0 0 8px rgba(200,154,143,0)}100%{box-shadow:0 0 0 0 rgba(200,154,143,0)}}
+
+  /* ===== INTRO ===== */
+  #intro{justify-content:center;align-items:center;text-align:center;padding:48px 28px}
+  #intro img{height:60px;margin-bottom:26px}
+  #intro h1{font-size:34px;font-weight:800;letter-spacing:-.02em;line-height:1.2;margin:18px 0 14px}
+  #intro h1 .grad{background:linear-gradient(120deg,var(--accent-2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+  #intro .quote{font-family:var(--serif);font-style:italic;font-size:22px;margin:6px 0 6px}
+  #intro .sub{color:var(--text-mute);font-size:14px;margin-bottom:38px;line-height:1.7}
+  #intro .cta{max-width:340px;width:100%}
+
+  /* ===== QUIZ (재회와 동일 구조) ===== */
+  .qhead{position:sticky;top:0;z-index:5;background:linear-gradient(var(--bg) 78%,rgba(31,30,29,0));padding:18px 22px 14px}
+  .qhead-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .xclose{width:30px;height:30px;border-radius:50%;border:1px solid var(--border-2);background:var(--surface);color:var(--text-dim);font-size:13px;cursor:pointer;display:grid;place-items:center}
+  .xclose:hover{background:var(--surface-2);color:var(--text)}
+  .qhead-sub{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+  .qhead-sub .diag{font-size:12.5px;color:var(--text-dim);font-weight:600}
+  .qhead-sub .step{font-size:11.5px;letter-spacing:.16em;color:var(--accent);font-weight:700}
+  .qhead-sub .step b{font-weight:800}
+  .progress-track{height:3px;background:var(--surface-2);border-radius:999px;overflow:hidden}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:999px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+  #quiz-body{padding:14px 22px 26px;flex:1}
+  .qcard{animation:fade .35s ease both}
+  .qnum{font-family:var(--serif);font-style:italic;font-size:32px;font-weight:600;color:var(--accent);line-height:1;margin-bottom:10px}
+  .qtitle{font-size:23px;font-weight:800;line-height:1.36;letter-spacing:-.02em;margin-bottom:8px}
+  .qhint{font-size:13px;color:var(--text-mute);margin-bottom:22px}
+  .options{display:flex;flex-direction:column;gap:9px}
+  .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);padding:16px 18px;border-radius:14px;font-family:inherit;font-size:15px;font-weight:500;line-height:1.45;transition:border-color .16s,background .16s,color .16s,box-shadow .16s}
+  .opt:hover{border-color:var(--border-2);background:var(--surface-2);color:var(--text)}
+  .opt .olabel{flex:1}
+  .opt .oradio{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1.8px solid var(--border-2);position:relative;transition:.16s}
+  .opt.selected{background:var(--accent);border-color:var(--accent);color:var(--on-accent);box-shadow:var(--shadow)}
+  .opt.selected .oradio{border-color:rgba(36,26,22,.45)}
+  .opt.selected .oradio::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--on-accent)}
+  .qfoot{display:flex;gap:11px;margin-top:26px;padding-bottom:30px}
+  .qfoot .btn{flex:1}.qfoot .btn.back{flex:0 0 84px}
+
+  /* ===== RESULT ===== */
+  #result{padding:40px 24px 40px;text-align:center}
+  #result img{height:22px;margin:0 auto 24px;display:block;opacity:.85}
+  .lvbadge{font-size:12.5px;color:var(--text-mute);letter-spacing:.1em;font-weight:600;margin-bottom:6px}
+  .lvname{font-size:46px;font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:18px}
+  .segs{display:flex;gap:7px;max-width:300px;margin:0 auto 10px}
+  .seg{flex:1;height:12px;border-radius:6px;background:var(--surface-2);transition:background .5s,box-shadow .5s}
+  .seg.on{box-shadow:0 0 14px -3px currentColor}
+  .lvtag{font-size:14px;font-weight:700;margin-bottom:24px}
+  .rbody{text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;color:var(--text-dim);font-size:15px;line-height:1.85;white-space:pre-line;margin-bottom:24px;box-shadow:var(--shadow)}
+  .cta-line{font-size:15px;font-weight:700;margin-bottom:14px}
+  .actions{display:flex;flex-direction:column;gap:11px}
+  #loading{justify-content:center;align-items:center;text-align:center;padding:54px 30px}
+  .spinner{width:54px;height:54px;border-radius:50%;border:3px solid var(--surface-2);border-top-color:var(--accent);animation:spin 1s linear infinite;margin-bottom:28px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .load-title{font-size:21px;font-weight:800;letter-spacing:-.01em;margin-bottom:14px}
+  .load-step{font-size:14.5px;color:var(--text-dim);min-height:22px;transition:opacity .2s;margin-bottom:26px}
+  .load-track{width:100%;max-width:280px;height:4px;background:var(--surface-2);border-radius:999px;overflow:hidden;margin:0 auto 30px}
+  .load-fill{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-2));border-radius:999px}
+  .load-trust{max-width:330px;font-size:14px;line-height:1.75;color:var(--text-dim);background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 20px}
+  .load-trust b{color:var(--accent);font-weight:700}
+  .footer{text-align:center;font-size:11px;color:var(--text-mute);letter-spacing:.25em;padding:14px 0 28px;opacity:.6}
+  .restart{margin-top:22px}
+  .restart button{background:none;border:none;color:var(--text-mute);font-family:inherit;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .restart button:hover{color:var(--text-dim)}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(18px);background:var(--surface-2);border:1px solid var(--border-2);color:var(--text);padding:12px 20px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:70;box-shadow:var(--shadow)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .sheet-overlay{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center}
+  .sheet-overlay.show{display:flex;animation:fade .25s ease both}
+  .sheet{width:100%;max-width:480px;background:var(--bg-2);border:1px solid var(--border);border-radius:22px 22px 0 0;padding:14px 22px calc(26px + env(safe-area-inset-bottom));box-shadow:var(--shadow);animation:up .3s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+  .grip{width:40px;height:4px;border-radius:999px;background:var(--border-2);margin:4px auto 18px}
+  .sheet-title{text-align:center;font-size:16px;font-weight:700;margin-bottom:22px;color:var(--text)}
+  .sheet-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+  .share-item{display:flex;flex-direction:column;align-items:center;gap:9px;background:none;border:none;cursor:pointer;font-family:inherit;color:var(--text-dim);font-size:12px;font-weight:600;padding:6px 2px}
+  .share-item:hover{color:var(--text)}
+  .share-ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;transition:transform .15s}
+  .share-item:active .share-ic{transform:scale(.92)}
+  .sheet-close{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font-family:inherit;font-size:15px;font-weight:600;padding:14px;border-radius:12px;cursor:pointer}
+  .sheet-close:hover{background:var(--surface-2);color:var(--text)}
+</style>
+</head>
+<body>
+<div class="app">
+  <section id="intro" class="screen active">
+    <img src="assets/clavis-logo.png" alt="CLAVIS" />
+    <div style="display:flex;justify-content:center;margin-bottom:6px"><span class="eyebrow"><span class="dot"></span>관계 신호 데이터 기반 진단</span></div>
+    <h1>관계 위험레벨<br><span class="grad">측정하기</span></h1>
+    <p class="quote">“우리, 괜찮은 걸까?”</p>
+    <p class="sub">지금 관계의 위험 신호를<br>단계로 진단해 드립니다.</p>
+    <div class="cta"><button class="btn" onclick="startQuiz()">측정 시작&nbsp;&nbsp;→</button></div>
+  </section>
+
+  <section id="quiz" class="screen">
+    <div class="qhead">
+      <div class="qhead-top"><span class="wm">클래비스 <i>CLAVIS</i></span><button class="xclose" onclick="restart()" title="처음으로">✕</button></div>
+      <div class="qhead-sub"><span class="diag">관계 위험레벨 진단</span><span class="step">STEP <b id="cur">01</b> / <span id="total">9</span></span></div>
+      <div class="progress-track"><div class="progress-fill" id="bar"></div></div>
+    </div>
+    <div id="quiz-body"></div>
+  </section>
+
+  <section id="loading" class="screen">
+    <div class="spinner"></div>
+    <div class="load-title">관계 위험 신호를 분석 중입니다.</div>
+    <div class="load-step" id="loadStep"></div>
+    <div class="load-track"><div class="load-fill" id="loadFill"></div></div>
+    <div class="load-trust">작은 균열이 돌이킬 수 없는 이별이 되기 전,<br><b>지금</b> 전문가의 점검을 받아보세요.</div>
+  </section>
+
+  <section id="result" class="screen">
+    <img src="assets/clavis-logo.png" alt="CLAVIS" />
+    <div class="lvbadge">RESULT · 위험레벨</div>
+    <div class="lvname" id="lvName">LEVEL 3</div>
+    <div class="segs" id="segs"></div>
+    <div class="lvtag" id="lvTag"></div>
+    <div class="rbody" id="rbody"></div>
+    <p class="cta-line" id="ctaLine"></p>
+    <div class="actions">
+      <a class="btn" id="consultBtn" target="_top">코치 상담 신청하기</a>
+      <button class="btn ghost" onclick="shareResult()">친구에게 결과 공유하기</button>
+    </div>
+    <div class="restart"><button onclick="restart()">다시 측정하기</button></div>
+  </section>
+  <div class="footer">CLAVIS</div>
+</div>
+
+<div class="sheet-overlay" id="shareSheet" onclick="if(event.target===this)closeShare()">
+  <div class="sheet">
+    <div class="grip"></div>
+    <div class="sheet-title">결과 공유하기</div>
+    <div class="sheet-grid">
+      <button class="share-item" onclick="shareNative()"><span class="share-ic" style="background:var(--accent)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3v12M12 3l-4 4M12 3l4 4" stroke="#241a16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v6a2 2 0 002 2h10a2 2 0 002-2v-6" stroke="#241a16" stroke-width="2" stroke-linecap="round"/></svg>
+      </span><span>공유하기</span></button>
+      <button class="share-item" onclick="shareKakao()"><span class="share-ic" style="background:#FEE500">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3.5C6.86 3.5 2.7 6.79 2.7 10.85c0 2.63 1.75 4.94 4.38 6.25-.19.69-.7 2.55-.8 2.95-.13.49.18.48.38.35.16-.1 2.5-1.7 3.51-2.39.6.09 1.21.13 1.83.13 5.14 0 9.3-3.29 9.3-7.35S17.14 3.5 12 3.5z"/></svg>
+      </span><span>카카오톡</span></button>
+      <button class="share-item" onclick="shareInstagram()"><span class="share-ic" style="background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5.5" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#fff" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.3" fill="#fff"/></svg>
+      </span><span>인스타그램</span></button>
+      <button class="share-item" onclick="copyLink()"><span class="share-ic" style="background:var(--surface-2);border:1px solid var(--border-2)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 12a3 3 0 003 3h3a3 3 0 100-6h-1" stroke="#f5f4ef" stroke-width="2" stroke-linecap="round"/><path d="M15 12a3 3 0 00-3-3H9a3 3 0 100 6h1" stroke="#f5f4ef" stroke-width="2" stroke-linecap="round"/></svg>
+      </span><span>링크 복사</span></button>
+    </div>
+    <button class="sheet-close" onclick="closeShare()">닫기</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const CONSULT_URL = "https://clavis.love/";
+const KAKAO_JS_KEY = "";
+/* ※ 아래 문항은 와이어프레임 흐름에 맞춘 '샘플'입니다. 실제 문항으로 교체하세요. point = 위험 점수(클수록 위험) */
+const QUESTIONS = [
+  { t:"두 사람의 교제 형태는 지금 어떤가요?", opts:[["안정적으로 잘 만나는 중",0],["권태기인 듯 미지근함",2],["자주 흔들리고 불안정",3],["헤어짐 직전까지 간 적 있음",4]]},
+  { t:"최근 한 달, 다툼의 빈도는?", opts:[["거의 없음",0],["가끔 (한두 번)",1],["자주 (주 1회 이상)",3],["거의 매일",4]]},
+  { t:"다툴 때 보통 어떻게 끝나나요?", opts:[["대화로 잘 풀린다",0],["한쪽이 참고 넘어간다",2],["연락 두절·잠수로 끝난다",3],["헤어지자는 말이 나온다",4]]},
+  { t:"상대의 연락(답장) 패턴 변화는?", opts:[["예전과 비슷하게 잘 온다",0],["조금 느려졌다",1],["눈에 띄게 줄었다",3],["읽씹·잠수가 잦다",4]]},
+  { t:"함께 보내는 시간은 예전과 비교하면?", opts:[["비슷하거나 더 늘었다",0],["조금 줄었다",1],["많이 줄었다",3],["거의 못 만난다",4]]},
+  { t:"애정 표현(말·스킨십)의 변화는?", opts:[["여전히 자연스럽다",0],["예전보다 줄었다",2],["어색하고 형식적이다",3],["거의 사라졌다",4]]},
+  { t:"미래(여행·약속) 이야기를 할 때 상대는?", opts:[["적극적으로 함께 그린다",0],["대답은 하지만 미지근",2],["말을 돌리거나 회피",3],["부담스러워 한다",4]]},
+  { t:"갈등 후 화해는 어떻게 이뤄지나요?", opts:[["서로 먼저 다가간다",0],["주로 내가 먼저 푼다",2],["흐지부지 넘어간다",3],["화해 없이 쌓인다",4]]},
+  { t:"요즘 '헤어질까' 하는 생각의 빈도는?", opts:[["거의 없다",0],["가끔 스친다",2],["자주 든다",3],["거의 매일 고민한다",4]]}
+];
+const LEVELS = [
+  { name:"LEVEL 1", tag:"안정 · 건강한 관계", color:"#7FB77E",
+    body:`지금 관계는 매우 안정적입니다.\n위험 신호가 거의 보이지 않아요.\n서로에 대한 신뢰와 표현이 잘 유지되고 있습니다.\n이 좋은 흐름을 꾸준히 이어가세요.`, cta:`더 단단한 관계로 만들고 싶다면?` },
+  { name:"LEVEL 2", tag:"양호 · 작은 신호", color:"#C89A8F",
+    body:`대체로 건강하지만, 작은 위험 신호가 보입니다.\n사소해 보이는 변화가 쌓이면 균열이 됩니다.\n지금 표현과 대화를 조금만 더 늘려도\n관계는 다시 단단해질 수 있어요.`, cta:`작은 균열을 미리 막고 싶다면?` },
+  { name:"LEVEL 3", tag:"주의 · 신호 누적 중", color:"#E0A84E",
+    body:`주의가 필요한 단계입니다.\n다툼·연락·표현에서 위험 신호가 누적되고 있어요.\n지금 방치하면 빠르게 악화될 수 있습니다.\n원인을 정확히 짚고, 방향을 잡아야 할 때입니다.`, cta:`지금 상황을 정확히 진단받고 싶다면?` },
+  { name:"LEVEL 4", tag:"경고 · 관계 흔들림", color:"#E07B4E",
+    body:`관계가 눈에 띄게 흔들리고 있습니다.\n감정의 거리, 회피, 갈등이 반복되는 상태예요.\n혼자 해결하려다 오히려 악화되기 쉬운 시점입니다.\n전문가의 개입으로 흐름을 되돌릴 수 있습니다.`, cta:`흔들리는 관계를 되돌리고 싶다면?` },
+  { name:"LEVEL 5", tag:"위험 · 이별 임박", color:"#D9544E",
+    body:`이별이 임박한 위험 단계입니다.\n지금의 대응이 관계의 마지막을 가를 수 있어요.\n감정적으로 매달리기보다, 정확한 전략이 필요합니다.\n늦기 전에 전문 코치와 상황을 점검하세요.`, cta:`이별을 막을 마지막 방법을 찾는다면?` }
+];
+
+let idx=0; const answers=QUESTIONS.map(()=>null);
+function go(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); document.getElementById(id).classList.add("active"); window.scrollTo({top:0,behavior:"instant"}); }
+function startQuiz(){ idx=0; go("quiz"); render(); }
+function pad(n){ return (n<10?"0":"")+n; }
+function render(){ const q=QUESTIONS[idx],total=QUESTIONS.length;
+  document.getElementById("cur").textContent=pad(idx+1); document.getElementById("total").textContent=total;
+  document.getElementById("bar").style.width=(idx/total*100)+"%";
+  let h=`<div class="qcard"><div class="qnum">Q${idx+1}</div><div class="qtitle">${q.t}</div><div class="qhint">하나만 선택하세요</div><div class="options">`;
+  q.opts.forEach((o,i)=>{ h+=`<button class="opt ${answers[idx]===i?'selected':''}" onclick="pick(${i})"><span class="olabel">${o[0]}</span><span class="oradio"></span></button>`; });
+  h+=`</div><div class="qfoot">${idx>0?'<button class="btn ghost back" onclick="prev()">이전</button>':''}<button class="btn" id="nextBtn" onclick="next()">${idx===total-1?'결과 보기':'다음  →'}</button></div></div>`;
+  document.getElementById("quiz-body").innerHTML=h; updateNext();
+}
+function pick(i){ answers[idx]=i; document.querySelectorAll("#quiz-body .opt").forEach((el,j)=>el.classList.toggle("selected",j===i)); updateNext(); }
+function updateNext(){ document.getElementById("nextBtn").disabled=answers[idx]===null; }
+function next(){ if(answers[idx]===null) return; if(idx<QUESTIONS.length-1){ idx++; render(); window.scrollTo({top:0,behavior:"instant"}); } else finish(); }
+function prev(){ if(idx>0){ idx--; render(); window.scrollTo({top:0,behavior:"instant"}); } }
+const LOAD_STEPS=["최근 다툼과 대화 패턴을 살펴보고 있어요","연락과 표현의 변화를 추적하고 있어요","관계의 위험 단계를 계산하고 있어요"];
+function finish(){ go("loading"); runLoading(); }
+function runLoading(){
+  const stepEl=document.getElementById("loadStep"), fill=document.getElementById("loadFill");
+  let i=0; stepEl.style.opacity="1"; stepEl.textContent=LOAD_STEPS[0];
+  fill.style.transition="none"; fill.style.width="0%";
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ fill.style.transition="width 7s linear"; fill.style.width="100%"; }));
+  const iv=setInterval(()=>{ i=(i+1)%LOAD_STEPS.length; stepEl.style.opacity="0"; setTimeout(()=>{ stepEl.textContent=LOAD_STEPS[i]; stepEl.style.opacity="1"; },180); },1600);
+  clearTimeout(window._loadT); window._loadT=setTimeout(()=>{ clearInterval(iv); showResult(); },7000);
+}
+function showResult(){
+  let sum=0,max=0; QUESTIONS.forEach((q,qi)=>{ sum+=q.opts[answers[qi]][1]; max+=Math.max(...q.opts.map(o=>o[1])); });
+  const ratio=sum/max; let lv=Math.min(5,Math.max(1,Math.floor(ratio*5)+1)); if(ratio>=1) lv=5;
+  const L=LEVELS[lv-1];
+  document.getElementById("lvName").textContent=L.name; document.getElementById("lvName").style.color=L.color;
+  document.getElementById("lvTag").textContent=L.tag; document.getElementById("lvTag").style.color=L.color;
+  document.getElementById("rbody").textContent=L.body;
+  document.getElementById("ctaLine").textContent=L.cta;
+  document.getElementById("consultBtn").href=CONSULT_URL;
+  const segs=document.getElementById("segs"); segs.innerHTML="";
+  for(let i=1;i<=5;i++){ const d=document.createElement("div"); d.className="seg"; if(i<=lv){ d.classList.add("on"); d.style.background=LEVELS[i-1].color; d.style.color=LEVELS[i-1].color; } segs.appendChild(d); }
+  go("result");
+}
+function restart(){ idx=0; answers.forEach((a,i)=>answers[i]=null); go("intro"); }
+
+function shareData(){ const lv=document.getElementById("lvName").textContent; return { title:"관계 위험레벨 측정 | CLAVIS", text:`나의 관계 위험레벨은 ${lv}! 당신도 측정해보세요.`, url:location.href }; }
+function shareResult(){ document.getElementById("shareSheet").classList.add("show"); document.body.style.overflow="hidden"; }
+function closeShare(){ document.getElementById("shareSheet").classList.remove("show"); document.body.style.overflow=""; }
+async function shareNative(){ const d=shareData(); if(navigator.share){ try{ await navigator.share(d); closeShare(); return; }catch(e){ if(e&&e.name==="AbortError") return; } } await copyToClipboard(`${d.text} ${d.url}`); toast("이 기기는 기본 공유를 지원하지 않아 링크를 복사했어요"); closeShare(); }
+async function shareKakao(){ const d=shareData(); if(KAKAO_JS_KEY&&window.Kakao&&window.Kakao.isInitialized&&window.Kakao.isInitialized()){ try{ window.Kakao.Share.sendDefault({objectType:"text",text:`${d.title}\n${d.text}`,link:{mobileWebUrl:d.url,webUrl:d.url}}); closeShare(); return; }catch(e){} } await copyToClipboard(`${d.text} ${d.url}`); toast("링크를 복사했어요. 카카오톡에 붙여넣어 공유하세요"); closeShare(); }
+async function shareInstagram(){ const d=shareData(); if(navigator.share){ try{ await navigator.share(d); closeShare(); return; }catch(e){ if(e&&e.name==="AbortError") return; } } await copyToClipboard(`${d.text} ${d.url}`); toast("링크를 복사했어요. 인스타그램 스토리·DM에 붙여넣어 공유하세요"); closeShare(); }
+async function copyToClipboard(t){ try{ await navigator.clipboard.writeText(t); return true; }catch(e){ const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(_){ } document.body.removeChild(ta); return ok; } }
+async function copyLink(){ const d=shareData(); const ok=await copyToClipboard(`${d.text} ${d.url}`); toast(ok?"링크가 복사되었습니다":"복사에 실패했습니다"); closeShare(); }
+function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
+(function loadKakao(){ if(!KAKAO_JS_KEY) return; const s=document.createElement("script"); s.src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"; s.crossOrigin="anonymous"; s.onload=()=>{ try{ if(window.Kakao&&!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY); }catch(e){} }; document.head.appendChild(s); })();
+</script>
+</body>
+</html>
