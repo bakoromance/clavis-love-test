@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>무료 연애 상황 진단 | CLAVIS</title>
+<title>무료 연애상황 진단 | CLAVIS</title>
 <link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -31,7 +31,10 @@
   .head .eyebrow{font-size:11.5px;font-weight:700;letter-spacing:.18em;color:var(--gold);margin-bottom:15px}
   .head h1{font-size:27px;font-weight:800;letter-spacing:-.02em;line-height:1.4}
   .head h1 .em{font-family:var(--serif);font-style:italic;font-weight:600;color:var(--gold)}
-  .head p{color:var(--muted);font-size:13.5px;margin-top:12px}
+  .head .acc{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:12.5px;font-weight:600;color:var(--gold);background:rgba(179,152,79,.1);border:1px solid rgba(179,152,79,.3);padding:7px 14px;border-radius:999px}
+  .head .acc b{font-weight:800;font-size:13.5px}
+  .head .acc .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);display:inline-block}
+  .head p{color:var(--muted);font-size:13.5px;margin-top:11px}
 
   /* ===== cards ===== */
   .cards{width:100%;display:flex;flex-direction:column;gap:14px;padding:6px 0 34px}
@@ -61,8 +64,9 @@
 <div class="app">
   <div class="head">
     <img class="logo" src="assets/clavis-logo-black.png" alt="CLAVIS" />
-    <div class="eyebrow">CLAVIS · 무료 연애 상황 진단</div>
+    <div class="eyebrow">CLAVIS · 무료 연애상황 진단</div>
     <h1>그 사람의 마음,<br><span class="em">무엇이 궁금한가요?</span></h1>
+    <div class="acc"><span class="dot"></span>누적 진단 데이터 기반 정확도 <b>98%</b></div>
     <p>궁금한 진단을 선택해 주세요.</p>
   </div>
 
@@ -70,8 +74,8 @@
     <!-- 재회 (골드 · 열쇠) -->
     <a class="card" href="reunion.html" style="--c:#b3984f;--g1:#d4ba78;--g2:#b3984f">
       <span class="ava">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="7" r="3.4"/><path d="M12 10.4V20"/><path d="M12 14.5h3.4"/><path d="M12 17.4h2.4"/>
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="8" cy="8" r="4.2"/><path d="M10.9 10.9 L20 20"/><path d="M17.4 19.6l2.2-2.2"/><path d="M14.8 17l1.9-1.9"/>
         </svg>
       </span>
       <span class="meta"><span class="tag">REUNION</span><span class="t">재회 가능성 알아보기</span><span class="s">이별한 그 사람과, 다시 만날 수 있을까?</span></span>
