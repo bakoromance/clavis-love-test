@@ -134,7 +134,7 @@
   <section id="quiz" class="screen">
     <div class="qhead">
       <div class="qhead-top"><span class="wm">클래비스 <i>CLAVIS</i></span><button class="xclose" onclick="restart()" title="처음으로">✕</button></div>
-      <div class="qhead-sub"><span class="diag">관계 위험레벨 진단</span><span class="step">STEP <b id="cur">01</b> / <span id="total">9</span></span></div>
+      <div class="qhead-sub"><span class="diag">관계 위험레벨 진단</span><span class="step">STEP <b id="cur">01</b> / <span id="total">18</span></span></div>
       <div class="progress-track"><div class="progress-fill" id="bar"></div></div>
     </div>
     <div id="quiz-body"></div>
@@ -192,17 +192,38 @@
 <script>
 const CONSULT_URL = "https://clavis.love/";
 const KAKAO_JS_KEY = "";
-/* ※ 아래 문항은 와이어프레임 흐름에 맞춘 '샘플'입니다. 실제 문항으로 교체하세요. point = 위험 점수(클수록 위험) */
+/* Google 설문지 저장 (entry 번호 채우면 활성화) */
+const FORM_ACTION = "";
+const FORM_FIELDS = { name:"", phone:"", email:"", score:"", items:"" };
+
+const MEMBER = (function(){
+  const p = new URLSearchParams(location.search);
+  return { uid:(p.get("uid")||"").trim(), name:(p.get("name")||"").trim(),
+           phone:(p.get("phone")||"").trim(), email:(p.get("email")||"").trim() };
+})();
+window.addEventListener("message",(e)=>{ const d=e.data;
+  if(d&&d.type==="clavis-member"){ ["uid","name","phone","email"].forEach(k=>{ if(d[k]) MEMBER[k]=String(d[k]).trim(); }); }});
+
+/* point = 위험 점수(클수록 위험). 단일 선택 18문항. 최대 위험점 = 4 × 18 = 72 */
 const QUESTIONS = [
   { t:"두 사람의 교제 형태는 지금 어떤가요?", opts:[["안정적으로 잘 만나는 중",0],["권태기인 듯 미지근함",2],["자주 흔들리고 불안정",3],["헤어짐 직전까지 간 적 있음",4]]},
   { t:"최근 한 달, 다툼의 빈도는?", opts:[["거의 없음",0],["가끔 (한두 번)",1],["자주 (주 1회 이상)",3],["거의 매일",4]]},
   { t:"다툴 때 보통 어떻게 끝나나요?", opts:[["대화로 잘 풀린다",0],["한쪽이 참고 넘어간다",2],["연락 두절·잠수로 끝난다",3],["헤어지자는 말이 나온다",4]]},
   { t:"상대의 연락(답장) 패턴 변화는?", opts:[["예전과 비슷하게 잘 온다",0],["조금 느려졌다",1],["눈에 띄게 줄었다",3],["읽씹·잠수가 잦다",4]]},
+  { t:"먼저 연락하는 쪽은 주로 누구인가요?", opts:[["비슷하거나 상대가 더 자주",0],["반반 정도",1],["주로 내가 먼저",3],["거의 항상 나 혼자",4]]},
   { t:"함께 보내는 시간은 예전과 비교하면?", opts:[["비슷하거나 더 늘었다",0],["조금 줄었다",1],["많이 줄었다",3],["거의 못 만난다",4]]},
+  { t:"데이트 약속을 잡을 때 상대는?", opts:[["먼저 제안하기도 한다",0],["잡으면 잘 응한다",1],["자꾸 미루거나 취소한다",3],["핑계로 피하는 느낌이다",4]]},
   { t:"애정 표현(말·스킨십)의 변화는?", opts:[["여전히 자연스럽다",0],["예전보다 줄었다",2],["어색하고 형식적이다",3],["거의 사라졌다",4]]},
-  { t:"미래(여행·약속) 이야기를 할 때 상대는?", opts:[["적극적으로 함께 그린다",0],["대답은 하지만 미지근",2],["말을 돌리거나 회피",3],["부담스러워 한다",4]]},
+  { t:"스킨십이나 애정 표현을 먼저 하는 쪽은?", opts:[["서로 자연스럽게",0],["주로 나",2],["어쩌다 한 번",3],["거의 없다",4]]},
+  { t:"상대가 당신의 일상에 보이는 관심은?", opts:[["먼저 챙기고 물어본다",0],["물어보면 답해준다",2],["시큰둥하다",3],["거의 관심이 없다",4]]},
+  { t:"상대의 표정·말투에서 느껴지는 감정은?", opts:[["여전히 다정하다",0],["평범하다",1],["짜증·피곤함이 잦다",3],["차갑거나 무관심하다",4]]},
+  { t:"미래(여행·약속) 이야기를 할 때 상대는?", opts:[["적극적으로 함께 그린다",0],["대답은 하지만 미지근",2],["말을 돌리거나 회피한다",3],["부담스러워 한다",4]]},
   { t:"갈등 후 화해는 어떻게 이뤄지나요?", opts:[["서로 먼저 다가간다",0],["주로 내가 먼저 푼다",2],["흐지부지 넘어간다",3],["화해 없이 쌓인다",4]]},
-  { t:"요즘 '헤어질까' 하는 생각의 빈도는?", opts:[["거의 없다",0],["가끔 스친다",2],["자주 든다",3],["거의 매일 고민한다",4]]}
+  { t:"상대가 휴대폰을 대하는 태도가 달라졌나요?", opts:[["평소와 같다",0],["살짝 신경 쓰는 듯하다",2],["숨기거나 예민해졌다",3],["알림·화면을 감춘다",4]]},
+  { t:"기념일·약속을 대하는 상대의 태도는?", opts:[["잘 챙긴다",0],["챙기긴 한다",1],["자주 잊는다",3],["무의미하게 여긴다",4]]},
+  { t:"주변(친구·가족)에게 당신을 대하는 태도는?", opts:[["여전히 소개하고 함께한다",0],["예전과 비슷하다",1],["언급을 피한다",3],["거리를 두려 한다",4]]},
+  { t:"요즘 '헤어질까' 하는 생각의 빈도는?", opts:[["거의 없다",0],["가끔 스친다",2],["자주 든다",3],["거의 매일 고민한다",4]]},
+  { t:"지금 이 관계에 대한 당신의 솔직한 느낌은?", opts:[["안정적이고 행복하다",0],["무난하지만 아쉽다",2],["불안하고 답답하다",3],["끝이 보이는 것 같다",4]]}
 ];
 const LEVELS = [
   { name:"LEVEL 1", tag:"안정 · 건강한 관계", color:"#7FB77E",
@@ -244,10 +265,18 @@ function runLoading(){
   clearTimeout(window._loadT); window._loadT=setTimeout(()=>{ clearInterval(iv); showResult(); },7000);
 }
 const RISK_COLORS=["#6FB573","#8CBD6A","#AEC064","#CEBE5F","#E2AD4F","#E69248","#E67B43","#E2663E","#DB553C","#D14741"];
+function collectSelectedTexts(){ const out=[];
+  QUESTIONS.forEach((q,qi)=>{ if(answers[qi]!==null){ out.push(`Q${qi+1}. ${q.opts[answers[qi]][0]}`); } }); return out; }
+function saveResult(score, items){ if(!FORM_ACTION||!FORM_FIELDS.score) return;
+  const fd=new URLSearchParams();
+  [[FORM_FIELDS.name,MEMBER.name],[FORM_FIELDS.phone,MEMBER.phone],[FORM_FIELDS.email,MEMBER.email],[FORM_FIELDS.score,String(score)],[FORM_FIELDS.items,(items||[]).join("\n")]]
+    .forEach(p=>{ if(p[0]) fd.append(p[0], p[1]==null?"":p[1]); });
+  try{ fetch(FORM_ACTION,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:fd.toString(),keepalive:true}).catch(()=>{}); }catch(e){} }
 function showResult(){
   let sum=0,max=0; QUESTIONS.forEach((q,qi)=>{ sum+=q.opts[answers[qi]][1]; max+=Math.max(...q.opts.map(o=>o[1])); });
   const ratio = max ? sum/max : 0;
   const lv = Math.min(10, Math.max(1, Math.round(ratio*10)));   // 1~10 레벨
+  saveResult(`LEVEL ${lv}/10`, collectSelectedTexts());
   const color = RISK_COLORS[lv-1];
   const band = LEVELS[Math.min(LEVELS.length-1, Math.ceil(lv/2)-1)]; // 10단계 → 5밴드 설명
   const numEl=document.getElementById("lvNum"); numEl.textContent=lv; numEl.style.color=color;
@@ -262,7 +291,7 @@ function showResult(){
 }
 function restart(){ idx=0; answers.forEach((a,i)=>answers[i]=null); go("intro"); }
 
-function shareData(){ const lv=document.getElementById("lvName").textContent; return { title:"관계 위험레벨 측정 | CLAVIS", text:`나의 관계 위험레벨은 ${lv}! 당신도 측정해보세요.`, url:location.href }; }
+function shareData(){ const lv=document.getElementById("lvNum").textContent; return { title:"관계 위험레벨 측정 | CLAVIS", text:`나의 관계 위험레벨은 LEVEL ${lv}/10! 당신도 측정해보세요.`, url:location.href }; }
 function shareResult(){ document.getElementById("shareSheet").classList.add("show"); document.body.style.overflow="hidden"; }
 function closeShare(){ document.getElementById("shareSheet").classList.remove("show"); document.body.style.overflow=""; }
 async function shareNative(){ const d=shareData(); if(navigator.share){ try{ await navigator.share(d); closeShare(); return; }catch(e){ if(e&&e.name==="AbortError") return; } } await copyToClipboard(`${d.text} ${d.url}`); toast("이 기기는 기본 공유를 지원하지 않아 링크를 복사했어요"); closeShare(); }
