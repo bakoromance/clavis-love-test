@@ -134,7 +134,7 @@
   <section id="quiz" class="screen">
     <div class="qhead">
       <div class="qhead-top"><span class="wm">클래비스 <i>CLAVIS</i></span><button class="xclose" onclick="restart()" title="처음으로">✕</button></div>
-      <div class="qhead-sub"><span class="diag">관계 위험레벨 진단</span><span class="step">STEP <b id="cur">01</b> / <span id="total">18</span></span></div>
+      <div class="qhead-sub"><span class="diag">관계 위험레벨 진단</span><span class="step">STEP <b id="cur">01</b> / <span id="total">20</span></span></div>
       <div class="progress-track"><div class="progress-fill" id="bar"></div></div>
     </div>
     <div id="quiz-body"></div>
@@ -204,17 +204,19 @@ const MEMBER = (function(){
 window.addEventListener("message",(e)=>{ const d=e.data;
   if(d&&d.type==="clavis-member"){ ["uid","name","phone","email"].forEach(k=>{ if(d[k]) MEMBER[k]=String(d[k]).trim(); }); }});
 
-/* point = 위험 점수(클수록 위험). 단일 선택 18문항. 최대 위험점 = 4 × 18 = 72 */
+/* v2 20문항. point = 위험 점수(클수록 위험, 음수 = 보호 요인).
+   type: 없음=단일 / multiSum(합산, cap 상한). opt 3번째 "solo" = 배타 선택지.
+   점수는 정규화: lv = 1 + round((raw - MINSUM)/(MAXSUM - MINSUM) × 9) → 1~10 */
 const QUESTIONS = [
   { t:"두 사람의 교제 형태는 지금 어떤가요?", opts:[["안정적으로 잘 만나는 중",0],["권태기인 듯 미지근함",2],["자주 흔들리고 불안정",3],["헤어짐 직전까지 간 적 있음",4]]},
   { t:"최근 한 달, 다툼의 빈도는?", opts:[["거의 없음",0],["가끔 (한두 번)",1],["자주 (주 1회 이상)",3],["거의 매일",4]]},
   { t:"다툴 때 보통 어떻게 끝나나요?", opts:[["대화로 잘 풀린다",0],["한쪽이 참고 넘어간다",2],["연락 두절·잠수로 끝난다",3],["헤어지자는 말이 나온다",4]]},
+  { t:"다툴 때 이런 모습이 있나요?", type:"multiSum", cap:4, opts:[["다툰 적이 거의 없다",0,"solo"],["목소리가 높아진다",1],["지난 일을 다시 꺼낸다",1],["비난·인신공격이 나온다",2],["침묵하거나 자리를 피한다",2],["주변 사람까지 끌어들인다",1]]},
   { t:"상대의 연락(답장) 패턴 변화는?", opts:[["예전과 비슷하게 잘 온다",0],["조금 느려졌다",1],["눈에 띄게 줄었다",3],["읽씹·잠수가 잦다",4]]},
   { t:"먼저 연락하는 쪽은 주로 누구인가요?", opts:[["비슷하거나 상대가 더 자주",0],["반반 정도",1],["주로 내가 먼저",3],["거의 항상 나 혼자",4]]},
   { t:"함께 보내는 시간은 예전과 비교하면?", opts:[["비슷하거나 더 늘었다",0],["조금 줄었다",1],["많이 줄었다",3],["거의 못 만난다",4]]},
   { t:"데이트 약속을 잡을 때 상대는?", opts:[["먼저 제안하기도 한다",0],["잡으면 잘 응한다",1],["자꾸 미루거나 취소한다",3],["핑계로 피하는 느낌이다",4]]},
   { t:"애정 표현(말·스킨십)의 변화는?", opts:[["여전히 자연스럽다",0],["예전보다 줄었다",2],["어색하고 형식적이다",3],["거의 사라졌다",4]]},
-  { t:"스킨십이나 애정 표현을 먼저 하는 쪽은?", opts:[["서로 자연스럽게",0],["주로 나",2],["어쩌다 한 번",3],["거의 없다",4]]},
   { t:"상대가 당신의 일상에 보이는 관심은?", opts:[["먼저 챙기고 물어본다",0],["물어보면 답해준다",2],["시큰둥하다",3],["거의 관심이 없다",4]]},
   { t:"상대의 표정·말투에서 느껴지는 감정은?", opts:[["여전히 다정하다",0],["평범하다",1],["짜증·피곤함이 잦다",3],["차갑거나 무관심하다",4]]},
   { t:"미래(여행·약속) 이야기를 할 때 상대는?", opts:[["적극적으로 함께 그린다",0],["대답은 하지만 미지근",2],["말을 돌리거나 회피한다",3],["부담스러워 한다",4]]},
@@ -222,37 +224,52 @@ const QUESTIONS = [
   { t:"상대가 휴대폰을 대하는 태도가 달라졌나요?", opts:[["평소와 같다",0],["살짝 신경 쓰는 듯하다",2],["숨기거나 예민해졌다",3],["알림·화면을 감춘다",4]]},
   { t:"기념일·약속을 대하는 상대의 태도는?", opts:[["잘 챙긴다",0],["챙기긴 한다",1],["자주 잊는다",3],["무의미하게 여긴다",4]]},
   { t:"주변(친구·가족)에게 당신을 대하는 태도는?", opts:[["여전히 소개하고 함께한다",0],["예전과 비슷하다",1],["언급을 피한다",3],["거리를 두려 한다",4]]},
+  { t:"최근 한 달, 상대에게서 이런 변화가 보이나요?", type:"multiSum", cap:5, opts:[["특별한 변화는 없다",0,"solo"],["혼자만의 시간을 자주 원한다",1],["짜증·예민함이 늘었다",1],["나를 다른 사람과 비교한다",2],["다른 이성 이야기·시선이 늘었다",2],["꾸밈새나 생활 패턴이 갑자기 바뀌었다",2]]},
+  { t:"지금 두 사람의 관계를 지켜주고 있는 것은?", type:"multiSum", opts:[["딱히 떠오르지 않는다",2,"solo"],["서로에 대한 깊은 신뢰",-2],["함께 있으면 여전히 즐거움",-2],["구체적인 미래 계획 공유",-2],["갈등을 함께 극복해본 경험",-1],["주변의 응원과 지지",-1]]},
   { t:"요즘 '헤어질까' 하는 생각의 빈도는?", opts:[["거의 없다",0],["가끔 스친다",2],["자주 든다",3],["거의 매일 고민한다",4]]},
   { t:"지금 이 관계에 대한 당신의 솔직한 느낌은?", opts:[["안정적이고 행복하다",0],["무난하지만 아쉽다",2],["불안하고 답답하다",3],["끝이 보이는 것 같다",4]]}
 ];
 const LEVELS = [
-  { name:"LEVEL 1", tag:"안정 · 건강한 관계", color:"#7FB77E",
-    body:`지금 관계는 매우 안정적입니다.\n위험 신호가 거의 보이지 않아요.\n서로에 대한 신뢰와 표현이 잘 유지되고 있습니다.\n이 좋은 흐름을 꾸준히 이어가세요.`, cta:`더 단단한 관계로 만들고 싶다면?` },
-  { name:"LEVEL 2", tag:"양호 · 작은 신호", color:"#C89A8F",
-    body:`대체로 건강하지만, 작은 위험 신호가 보입니다.\n사소해 보이는 변화가 쌓이면 균열이 됩니다.\n지금 표현과 대화를 조금만 더 늘려도\n관계는 다시 단단해질 수 있어요.`, cta:`작은 균열을 미리 막고 싶다면?` },
-  { name:"LEVEL 3", tag:"주의 · 신호 누적 중", color:"#E0A84E",
-    body:`주의가 필요한 단계입니다.\n다툼·연락·표현에서 위험 신호가 누적되고 있어요.\n지금 방치하면 빠르게 악화될 수 있습니다.\n원인을 정확히 짚고, 방향을 잡아야 할 때입니다.`, cta:`지금 상황을 정확히 진단받고 싶다면?` },
-  { name:"LEVEL 4", tag:"경고 · 관계 흔들림", color:"#E07B4E",
-    body:`관계가 눈에 띄게 흔들리고 있습니다.\n감정의 거리, 회피, 갈등이 반복되는 상태예요.\n혼자 해결하려다 오히려 악화되기 쉬운 시점입니다.\n전문가의 개입으로 흐름을 되돌릴 수 있습니다.`, cta:`흔들리는 관계를 되돌리고 싶다면?` },
-  { name:"LEVEL 5", tag:"위험 · 이별 임박", color:"#D9544E",
-    body:`이별이 임박한 위험 단계입니다.\n지금의 대응이 관계의 마지막을 가를 수 있어요.\n감정적으로 매달리기보다, 정확한 전략이 필요합니다.\n늦기 전에 전문 코치와 상황을 점검하세요.`, cta:`이별을 막을 마지막 방법을 찾는다면?` }
+  { name:"BAND 1", tag:"안정 · 마음이 잘 연결되어 있어요", color:"#7FB77E",
+    body:`지금 두 사람은 감정의 흐름이 잘 통하는 상태예요.\n표현과 신뢰가 무너지지 않고 잘 유지되고 있습니다.\n다만 관계는 '좋을 때 어떻게 하느냐'가 위기를 결정해요.\n지금의 온도를 지키는 습관을 만들어 두세요.`, cta:`좋은 관계를 더 오래 지키고 싶다면?` },
+  { name:"BAND 2", tag:"양호 · 작은 신호가 깜빡이고 있어요", color:"#C89A8F",
+    body:`큰 문제는 없지만, 작은 신호들이 하나둘 보이기 시작했어요.\n상대는 마음이 떠난 게 아니라, 익숙함에 표현이 무뎌진 상태에 가깝습니다.\n이 시기를 방치하면 서운함이 쌓여 권태로 이어지기 쉬워요.\n지금은 대화와 표현을 조금만 늘려도 빠르게 회복됩니다.`, cta:`무뎌진 관계에 다시 온도를 올리고 싶다면?` },
+  { name:"BAND 3", tag:"주의 · 마음의 거리가 벌어지는 중입니다", color:"#E0A84E",
+    body:`위험 신호가 누적되고 있는 단계예요.\n상대는 마음이 식었다기보다, 관계에 지쳐가고 있을 가능성이 큽니다.\n이때 다그치거나 매달리면 상대의 회피는 더 심해져요.\n원인을 정확히 짚고, 다가가는 방식을 바꿔야 할 때입니다.`, cta:`지금 관계의 문제를 정확히 진단받고 싶다면?` },
+  { name:"BAND 4", tag:"경고 · 상대가 마음을 정리하기 시작했을 수 있어요", color:"#E07B4E",
+    body:`관계가 눈에 띄게 흔들리고 있어요.\n상대는 이미 마음속으로 관계를 저울질하기 시작했을 수 있습니다.\n감정적으로 부딪히면 상대의 결심만 앞당기게 돼요.\n혼자 해결하기보다, 전략적인 접근이 필요한 시점입니다.`, cta:`흔들리는 상대의 마음을 되돌리고 싶다면?` },
+  { name:"BAND 5", tag:"위험 · 이별이 코앞까지 와 있습니다", color:"#D9544E",
+    body:`이별이 임박한 위험 단계예요.\n상대는 마음 정리를 거의 끝냈거나, 마지막 계기를 기다리고 있을 수 있습니다.\n지금의 말과 행동 하나하나가 관계의 결말을 가릅니다.\n매달리기 전에, 반드시 전문가와 상황을 점검하세요.`, cta:`이별을 막을 마지막 골든타임을 잡고 싶다면?` }
 ];
 
-let idx=0; const answers=QUESTIONS.map(()=>null);
+function isMulti(q){ return q.type==="multiSum"; }
+let idx=0; const answers=QUESTIONS.map(q=> isMulti(q)?[]:null);
 function go(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); document.getElementById(id).classList.add("active"); window.scrollTo({top:0,behavior:"instant"}); }
 function startQuiz(){ idx=0; go("quiz"); render(); }
 function pad(n){ return (n<10?"0":"")+n; }
-function render(){ const q=QUESTIONS[idx],total=QUESTIONS.length;
+function render(){ const q=QUESTIONS[idx],total=QUESTIONS.length,multi=isMulti(q);
   document.getElementById("cur").textContent=pad(idx+1); document.getElementById("total").textContent=total;
   document.getElementById("bar").style.width=(idx/total*100)+"%";
-  let h=`<div class="qcard"><div class="qnum">Q${idx+1}</div><div class="qtitle">${q.t}</div><div class="qhint">하나만 선택하세요</div><div class="options">`;
-  q.opts.forEach((o,i)=>{ h+=`<button class="opt ${answers[idx]===i?'selected':''}" onclick="pick(${i})"><span class="olabel">${o[0]}</span><span class="oradio"></span></button>`; });
+  const hint = multi ? '<span style="color:var(--accent);font-weight:700">중복 선택 가능</span> · 해당하는 항목을 모두 선택' : '하나만 선택하세요';
+  let h=`<div class="qcard"><div class="qnum">Q${idx+1}</div><div class="qtitle">${q.t}</div><div class="qhint">${hint}</div><div class="options">`;
+  q.opts.forEach((o,i)=>{ const sel=multi?answers[idx].includes(i):answers[idx]===i;
+    h+=`<button class="opt ${sel?'selected':''}" onclick="pick(${i})"><span class="olabel">${o[0]}</span><span class="oradio"></span></button>`; });
   h+=`</div><div class="qfoot">${idx>0?'<button class="btn ghost back" onclick="prev()">이전</button>':''}<button class="btn" id="nextBtn" onclick="next()">${idx===total-1?'결과 보기':'다음  →'}</button></div></div>`;
   document.getElementById("quiz-body").innerHTML=h; updateNext();
 }
-function pick(i){ answers[idx]=i; document.querySelectorAll("#quiz-body .opt").forEach((el,j)=>el.classList.toggle("selected",j===i)); updateNext(); }
-function updateNext(){ document.getElementById("nextBtn").disabled=answers[idx]===null; }
-function next(){ if(answers[idx]===null) return; if(idx<QUESTIONS.length-1){ idx++; render(); window.scrollTo({top:0,behavior:"instant"}); } else finish(); }
+function pick(i){ const q=QUESTIONS[idx];
+  if(!isMulti(q)){ answers[idx]=i; }
+  else { const arr=answers[idx], isSolo=q.opts[i][2]==="solo";
+    if(isSolo){ answers[idx]=arr.includes(i)?[]:[i]; }
+    else { const soloIdxs=q.opts.map((o,j)=>o[2]==="solo"?j:-1).filter(j=>j>=0); let nx=arr.filter(x=>!soloIdxs.includes(x));
+      if(nx.includes(i)) nx=nx.filter(x=>x!==i); else nx.push(i); answers[idx]=nx; } }
+  refreshOptions(); updateNext();
+}
+function refreshOptions(){ const q=QUESTIONS[idx],multi=isMulti(q);
+  document.querySelectorAll("#quiz-body .opt").forEach((el,i)=>el.classList.toggle("selected", multi?answers[idx].includes(i):answers[idx]===i)); }
+function answered(){ const q=QUESTIONS[idx]; return isMulti(q)?answers[idx].length>0:answers[idx]!==null; }
+function updateNext(){ document.getElementById("nextBtn").disabled=!answered(); }
+function next(){ if(!answered()) return; if(idx<QUESTIONS.length-1){ idx++; render(); window.scrollTo({top:0,behavior:"instant"}); } else finish(); }
 function prev(){ if(idx>0){ idx--; render(); window.scrollTo({top:0,behavior:"instant"}); } }
 const LOAD_STEPS=["최근 다툼과 대화 패턴을 살펴보고 있어요","연락과 표현의 변화를 추적하고 있어요","관계의 위험 단계를 계산하고 있어요"];
 function finish(){ go("loading"); runLoading(); }
@@ -266,16 +283,38 @@ function runLoading(){
 }
 const RISK_COLORS=["#6FB573","#8CBD6A","#AEC064","#CEBE5F","#E2AD4F","#E69248","#E67B43","#E2663E","#DB553C","#D14741"];
 function collectSelectedTexts(){ const out=[];
-  QUESTIONS.forEach((q,qi)=>{ if(answers[qi]!==null){ out.push(`Q${qi+1}. ${q.opts[answers[qi]][0]}`); } }); return out; }
+  QUESTIONS.forEach((q,qi)=>{ const a=answers[qi];
+    if(isMulti(q)){ a.forEach(i=>out.push(`Q${qi+1}. ${q.opts[i][0]}`)); }
+    else if(a!==null){ out.push(`Q${qi+1}. ${q.opts[a][0]}`); } }); return out; }
 function saveResult(score, items){ if(!FORM_ACTION||!FORM_FIELDS.score) return;
   const fd=new URLSearchParams();
   [[FORM_FIELDS.name,MEMBER.name],[FORM_FIELDS.phone,MEMBER.phone],[FORM_FIELDS.email,MEMBER.email],[FORM_FIELDS.score,String(score)],[FORM_FIELDS.items,(items||[]).join("\n")]]
     .forEach(p=>{ if(p[0]) fd.append(p[0], p[1]==null?"":p[1]); });
   try{ fetch(FORM_ACTION,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:fd.toString(),keepalive:true}).catch(()=>{}); }catch(e){} }
+/* 문항 점수: 단일=선택값 / multiSum=합산(cap 상한, 음수는 그대로) */
+function qPoints(q,a){
+  if(!isMulti(q)) return a===null?0:q.opts[a][1];
+  if(!a.length) return 0;
+  const s=a.map(i=>q.opts[i][1]).reduce((x,y)=>x+y,0);
+  return q.cap==null? s : Math.min(q.cap, s);
+}
+function qBounds(q){
+  const pts=q.opts.map(o=>o[1]);
+  if(!isMulti(q)) return [Math.min(...pts), Math.max(...pts)];
+  const solos=q.opts.filter(o=>o[2]==="solo").map(o=>o[1]);
+  const nonSolo=q.opts.filter(o=>o[2]!=="solo").map(o=>o[1]);
+  const posSum=nonSolo.filter(v=>v>0).reduce((a,b)=>a+b,0);
+  const negSum=nonSolo.filter(v=>v<0).reduce((a,b)=>a+b,0);
+  const cap=q.cap==null?Infinity:q.cap;
+  const mx=Math.max(...solos.concat([posSum>0?Math.min(cap,posSum):Math.max(...nonSolo)]));
+  const mn=Math.min(...solos.concat([negSum<0?negSum:Math.min(...nonSolo)]));
+  return [mn,mx];
+}
+const MINSUM=QUESTIONS.reduce((s,q)=>s+qBounds(q)[0],0);
+const MAXSUM=QUESTIONS.reduce((s,q)=>s+qBounds(q)[1],0);
 function showResult(){
-  let sum=0,max=0; QUESTIONS.forEach((q,qi)=>{ sum+=q.opts[answers[qi]][1]; max+=Math.max(...q.opts.map(o=>o[1])); });
-  const ratio = max ? sum/max : 0;
-  const lv = Math.min(10, Math.max(1, Math.round(ratio*10)));   // 1~10 레벨
+  let raw=0; QUESTIONS.forEach((q,qi)=>{ raw+=qPoints(q,answers[qi]); });
+  const lv = Math.min(10, Math.max(1, 1+Math.round((raw-MINSUM)/(MAXSUM-MINSUM)*9)));   // 1~10 레벨 (정규화)
   saveResult(`LEVEL ${lv}/10`, collectSelectedTexts());
   const color = RISK_COLORS[lv-1];
   const band = LEVELS[Math.min(LEVELS.length-1, Math.ceil(lv/2)-1)]; // 10단계 → 5밴드 설명
@@ -289,7 +328,7 @@ function showResult(){
   for(let i=1;i<=10;i++){ const d=document.createElement("div"); d.className="seg"; if(i<=lv){ d.classList.add("on"); d.style.background=RISK_COLORS[i-1]; d.style.color=RISK_COLORS[i-1]; } segs.appendChild(d); }
   go("result");
 }
-function restart(){ idx=0; answers.forEach((a,i)=>answers[i]=null); go("intro"); }
+function restart(){ idx=0; QUESTIONS.forEach((q,i)=>answers[i]=isMulti(q)?[]:null); go("intro"); }
 
 function shareData(){ const lv=document.getElementById("lvNum").textContent; return { title:"관계 위험레벨 측정 | CLAVIS", text:`나의 관계 위험레벨은 LEVEL ${lv}/10! 당신도 측정해보세요.`, url:location.href }; }
 function shareResult(){ document.getElementById("shareSheet").classList.add("show"); document.body.style.overflow="hidden"; }
