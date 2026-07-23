@@ -62,7 +62,10 @@
   .qcard{animation:fade .35s ease both}
   .qnum{font-family:var(--serif);font-style:italic;font-size:32px;font-weight:600;color:var(--accent);line-height:1;margin-bottom:10px}
   .qtitle{font-size:23px;font-weight:800;line-height:1.36;letter-spacing:-.02em;margin-bottom:8px}
-  .qhint{font-size:13px;color:var(--text-mute);margin-bottom:22px}
+  .hint-row{margin-bottom:22px}
+  .qhint{font-size:13px;color:var(--text-mute)}
+  .multi-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 15px;border-radius:999px;font-size:13px;font-weight:700;color:var(--on-accent);background:linear-gradient(135deg,var(--accent-2),var(--accent));box-shadow:0 8px 18px -8px rgba(200,154,143,.75)}
+  .multi-chip svg{width:15px;height:15px;flex:0 0 auto}
   .options{display:flex;flex-direction:column;gap:9px}
   .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);padding:16px 18px;border-radius:14px;font-family:inherit;font-size:15px;font-weight:500;line-height:1.45;transition:border-color .16s,background .16s,color .16s,box-shadow .16s}
   .opt:hover{border-color:var(--border-2);background:var(--surface-2);color:var(--text)}
@@ -75,23 +78,29 @@
   .qfoot .btn{flex:1}.qfoot .btn.back{flex:0 0 84px}
 
   /* ===== RESULT ===== */
-  #result{padding:40px 24px 40px;text-align:center}
-  #result img{height:22px;margin:0 auto 24px;display:block;opacity:.85}
-  .lvbadge{font-size:12.5px;color:var(--text-mute);letter-spacing:.1em;font-weight:600;margin-bottom:12px}
-  .lvname{display:flex;align-items:baseline;justify-content:center;gap:9px;margin-bottom:7px}
-  .lvname .lvlabel{font-size:17px;font-weight:700;letter-spacing:.06em;color:var(--text-dim)}
-  .lvname #lvNum{font-size:60px;font-weight:800;line-height:1}
-  .lvname .lvmax{font-size:23px;font-weight:700;color:var(--text-mute)}
-  .lvsub{font-size:13px;color:var(--text-dim);font-weight:600;margin-bottom:18px}
-  .segs{display:flex;gap:5px;max-width:330px;margin:0 auto 12px}
-  .seg{flex:1;height:10px;border-radius:5px;background:var(--surface-2);transition:background .4s,box-shadow .4s}
-  .seg.on{box-shadow:0 0 12px -3px currentColor}
-  .lvtag{font-size:14px;font-weight:700;margin-bottom:20px}
-  .type-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;margin:0 0 22px;text-align:center}
-  .type-label{font-size:11px;letter-spacing:.16em;color:var(--text-mute);font-weight:700;margin-bottom:7px}
-  .type-name{font-size:21px;font-weight:800;letter-spacing:-.01em;color:var(--accent-2);margin-bottom:8px}
-  .type-desc{font-size:13.5px;color:var(--text-dim);line-height:1.7;white-space:pre-line}
-  .rbody{text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:22px;color:var(--text-dim);font-size:15px;line-height:1.85;white-space:pre-line;margin-bottom:24px;box-shadow:var(--shadow)}
+  #result{padding:38px 22px 40px;text-align:center}
+  #result img{height:22px;margin:0 auto 22px;display:block;opacity:.85}
+  .r-hero{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:26px 22px 22px;margin-bottom:14px;position:relative;overflow:hidden;transition:background .6s ease,border-color .6s ease}
+  .lvbadge{font-size:11px;color:var(--text-mute);letter-spacing:.16em;font-weight:700;margin-bottom:14px}
+  .lvname{display:flex;align-items:baseline;justify-content:center;gap:8px;margin-bottom:12px}
+  .lvname .lvlabel{font-size:15px;font-weight:700;letter-spacing:.08em;color:var(--text-dim)}
+  .lvname #lvNum{font-size:68px;font-weight:800;line-height:.9;letter-spacing:-.03em}
+  .lvname .lvmax{font-size:20px;font-weight:700;color:var(--text-mute)}
+  .lvtag{display:inline-block;font-size:13.5px;font-weight:700;padding:6px 15px;border-radius:999px;margin-bottom:18px}
+  .segs{display:flex;align-items:center;gap:4px;max-width:320px;margin:0 auto 13px}
+  .seg{flex:1;height:9px;border-radius:4px;background:var(--surface-2);transition:background .4s,box-shadow .4s,transform .4s}
+  .seg.on{box-shadow:0 0 10px -2px currentColor}
+  .seg.cur{transform:scaleY(1.55)}
+  .lvsub{font-size:12.5px;color:var(--text-dim);font-weight:600}
+  .type-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px 18px 22px;margin-bottom:14px;text-align:left;position:relative;overflow:hidden}
+  .type-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent-2)}
+  .type-head{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+  .type-ic{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:var(--accent-dim);border:1px solid var(--accent-line);color:var(--accent-2)}
+  .type-ic svg{width:15px;height:15px}
+  .type-label{font-size:11px;letter-spacing:.14em;color:var(--text-mute);font-weight:700}
+  .type-name{font-size:20px;font-weight:800;letter-spacing:-.01em;color:var(--accent-2);margin-bottom:9px}
+  .type-desc{font-size:13.5px;color:var(--text-dim);line-height:1.75;white-space:pre-line}
+  .rbody{text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;color:var(--text-dim);font-size:14.5px;line-height:1.85;white-space:pre-line;margin-bottom:22px;box-shadow:var(--shadow)}
   .cta-line{font-size:15px;font-weight:700;margin-bottom:14px}
   .actions{display:flex;flex-direction:column;gap:11px}
   #loading{justify-content:center;align-items:center;text-align:center;padding:54px 30px}
@@ -154,13 +163,18 @@
 
   <section id="result" class="screen">
     <img src="assets/clavis-logo.png" alt="CLAVIS" />
-    <div class="lvbadge">RESULT · 관계 위험도</div>
-    <div class="lvname"><span class="lvlabel">LEVEL</span><span id="lvNum">7</span><span class="lvmax">/ 10</span></div>
-    <div class="lvsub" id="lvSub"></div>
-    <div class="segs" id="segs"></div>
-    <div class="lvtag" id="lvTag"></div>
+    <div class="r-hero" id="rHero">
+      <div class="lvbadge">RESULT · 관계 위험도</div>
+      <div class="lvname"><span class="lvlabel">LEVEL</span><span id="lvNum">7</span><span class="lvmax">/10</span></div>
+      <div class="lvtag" id="lvTag"></div>
+      <div class="segs" id="segs"></div>
+      <div class="lvsub" id="lvSub"></div>
+    </div>
     <div class="type-card" id="typeCard" style="display:none">
-      <div class="type-label">위험 유형</div>
+      <div class="type-head">
+        <span class="type-ic"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3L2 20h20L12 3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/></svg></span>
+        <span class="type-label">위험 유형</span>
+      </div>
       <div class="type-name" id="typeName"></div>
       <div class="type-desc" id="typeDesc"></div>
     </div>
@@ -275,8 +289,10 @@ function pad(n){ return (n<10?"0":"")+n; }
 function render(){ const q=QUESTIONS[idx],total=QUESTIONS.length,multi=isMulti(q);
   document.getElementById("cur").textContent=pad(idx+1); document.getElementById("total").textContent=total;
   document.getElementById("bar").style.width=(idx/total*100)+"%";
-  const hint = multi ? '<span style="color:var(--accent);font-weight:700">중복 선택 가능</span> · 해당하는 항목을 모두 선택' : '하나만 선택하세요';
-  let h=`<div class="qcard"><div class="qnum">Q${idx+1}</div><div class="qtitle">${q.t}</div><div class="qhint">${hint}</div><div class="options">`;
+  const hintHtml = multi
+    ? '<span class="multi-chip"><svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 6" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>여러 개 선택할 수 있어요</span>'
+    : '<span class="qhint">하나만 선택하세요</span>';
+  let h=`<div class="qcard"><div class="qnum">Q${idx+1}</div><div class="qtitle">${q.t}</div><div class="hint-row">${hintHtml}</div><div class="options">`;
   q.opts.forEach((o,i)=>{ const sel=multi?answers[idx].includes(i):answers[idx]===i;
     h+=`<button class="opt ${sel?'selected':''}" onclick="pick(${i})"><span class="olabel">${o[0]}</span><span class="oradio"></span></button>`; });
   h+=`</div><div class="qfoot">${idx>0?'<button class="btn ghost back" onclick="prev()">이전</button>':''}<button class="btn" id="nextBtn" onclick="next()">${idx===total-1?'결과 보기':'다음  →'}</button></div></div>`;
@@ -359,7 +375,11 @@ function showResult(){
   const band = LEVELS[Math.min(LEVELS.length-1, Math.ceil(lv/2)-1)]; // 10단계 → 5밴드 설명
   const numEl=document.getElementById("lvNum"); numEl.textContent=lv; numEl.style.color=color;
   document.getElementById("lvSub").textContent=`위험도 10단계 중 현재 ${lv}단계`;
-  const tagEl=document.getElementById("lvTag"); tagEl.textContent=band.tag; tagEl.style.color=color;
+  const hero=document.getElementById("rHero");
+  hero.style.background=`linear-gradient(165deg, ${color}26, var(--surface) 72%)`;
+  hero.style.borderColor=`${color}55`;
+  const tagEl=document.getElementById("lvTag"); tagEl.textContent=band.tag;
+  tagEl.style.color=color; tagEl.style.background=color+"1f"; tagEl.style.border="1px solid "+color+"44";
   const typeCard=document.getElementById("typeCard");
   if(showType){ document.getElementById("typeName").textContent=RISK_TYPES[tp.type].name;
     document.getElementById("typeDesc").textContent=RISK_TYPES[tp.type].desc; typeCard.style.display="block"; }
@@ -368,7 +388,7 @@ function showResult(){
   document.getElementById("ctaLine").textContent=band.cta;
   document.getElementById("consultBtn").href=CONSULT_URL;
   const segs=document.getElementById("segs"); segs.innerHTML="";
-  for(let i=1;i<=10;i++){ const d=document.createElement("div"); d.className="seg"; if(i<=lv){ d.classList.add("on"); d.style.background=RISK_COLORS[i-1]; d.style.color=RISK_COLORS[i-1]; } segs.appendChild(d); }
+  for(let i=1;i<=10;i++){ const d=document.createElement("div"); d.className="seg"; if(i<=lv){ d.classList.add("on"); if(i===lv) d.classList.add("cur"); d.style.background=RISK_COLORS[i-1]; d.style.color=RISK_COLORS[i-1]; } segs.appendChild(d); }
   go("result");
 }
 function restart(){ idx=0; QUESTIONS.forEach((q,i)=>answers[i]=isMulti(q)?[]:null); go("intro"); }
