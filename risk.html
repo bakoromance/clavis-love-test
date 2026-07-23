@@ -99,15 +99,10 @@
   .type-label{font-size:11px;letter-spacing:.14em;color:var(--text-mute);font-weight:700}
   .type-name-row{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;margin-bottom:10px}
   .type-name{font-size:20px;font-weight:800;letter-spacing:-.01em;color:var(--tc)}
-  .type-en{font-size:10.5px;font-weight:800;letter-spacing:.12em;color:var(--tc);background:color-mix(in srgb,var(--tc) 15%,transparent);border:1px solid color-mix(in srgb,var(--tc) 32%,transparent);padding:3px 8px 2px;border-radius:6px}
+  .type-en{font-size:11px;font-weight:800;letter-spacing:.16em;color:var(--tc);align-self:flex-start;margin-top:1px}
   .type-desc{font-size:13.5px;color:var(--text-dim);line-height:1.75;white-space:pre-line}
-  .rbody{text-align:left;background:#34322d;border:1px solid var(--border-2);border-radius:18px;padding:24px;color:var(--text);font-size:15.5px;line-height:1.9;white-space:pre-line;margin-bottom:16px;box-shadow:0 24px 55px -22px rgba(0,0,0,.85)}
-  .cta-box{display:block;width:100%;text-decoration:none;color:var(--on-accent);background:linear-gradient(135deg,var(--accent-2),var(--accent));border-radius:16px;padding:18px 20px 16px;margin-bottom:11px;box-shadow:0 16px 34px -12px rgba(200,154,143,.55);transition:transform .16s ease,box-shadow .2s}
-  .cta-box:hover{transform:translateY(-2px);box-shadow:0 24px 42px -12px rgba(200,154,143,.7)}
-  .cta-box:active{transform:translateY(0)}
-  .cta-box-q{display:block;font-family:"Nanum Myeongjo",serif;font-size:16.5px;font-weight:700;line-height:1.55;margin-bottom:12px;letter-spacing:-.01em}
-  .cta-box-go{display:flex;align-items:center;justify-content:center;gap:7px;font-size:16px;font-weight:800;padding-top:12px;border-top:1px solid rgba(36,26,22,.16)}
-  .cta-box-go svg{width:18px;height:18px}
+  .rbody{text-align:left;background:#121110;border:1px solid var(--border-2);border-radius:18px;padding:24px;color:var(--text);font-size:15.5px;line-height:1.85;white-space:pre-line;margin-bottom:20px;box-shadow:0 24px 55px -22px rgba(0,0,0,.9)}
+  .cta-line{font-family:"Nanum Myeongjo",serif;font-size:16px;font-weight:700;color:var(--text-dim);text-align:center;line-height:1.55;letter-spacing:-.01em;margin-bottom:13px}
   .actions{display:flex;flex-direction:column;gap:11px}
   #loading{justify-content:center;align-items:center;text-align:center;padding:54px 30px}
   .spinner{width:54px;height:54px;border-radius:50%;border:3px solid var(--surface-2);border-top-color:var(--accent);animation:spin 1s linear infinite;margin-bottom:28px}
@@ -188,11 +183,9 @@
       <div class="type-desc" id="typeDesc"></div>
     </div>
     <div class="rbody" id="rbody"></div>
-    <a class="cta-box" id="consultBtn" target="_top">
-      <span class="cta-box-q" id="ctaLine"></span>
-      <span class="cta-box-go">1:1 맞춤상담 신청하기<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
-    </a>
+    <p class="cta-line" id="ctaLine"></p>
     <div class="actions">
+      <a class="btn" id="consultBtn" target="_top">1:1 맞춤상담 신청하기</a>
       <button class="btn ghost" onclick="shareResult()">친구에게 결과 공유하기</button>
     </div>
     <div class="restart"><button onclick="restart()">다시 측정하기</button></div>
@@ -275,7 +268,7 @@ const QUESTIONS = [
 const RISK_TYPES = {
   STABLE:  { name:"균형·안정형", en:"STABLE", kind:"good",
     desc:"큰 위험 신호 없이, 두 사람의 균형이 잘 잡혀 있는 상태예요.\n표현과 신뢰가 안정적으로 유지되고 있습니다.\n다만 관계는 방심하는 순간부터 금이 가기 시작하니,\n지금의 좋은 흐름을 '지키려는 노력'은 필요합니다." },
-  COOL:    { name:"표현 냉각형", en:"COOL",
+  COOL:    { name:"표현 냉각형", en:"COLD",
     desc:"서로에 대한 표현이 서서히 줄어들어,\n조용히 마음의 거리가 벌어질 수 있는 상황이에요.\n소통이 잘 되는 편이 아니기 때문에\n사소한 오해의 씨앗도 관계에 치명적일 수 있습니다." },
   CONFLICT:{ name:"갈등 누적형", en:"CONFLICT",
     desc:"같은 문제가 해소되지 않고 계속 부딪히고,\n근본적인 해결이 되지 않는 상태입니다.\n서로에 대한 피로도가 높아지고, 쉽게 감정이 소진되기 쉬워요.\n잘 지내다가 어느 순간 홱 돌아설 수 있습니다." },
@@ -294,15 +287,15 @@ const RISK_TYPES = {
 };
 const LEVELS = [
   { name:"BAND 1", tag:"안정 · 마음이 잘 연결되어 있어요", color:"#7FB77E",
-    body:`지금 두 사람은 감정의 흐름이 잘 통하는 상태예요.\n표현과 신뢰가 무너지지 않고 잘 유지되고 있습니다.\n다만 관계는 '좋을 때 어떻게 하느냐'가 중요하니,\n지금의 온도를 지키는 노력은 필수!`, cta:`좋은 관계를 변함없이 지키고 싶다면?` },
+    body:`지금 두 사람은 감정의 흐름이\n잘 통하는 상태예요.\n표현과 신뢰가 무너지지 않고\n잘 유지되고 있습니다.\n다만 관계는 '좋을 때 어떻게 하느냐'가\n중요하니, 지금의 온도를\n지키는 노력은 필수!`, cta:`좋은 관계를 변함없이 지키고 싶다면?` },
   { name:"BAND 2", tag:"작은 위기가 있지만, 아직 양호해요", color:"#C89A8F",
-    body:`큰 문제는 없지만, 작은 위기가 생길 수 있습니다.\n이 위기를 방치하면, 권태로 이어지거나 더 큰 문제로 번질 수 있어요.\n대화와 표현을 조금만 늘려도 빠르게 회복될 수 있습니다!`, cta:`조금씩 가라앉는 온도를 다시 올리고 싶다면?` },
+    body:`큰 문제는 없지만,\n작은 위기가 생길 수 있습니다.\n이 위기를 방치하면, 권태로 이어지거나\n더 큰 문제로 번질 수 있어요.\n대화와 표현을 조금만 늘려도\n빠르게 회복될 수 있습니다!`, cta:`조금씩 가라앉는 온도를 다시 올리고 싶다면?` },
   { name:"BAND 3", tag:"주의 · 마음의 거리가 벌어지는 중입니다", color:"#E0A84E",
-    body:`위험 신호가 누적되고 있는 단계예요.\n상대는 마음이 식었다기보다, 이 관계에 지쳐가고 있을 가능성이 큽니다.\n이때 다그치거나 매달리면 관계가 악화될 수 있어요.\n원인을 정확히 짚고, 다가가는 방식을 바꿔야 할 때입니다.`, cta:`관계의 균열을 확실히 극복하고 싶다면?` },
+    body:`위험 신호가 누적되고 있는 단계예요.\n상대는 마음이 식었다기보다,\n이 관계에 지쳐가고 있을 가능성이 큽니다.\n이때 다그치거나 매달리면\n관계가 악화될 수 있어요.\n원인을 정확히 짚고,\n다가가는 방식을 바꿔야 할 때입니다.`, cta:`관계의 균열을 확실히 극복하고 싶다면?` },
   { name:"BAND 4", tag:"경고 · 관계가 눈에 띄게 흔들려요", color:"#E07B4E",
-    body:`마음이 정리되기 시작하는 타이밍이에요.\n무의식적으로 우리 관계를 저울질하는 시기입니다.\n무작정 감정적으로 부딪히면, 더 안 좋은 쪽으로 기울게 돼요.\n정신 차리고, 전략적으로 상대를 바라보아야 합니다.`, cta:`흔들리는 상대의 마음을 되돌리고 싶다면?` },
+    body:`마음이 정리되기 시작하는 타이밍이에요.\n무의식적으로 우리 관계를\n저울질하는 시기입니다.\n무작정 감정적으로 부딪히면,\n더 안 좋은 쪽으로 기울게 돼요.\n정신 차리고,\n전략적으로 상대를 바라보아야 합니다.`, cta:`흔들리는 상대의 마음을 되돌리고 싶다면?` },
   { name:"BAND 5", tag:"위험 · 이별이 코앞까지 와 있어요", color:"#D9544E",
-    body:`이별이 임박한 위험 단계예요.\n상대는 마음 정리를 거의 끝냈거나,\n이별할 계기를 기다리고 있을 수 있습니다.\n지금의 말과 행동 하나하나가 관계의 결말을 가릅니다.\n매달리기 전, 반드시 전문가와 상황을 점검하세요.`, cta:`이별을 막을 마지막 골든타임을 잡고 싶다면?` }
+    body:`이별이 임박한 위험 단계예요.\n상대는 마음 정리를 거의 끝냈거나,\n이별할 계기를 기다리고 있을 수 있습니다.\n지금의 말과 행동 하나하나가\n관계의 결말을 가릅니다.\n매달리기 전,\n반드시 전문가와 상황을 점검하세요.`, cta:`이별을 막을 마지막 골든타임을 잡고 싶다면?` }
 ];
 
 function isMulti(q){ return q.type==="multiSum"; }
