@@ -387,18 +387,9 @@ function hasDanger(){
   return QUESTIONS.some((q,qi)=>{ const a=answers[qi]; const sel=isMulti(q)?a:(a===null?[]:[a]);
     return sel.some(i=>q.opts[i][2]==="DANGER"); });
 }
-function showResult(){
-  let raw=0; QUESTIONS.forEach((q,qi)=>{ raw+=qPoints(q,answers[qi]); });
-  let lv = Math.min(10, Math.max(1, 1+Math.round((raw-MINSUM)/(MAXSUM-MINSUM)*9)));   // 1~10 레벨 (정규화)
-  const danger = hasDanger();
-  if(danger) lv = Math.min(10, lv+1);   // 폭력·집착(DANGER) 선택 시 레벨 강제 +1단계
-  // 유형 결정: DANGER(안전경고) 최우선 → LEVEL 1~2 = STABLE → 그 외 = 태그 최다 유형
-  let typeKey;
-  if(danger) typeKey="DANGER";
-  else if(lv<=2) typeKey="STABLE";
-  else { const tp=computeType(); typeKey=tp.type || "STABLE"; }
-  const T=RISK_TYPES[typeKey];
-  saveResult(`LEVEL ${lv}/10 · ${T.name}`, collectSelectedTexts());
+/* 결과 화면 그리기 (lv 1~10, typeKey) — showResult / 미리보기 공용 */
+function renderResult(lv, typeKey){
+  const T=RISK_TYPES[typeKey] || RISK_TYPES.STABLE;
   const color = RISK_COLORS[lv-1];
   const band = LEVELS[Math.min(LEVELS.length-1, Math.ceil(lv/2)-1)]; // 10단계 → 5밴드 설명
   const numEl=document.getElementById("lvNum"); numEl.textContent=lv; numEl.style.color=color;
@@ -427,6 +418,28 @@ function showResult(){
   for(let i=1;i<=10;i++){ const d=document.createElement("div"); d.className="seg"; if(i<=lv){ d.classList.add("on"); if(i===lv) d.classList.add("cur"); d.style.background=RISK_COLORS[i-1]; d.style.color=RISK_COLORS[i-1]; } segs.appendChild(d); }
   go("result");
 }
+function showResult(){
+  let raw=0; QUESTIONS.forEach((q,qi)=>{ raw+=qPoints(q,answers[qi]); });
+  let lv = Math.min(10, Math.max(1, 1+Math.round((raw-MINSUM)/(MAXSUM-MINSUM)*9)));   // 1~10 레벨 (정규화)
+  const danger = hasDanger();
+  if(danger) lv = Math.min(10, lv+1);   // 폭력·집착(DANGER) 선택 시 레벨 강제 +1단계
+  // 유형 결정: DANGER(안전경고) 최우선 → LEVEL 1~2 = STABLE → 그 외 = 태그 최다 유형
+  let typeKey;
+  if(danger) typeKey="DANGER";
+  else if(lv<=2) typeKey="STABLE";
+  else { const tp=computeType(); typeKey=tp.type || "STABLE"; }
+  saveResult(`LEVEL ${lv}/10 · ${(RISK_TYPES[typeKey]||{}).name||""}`, collectSelectedTexts());
+  renderResult(lv, typeKey);
+}
+/* ★ 결과지 바로보기(미리보기): ?lv=7  또는  ?lv=7&type=TRUST  (type: STABLE/COOL/CONFLICT/AVOID/TRUST/BORED/FUTURE/BREAKUP/DANGER) */
+(function(){
+  const p=new URLSearchParams(location.search);
+  if(!p.has("lv") && !p.has("preview")) return;
+  const lv=Math.min(10, Math.max(1, parseInt(p.get("lv"))||5));
+  let type=(p.get("type")||"").toUpperCase();
+  if(!RISK_TYPES[type]) type = lv<=2 ? "STABLE" : "COOL";
+  renderResult(lv, type);
+})();
 function restart(){ idx=0; QUESTIONS.forEach((q,i)=>answers[i]=isMulti(q)?[]:null); go("intro"); }
 
 function shareData(){ const lv=document.getElementById("lvNum").textContent; return { title:"관계 위험레벨 측정 | CLAVIS", text:`나의 관계 위험레벨은 LEVEL ${lv}/10! 당신도 측정해보세요.`, url:location.href }; }
