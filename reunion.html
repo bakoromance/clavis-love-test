@@ -399,9 +399,8 @@ function runLoading(){
   const iv=setInterval(()=>{ i=(i+1)%LOAD_STEPS.length; stepEl.style.opacity="0"; setTimeout(()=>{ stepEl.textContent=LOAD_STEPS[i]; stepEl.style.opacity="1"; },180); },1600);
   clearTimeout(window._loadT); window._loadT=setTimeout(()=>{ clearInterval(iv); showResult(); },7000);
 }
-function showResult(){
-  const score=computeScore(); const res=RESULTS.find(r=>score<=r.max)||RESULTS[RESULTS.length-1];
-  saveResult(score, collectSelectedTexts());
+function renderResult(score){
+  const res=RESULTS.find(r=>score<=r.max)||RESULTS[RESULTS.length-1];
   document.getElementById("rtitle").innerHTML = `<span class="em">${res.title.replace(/\n/g,'<br>')}</span>`;
   document.getElementById("rbody").textContent = res.body;
   document.getElementById("ctaLine").textContent = res.cta;
@@ -415,6 +414,14 @@ function showResult(){
   function tick(now){ const p=Math.min(1,(now-start)/dur),e=1-Math.pow(1-p,3); numEl.textContent=Math.round(score*e); if(p<1) requestAnimationFrame(tick); else numEl.textContent=score; }
   requestAnimationFrame(tick);
 }
+function showResult(){
+  const score=computeScore();
+  saveResult(score, collectSelectedTexts());
+  renderResult(score);
+}
+/* ★ 결과지 바로보기(미리보기): ?pct=63  (재회 가능성 10~100) */
+(function(){ const p=new URLSearchParams(location.search); if(!p.has("pct")&&!p.has("preview")) return;
+  let v=parseInt(p.get("pct")); if(isNaN(v)) v=65; v=Math.max(10,Math.min(100,v)); renderResult(v); })();
 function restart(){ idx=0; answers.forEach((a,i)=>answers[i]=QUESTIONS[i].type==="multi"?[]:null); go("intro"); }
 
 function shareData(){ const s=document.getElementById("pctNum").textContent; return { title:"재회 가능성 알아보기 | CLAVIS", text:`나의 재회 가능성은 ${s}%! 당신도 측정해보세요.`, url:location.href }; }

@@ -307,10 +307,7 @@ function qBounds(q){
 }
 const MINSUM=QUESTIONS.reduce((s,q)=>s+qBounds(q)[0],0);
 const MAXSUM=QUESTIONS.reduce((s,q)=>s+qBounds(q)[1],0);
-function showResult(){
-  let raw=0; QUESTIONS.forEach((q,qi)=>{ raw+=qPoints(q,answers[qi]); });
-  let pct=15+Math.round((raw-MINSUM)/(MAXSUM-MINSUM)*84); pct=Math.max(15,Math.min(99,pct));
-  saveResult(`${pct}%`, collectSelectedTexts());
+function renderResult(pct){
   const T=TIERS.find(t=>pct<=t.max)||TIERS[TIERS.length-1];
   document.getElementById("rtitle").innerHTML=`<span class="em">${T.title.replace(/\n/g,'<br>')}</span>`;
   document.getElementById("rbody").textContent=T.body;
@@ -325,6 +322,15 @@ function showResult(){
   function tick(now){ const p=Math.min(1,(now-start)/dur),e=1-Math.pow(1-p,3); numEl.textContent=Math.round(pct*e); if(p<1) requestAnimationFrame(tick); else numEl.textContent=pct; }
   requestAnimationFrame(tick);
 }
+function showResult(){
+  let raw=0; QUESTIONS.forEach((q,qi)=>{ raw+=qPoints(q,answers[qi]); });
+  let pct=15+Math.round((raw-MINSUM)/(MAXSUM-MINSUM)*84); pct=Math.max(15,Math.min(99,pct));
+  saveResult(`${pct}%`, collectSelectedTexts());
+  renderResult(pct);
+}
+/* ★ 결과지 바로보기(미리보기): ?pct=74 */
+(function(){ const p=new URLSearchParams(location.search); if(!p.has("pct")&&!p.has("preview")) return;
+  let v=parseInt(p.get("pct")); if(isNaN(v)) v=74; v=Math.max(15,Math.min(99,v)); renderResult(v); })();
 function restart(){ idx=0; QUESTIONS.forEach((q,i)=>answers[i]=isMulti(q)?[]:null); go("intro"); }
 
 function shareData(){ const s=document.getElementById("pctNum").textContent; return { title:"썸 / 짝사랑 성사율 계산하기 | CLAVIS", text:`나의 썸·짝사랑 성사율은 ${s}%! 당신도 측정해보세요.`, url:location.href }; }
