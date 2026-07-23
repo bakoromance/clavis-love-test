@@ -94,15 +94,17 @@
   .lvsub{font-size:12.5px;color:var(--text-dim);font-weight:600}
   .type-card{--tc:#d9b0a6;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px 20px 18px 22px;margin-bottom:14px;text-align:left;position:relative;overflow:hidden}
   .type-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--tc)}
-  .type-head{display:flex;align-items:center;gap:9px;margin-bottom:11px}
-  .type-ic{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--tc)}
-  .type-ic svg{width:15px;height:15px}
+  .type-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .type-ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--tc)}
+  .type-ic svg{width:14px;height:14px}
   .type-label{font-size:11px;letter-spacing:.14em;color:var(--text-mute);font-weight:700}
-  .type-en{margin-left:auto;font-size:11px;font-weight:800;letter-spacing:.16em;color:var(--tc);opacity:.9}
-  .type-name{font-size:20px;font-weight:800;letter-spacing:-.01em;color:var(--tc);margin-bottom:9px}
-  .type-desc{font-size:13.5px;color:var(--text-dim);line-height:1.75;white-space:pre-line}
-  .rbody{text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;color:var(--text-dim);font-size:14.5px;line-height:1.85;white-space:pre-line;margin-bottom:22px;box-shadow:var(--shadow)}
-  .cta-line{font-size:15px;font-weight:700;margin-bottom:14px}
+  .type-name-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:9px}
+  .type-name{font-size:20px;font-weight:800;letter-spacing:-.01em;color:var(--tc)}
+  .type-en{font-size:10.5px;font-weight:800;letter-spacing:.12em;color:var(--tc);background:color-mix(in srgb,var(--tc) 15%,transparent);border:1px solid color-mix(in srgb,var(--tc) 32%,transparent);padding:3px 8px 2px;border-radius:6px}
+  .type-desc{font-size:13.5px;color:var(--text-dim);line-height:1.7;white-space:pre-line}
+  .rbody{position:relative;overflow:hidden;text-align:left;background:var(--surface);border:1px solid var(--border-2);border-radius:18px;padding:24px 24px 24px 26px;color:var(--text);font-size:15px;line-height:1.9;white-space:pre-line;margin-bottom:16px;box-shadow:0 24px 55px -22px rgba(0,0,0,.8)}
+  .rbody::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--rc,var(--accent))}
+  .cta-line{font-size:16px;font-weight:800;letter-spacing:-.01em;margin-bottom:15px;line-height:1.5}
   .actions{display:flex;flex-direction:column;gap:11px}
   #loading{justify-content:center;align-items:center;text-align:center;padding:54px 30px}
   .spinner{width:54px;height:54px;border-radius:50%;border:3px solid var(--surface-2);border-top-color:var(--accent);animation:spin 1s linear infinite;margin-bottom:28px}
@@ -175,9 +177,11 @@
       <div class="type-head">
         <span class="type-ic" id="typeIc"></span>
         <span class="type-label" id="typeLabel">위험 유형</span>
+      </div>
+      <div class="type-name-row">
+        <span class="type-name" id="typeName"></span>
         <span class="type-en" id="typeEn"></span>
       </div>
-      <div class="type-name" id="typeName"></div>
       <div class="type-desc" id="typeDesc"></div>
     </div>
     <div class="rbody" id="rbody"></div>
@@ -418,8 +422,12 @@ function showResult(){
   document.getElementById("typeName").textContent = T.name;
   document.getElementById("typeDesc").textContent = T.desc;
   typeCard.style.display="block";
-  document.getElementById("rbody").textContent=band.body;
-  document.getElementById("ctaLine").textContent=band.cta;
+  const rbodyEl=document.getElementById("rbody");
+  rbodyEl.textContent=band.body;
+  rbodyEl.style.setProperty("--rc", color);
+  rbodyEl.style.background=`linear-gradient(162deg, ${color}12, var(--surface) 58%)`;
+  const ctaEl=document.getElementById("ctaLine");
+  ctaEl.textContent=band.cta; ctaEl.style.color=color;
   document.getElementById("consultBtn").href=CONSULT_URL;
   const segs=document.getElementById("segs"); segs.innerHTML="";
   for(let i=1;i<=10;i++){ const d=document.createElement("div"); d.className="seg"; if(i<=lv){ d.classList.add("on"); if(i===lv) d.classList.add("cur"); d.style.background=RISK_COLORS[i-1]; d.style.color=RISK_COLORS[i-1]; } segs.appendChild(d); }
