@@ -227,11 +227,11 @@ window.addEventListener("message",(e)=>{ const d=e.data;
 const QUESTIONS = [
   { t:"썸 분위기가 생긴 뒤 얼마나 지났나요?", opts:[["썸이라 할 분위기는 없었다",-2,"FRIEND"],["1주 이내",0,"SCOUTING"],["2주 ~ 2개월",3],["2 ~ 4개월",1],["4 ~ 6개월",2],["6개월 이상",-1]]},
   { t:"최근 일주일 기준, 이전보다 연락·대화 분위기가 변했나요?", opts:[["비슷하게 유지 중",1],["더 좋아졌다",3],["상대 텐션이 낮아졌다",-2,"UNEVEN"],["대화가 끊겼다",-3],["빈도는 줄었지만 분위기는 나쁘지 않다",0,"SCOUTING"],["애초에 사적인 분위기는 없었다",-3,"FRIEND"]]},
-  { t:"둘이 나누는 대화의 결은?", type:"multiDepth", opts:[["사적인 연락 자체가 거의 없다",-2,"solo","FRIEND"],["업무·용건·정보성",0,"HESITANT"],["시시콜콜한 잡담",1,"ACCESS"],["일상 공유",2,"SCOUTING"],["개인적·속깊은 이야기",3,"ALMOST"]]},
+  { t:"둘이 나누는 대화의 결은?", type:"multiDepth", opts:[["사적인 연락 자체가 거의 없다",-2,"solo","FRIEND"],["업무·용건·정보성",0,"HESITANT"],["시시콜콜한 잡담",1,"ACCESS","FRIEND"],["일상 공유",2,"SCOUTING"],["개인적·속깊은 이야기",3,"ALMOST"]]},
   { t:"상대의 답장·리액션 스타일은?", type:"multiSum", cap:3, opts:[["답장이 느리거나 자주 씹는다",-2,"UNEVEN"],["단답 위주다",-1,"UNEVEN"],["리액션이 좋다",1,"ACCESS"],["나에게 먼저 질문한다",1,"SCOUTING"],["내 말에서 대화를 확장한다",2],["묻지 않은 자기 얘기를 꺼낸다",2,"ALMOST"]]},
   { t:"대화가 끊기거나 연락이 뜸해지면 상대는?", type:"multiSum", cap:3, opts:[["그대로 흐지부지 끝난다",-2,"UNEVEN"],["무응답(읽씹·안읽씹) 한다",-3,"UNEVEN"],["내가 다시 말하면 평범하게 받는다",1],["내가 말하면 달갑게 받아준다",2,"ACCESS"],["상대가 먼저 다시 말을 건다",3,"SCOUTING"],["끊긴 적이 없어 판단이 어렵다",1,"solo"]]},
   { t:"상대가 나의 정보나 감정 상태를 얼마나 신경 쓰나요?", opts:[["거의 묻지 않거나, 기억 못한다",-2,"UNEVEN"],["큼직한 것만 기억하거나, 반응한다",0,"ACCESS"],["흘리듯 말한 것도 기억한다",2,"ALMOST"],["먼저 알아채거나, 기억해서 챙겨준다",3,"ALMOST"]]},
-  { t:"상대가 나를 칭찬하는 방식은?", type:"multiSum", cap:4, opts:[["칭찬은커녕 비난·지적이 많다",-2,"solo","FRIEND"],["거의 없다",-1],["능력·성격 등 일반적 칭찬",1,"ACCESS"],["‘이런 점이 좋다’는 개인화된 칭찬",2,"ACCESS"],["외모·이성적 매력을 언급",3,"SCOUTING"]]},
+  { t:"상대가 나를 칭찬하는 방식은?", type:"multiSum", cap:4, opts:[["칭찬은커녕 비난·지적이 많다",-2,"solo","FRIEND"],["거의 없다",-1],["능력·성격 등 일반적 칭찬",1,"ACCESS","FRIEND"],["‘이런 점이 좋다’는 개인화된 칭찬",2,"ACCESS"],["외모·이성적 매력을 언급",3,"SCOUTING"]]},
   { t:"단둘이 만난 빈도는?", opts:[["아직 없다 (우연히 마주친 정도 포함)",0],["곧 만날 약속이 있다",1,"ACCESS"],["한두 번 있었다",2],["가끔 만난다",2,"SCOUTING"],["자주 만난다",3,"ALMOST"]]},
   { t:"상대가 나와의 만남에 얼마나 적극적인가요?", opts:[["제안하면 피하거나 넘긴다",-2,"RIVAL"],["공적인 자리에서만 본다",-1,"RIVAL"],["제안하면 가능한 한 응한다",1],["날짜·장소를 함께 조율한다",2],["상대가 먼저 보자고 제안한다",3,"SCOUTING"],["만나자는 얘기가 나온 적 없다",-3,"HESITANT"]]},
   { t:"가장 최근 만남 이후 상대의 반응은?", type:"multiSum", cap:3, opts:[["상대가 거리를 두기 시작했다",-3,"RIVAL"],["오히려 연락 공백이 생겼다",-2,"UNEVEN"],["평소와 똑같다",0],["잘 들어가라는 인사 정도",0],["다음 약속을 기약했다",2,"SCOUTING"],["연락 빈도·친밀도가 올라갔다",2]]},
@@ -385,7 +385,20 @@ function computeCrushType(pct){
   if(picked(qIdx("플러팅"),"아직 시도해본 적 없다")) stalled++;
   if(picked(qIdx("스킨십"),"없다")) stalled++;
   if(stalled>=3 && pct>=60) return "HESITANT";
-  // 4) 태그 우세형 — 한 선택지에 유형을 여러 개 붙일 수 있다(예: 애매하다 → 온도차형+비중 편차형)
+  // 4) 오래 알고 지냈고 친밀한데 이성 신호가 없으면 편안함 우위형 (오래된 지인 = 친구지대 고착)
+  //    → 이 경우가 '접점 형성기'(=접점을 만들어가는 초중반)로 빠지면 안 된다.
+  if(picked(qIdx("얼마나 지났나요"),"6개월 이상")){
+    let familiar=0;
+    ["한두 번 있었다","가끔 만난다","자주 만난다"].forEach(t=>{ if(picked(qIdx("단둘이 만난 빈도"),t)) familiar++; });
+    ["가끔씩 몇 번","틈틈이 있다","끊기면 어색할"].forEach(t=>{ if(picked(qIdx("반복되는 루틴"),t)) familiar++; });
+    ["같은 집단에서 생긴","둘만의 농담","자주 반복되는","둘만의 별명"].forEach(t=>{ if(picked(qIdx("둘만 아는 농담"),t)) familiar++; });
+    const lowRomance = (picked(qIdx("스킨십"),"없다")||picked(qIdx("스킨십"),"자주 눈 마주침"))
+      && !picked(qIdx("이성으로서 어떻게 평가"),"외모·분위기·매력")
+      && !picked(qIdx("이성으로서 어떻게 평가"),"이성적 호감을 여러 번")
+      && !picked(qIdx("플러팅"),"적극적으로 받아주고");
+    if(familiar>=2 && lowRomance) return "FRIEND";
+  }
+  // 5) 태그 우세형 — 한 선택지에 유형을 여러 개 붙일 수 있다(예: 애매하다 → 온도차형+비중 편차형)
   const sc={};
   QUESTIONS.forEach((q,qi)=>{ const a=answers[qi]; const sel=Array.isArray(a)?a:(a===null?[]:[a]);
     sel.forEach(i=>{ const o=q.opts[i]; if(!o) return;
@@ -394,9 +407,9 @@ function computeCrushType(pct){
       o.slice(2).forEach(t=>{ if(typeof t==="string" && t!=="solo") sc[t]=(sc[t]||0)+w; }); }); });
   let best=null,bs=0,tie=false;
   Object.keys(sc).forEach(k=>{ if(sc[k]>bs){ bs=sc[k]; best=k; tie=false; } else if(sc[k]===bs) tie=true; });
-  // 5) 신호가 약하거나(3점 미만) 동점이면 태그 순서로 임의 결정되므로, 성사율 기준으로 보수적 판정
+  // 6) 신호가 약하거나(3점 미만) 동점이면 태그 순서로 임의 결정되므로, 성사율 기준으로 보수적 판정
   if(!best || bs<3 || tie) return pct>=85 ? "ALMOST" : (pct>=70 ? "RISING" : (pct>=50 ? "SCOUTING" : "UNEVEN"));
-  // 6) 진행 단계 유형은 성사율 구간과 어긋나면 안 된다.
+  // 7) 진행 단계 유형은 성사율 구간과 어긋나면 안 된다.
   //    (78%인데 "아직 알아가는 초입", 반대로 40%인데 "확정 직전"이 나오는 모순 방지)
   //    편안함/온도차/비중편차/자기검열/재점화는 '구도' 유형이라 성사율과 무관하게 그대로 둔다.
   const STAGE={ACCESS:1,SCOUTING:2,RISING:3,ALMOST:4};
