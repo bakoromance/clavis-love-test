@@ -272,9 +272,9 @@ const TIERS = [
    유저가 절망하면 상담으로 오지 않는다. 모든 유형은 다음 한 수가 보이게 쓴다. */
 const CRUSH_TYPES = {
   FRIEND:   { en:"FRIEND",   name:"편안함 우위형",
-    body:`지금 상대에게 나는 '이성'보다 '편한 사람'에 가깝습니다.\n사이가 나쁜 게 아니라, 설렘의 자리가 비어 있는 구도예요.\n\n이 구도는 시간이 지난다고 저절로 바뀌지 않습니다.\n익숙한 거리를 의도적으로 흔드는 순간부터\n관계가 움직이기 시작합니다.` },
+    body:`지금 이 관계는 설렘보다 편안함이 앞서 있는 구도입니다.\n이성적 끌림이 없어서가 아니라,\n편안함에 묻혀 감정이 더 쌓이지 못하는 상태예요.\n\n이 구도는 시간이 지난다고 저절로 바뀌지 않습니다.\n익숙한 거리를 의도적으로 흔들어야\n관계가 다시 움직이기 시작합니다.` },
   SCOUTING: { en:"SCOUTING", name:"탐색기",
-    body:`아직 서로에 대한 판단이 끝나지 않은 시기입니다.\n호감이 없어서가 아니라, 확신을 만들 재료가 부족한 거예요.\n\n이 시기엔 밀어붙이는 쪽보다\n더 알고 싶게 만드는 쪽이 이깁니다.\n지금 쌓는 인상이 이후 관계의 방향을 거의 결정합니다.` },
+    body:`접점은 충분히 쌓였고,\n이제 서로를 본격적으로 알아가는 단계입니다.\n서로 궁금해하고 있지만 아직 확신은 서지 않은 시기예요.\n\n이 시기엔 밀어붙이는 쪽보다\n더 알고 싶게 만드는 쪽이 이깁니다.\n지금 쌓는 인상이 이후 관계의 방향을 거의 결정합니다.` },
   UNEVEN:   { en:"UNEVEN",   name:"온도차형",
     body:`내 마음이 상대보다 조금 앞서 있는 구도입니다.\n상대가 식은 게 아니라,\n아직 나만큼 올라오지 않은 것에 가까워요.\n\n이럴 때 조급함이 드러나면 상대는 부담부터 느낍니다.\n마음을 줄이는 게 아니라,\n드러내는 방식을 바꿔야 할 때입니다.` },
   RIVAL:    { en:"PRIORITY", name:"비중 편차형",
@@ -288,7 +288,7 @@ const CRUSH_TYPES = {
   ALMOST:   { en:"ALMOST",   name:"확정 직전형",
     body:`서로의 마음은 이미 확인된 것과 다름없는 구도입니다.\n남은 건 관계를 정의할 '한 번의 계기'뿐이에요.\n\n다만 이 구간이 길어지면 설렘은 관성으로 바뀝니다.\n타이밍을 놓치지 않는 것이 사실상 유일한 변수입니다.` },
   ACCESS:   { en:"ACCESS",   name:"접점 형성기",
-    body:`아직 관계라고 부를 만한 접점이 충분히 쌓이지 않았습니다.\n상대가 거절한 게 아니라, 판단할 기회 자체가 없었던 거예요.\n\n이 단계에서 마음부터 전하면 대부분 부담으로 돌아옵니다.\n먼저 자연스럽게 마주칠 이유를 만드는 것이 순서입니다.` },
+    body:`아직 둘 사이에 쌓인 접점이 많지 않은 단계입니다.\n상대가 관심이 없어서가 아니라,\n서로를 알아갈 기회 자체가 적었던 거예요.\n\n이 단계에서는 마음보다 '만날 이유'가 먼저입니다.\n자연스럽게 마주칠 접점을 늘리는 것부터가 시작이에요.` },
   REKINDLE: { en:"REKINDLE", name:"재점화 구간",
     body:`분명히 가까웠던 시기가 있었던 관계입니다.\n좋았던 기억이 남아 있다는 건 그 자체로 큰 자산이에요.\n\n다만 예전 방식 그대로 다가가면 같은 결과가 반복됩니다.\n식은 이유를 정확히 짚는 것이 재점화의 출발점입니다.` }
 };
@@ -387,6 +387,16 @@ function romanceScore(){
   if(picked(qIdx("미래를 함께하는"),"상대가 반복적으로 제안")) r++;
   return r;
 }
+/* 관계 밀도 — 둘 사이에 실제로 쌓인 접점의 양(대화의 깊이·만남·루틴·둘만의 코드).
+   접점 형성기 < 탐색기 순서를 고정하는 데 쓴다.
+   접점 형성기 = 아직 접점을 만들어가는 단계 / 탐색기 = 접점이 쌓여 본격적으로 서로 알아가는 단계 */
+function closeness(){
+  function idx(qi){ if(qi<0) return 0; const a=answers[qi];
+    if(a===null||a===undefined) return 0;
+    return Array.isArray(a) ? (a.length?Math.max.apply(null,a):0) : a; }
+  return idx(qIdx("대화의 결")) + idx(qIdx("단둘이 만난 빈도"))
+       + idx(qIdx("반복되는 루틴")) + idx(qIdx("둘만 아는 농담"));  // 0~15
+}
 function computeCrushType(pct){
   // 1) 상대에게 애인이 있으면 무조건 어장의심형 (가장 강한 사실 신호)
   if(picked(qIdx("연애할 수 있는 상태"),"사귀는 사람이 있다")) return "RIVAL";
@@ -447,7 +457,14 @@ function computeCrushType(pct){
   //    (78%인데 "아직 알아가는 초입", 반대로 40%인데 "확정 직전"이 나오는 모순 방지)
   //    편안함/온도차/비중편차/자기검열/재점화는 '구도' 유형이라 성사율과 무관하게 그대로 둔다.
   const STAGE={ACCESS:1,SCOUTING:2,RISING:3,ALMOST:4};
-  if(STAGE[best]) return isAlmost ? "ALMOST" : (pct>=65 ? "RISING" : best);
+  if(STAGE[best]){
+    if(isAlmost) return "ALMOST";
+    if(pct>=65) return "RISING";
+    // 접점 형성기와 탐색기는 같은 밴드라 태그 점수만으론 갈리지 않는다.
+    // 실제로 쌓인 접점의 양으로 가른다 — 탐색기가 접점 형성기보다 가까운 단계.
+    if(best==="ACCESS"||best==="SCOUTING") return closeness()<=7 ? "ACCESS" : "SCOUTING";
+    return best;
+  }
   return best;
 }
 const ICON_HEART='<svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-7-9.4A3.6 3.6 0 0 1 12 8.2a3.6 3.6 0 0 1 7 2.4c0 5-7 9.4-7 9.4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
