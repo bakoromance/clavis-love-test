@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>스킨십 성향 테스트 | CLAVIS</title>
+<meta property="og:type" content="website">
+<meta property="og:title" content="스킨십 성향 테스트 — 나의 밤은 낮과 같은 사람일까">
+<meta property="og:description" content="4가지 축으로 갈리는 16가지 스킨십 성향. 욕망 온도와 표출 온도, 그 사이의 갭까지. 12,000건 상담 데이터 기반.">
+<link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin />
+<link rel="stylesheet" as="style" crossorigin
+  href="https://fastly.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" />
+<style>
+  :root{
+    --bg:#171213; --bg-2:#1d1718; --surface:#211a1c; --card:#261e20;
+    --border:#372c2e; --border-2:#443538;
+    --text:#efe7e4; --text-dim:#b7a8a5; --text-mute:#8a7b78;
+    --acc:#c9564f; --acc-2:#e0776b; --acc-soft:rgba(201,86,79,.13);
+    --gold:#d9ae62; --gold-2:#f0d9a8; --gold-1:#8f6224;
+    --serif:"Cormorant Garamond",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .app{position:relative;max-width:480px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+  .screen{display:none;flex:1;flex-direction:column}
+  .screen.active{display:flex;animation:fade .5s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;border:none;cursor:pointer;background:var(--acc);color:#fff;font-family:inherit;font-weight:700;font-size:16px;padding:17px 24px;border-radius:14px;transition:transform .15s,background .2s,opacity .2s}
+  .btn:hover{background:var(--acc-2)}
+  .btn:active{transform:scale(.985)}
+  .btn:disabled{background:#3a2f31;color:#77686a;cursor:not-allowed}
+  .btn.ghost{background:transparent;border:1px solid var(--border-2);color:var(--text-dim);font-weight:600}
+
+  /* 인트로 */
+  #intro{justify-content:center;align-items:center;text-align:center;padding:54px 28px}
+  #intro img{height:30px;margin-bottom:32px;opacity:.92}
+  #intro .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--acc-2);background:var(--acc-soft);border:1px solid rgba(201,86,79,.3);padding:7px 14px;border-radius:999px;margin-bottom:26px;letter-spacing:.04em}
+  #intro h1{font-size:31px;font-weight:800;letter-spacing:-.02em;line-height:1.32;margin-bottom:18px}
+  #intro h1 .em{font-family:var(--serif);font-style:italic;color:var(--acc-2)}
+  #intro .sub{color:var(--text-dim);font-size:14.5px;line-height:1.8;margin-bottom:14px}
+  #intro .meta{font-family:var(--serif);font-style:italic;font-size:13px;letter-spacing:.14em;color:var(--text-mute);margin-bottom:40px}
+  #intro .cta{max-width:340px;width:100%}
+  #intro .note{margin-top:18px;font-size:12.5px;color:var(--text-mute)}
+
+  /* 퀴즈 */
+  .qhead{position:sticky;top:0;z-index:5;background:var(--bg);padding:18px 22px 14px;box-shadow:0 10px 16px -12px rgba(0,0,0,.7)}
+  .qhead-sub{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+  .qhead-sub .diag{font-size:12.5px;color:var(--text-dim);font-weight:600}
+  .qhead-sub .step{font-size:11.5px;letter-spacing:.16em;color:var(--acc-2);font-weight:700}
+  .progress-track{height:3px;background:#2c2325;border-radius:999px;overflow:hidden}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc-2));border-radius:999px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+  #quiz-body{padding:14px 22px 26px;flex:1}
+  .qcard{animation:fade .35s ease both}
+  .qnum{font-family:var(--serif);font-style:italic;font-size:30px;font-weight:600;color:var(--acc-2);line-height:1;margin-bottom:8px}
+  .qax{font-size:11px;letter-spacing:.22em;font-weight:700;color:var(--text-mute);margin-bottom:6px}
+  .qtitle{font-size:22px;font-weight:800;line-height:1.36;letter-spacing:-.02em;margin-bottom:8px;white-space:pre-line}
+  .qhint{font-size:13px;color:var(--text-mute);margin-bottom:20px}
+  .qhint .multi{color:var(--acc-2);font-weight:700}
+  .options{display:flex;flex-direction:column;gap:9px}
+  .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);padding:15px 17px;border-radius:14px;font-family:inherit;font-size:14.5px;font-weight:500;line-height:1.5;transition:border-color .16s,background .16s,color .16s}
+  .opt:hover{border-color:#584547}
+  .opt .olabel{flex:1;white-space:pre-line}
+  .opt .oradio{flex:0 0 auto;width:21px;height:21px;border-radius:50%;border:1.8px solid #5b4a4c;position:relative;transition:.16s}
+  .opt.check .oradio{border-radius:7px}
+  .opt.selected{background:#2e2224;border-color:var(--acc);color:var(--text)}
+  .opt.selected .oradio{border-color:var(--acc-2)}
+  .opt.selected .oradio::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--acc-2)}
+  .opt.check.selected .oradio::after{border-radius:3px}
+  .qfoot{display:flex;gap:11px;margin-top:26px;padding-bottom:30px}
+  .qfoot .btn{flex:1}.qfoot .btn.back{flex:0 0 84px}
+
+  /* 로딩 */
+  #loading{justify-content:center;align-items:center;text-align:center;padding:54px 30px}
+  .spinner{width:54px;height:54px;border-radius:50%;border:3px solid #372c2e;border-top-color:var(--acc);animation:spin 1s linear infinite;margin-bottom:28px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .load-title{font-size:21px;font-weight:800;letter-spacing:-.01em;margin-bottom:14px}
+  .load-step{font-size:14.5px;color:var(--text-dim);min-height:22px;margin-bottom:26px}
+
+  /* 결과 */
+  #result{padding:38px 24px 44px}
+  #result .logo{height:26px;margin:0 auto 24px;display:block;opacity:.9}
+  .rbadge{display:block;text-align:center;font-size:11px;letter-spacing:.22em;color:var(--text-mute);font-weight:700;margin-bottom:16px}
+  .code-row{display:flex;justify-content:center;gap:14px;margin-bottom:6px}
+  .code-row .cl{text-align:center}
+  .code-row b{font-family:var(--serif);font-size:44px;font-weight:600;line-height:1;color:var(--acc-2);display:block}
+  .code-row i{font-style:normal;font-size:10.5px;letter-spacing:.08em;color:var(--text-mute);font-weight:600}
+  .tname{ text-align:center;font-size:27px;font-weight:800;letter-spacing:-.02em;margin:14px 0 8px}
+  .tline{text-align:center;font-size:14.5px;color:var(--text-dim);white-space:pre-line;margin-bottom:14px}
+  .tagrow{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+  .tagrow span{font-size:12px;font-weight:700;color:var(--acc-2);background:var(--acc-soft);border:1px solid rgba(201,86,79,.3);padding:5px 11px;border-radius:999px}
+  .rarrow{text-align:center;font-size:12.5px;color:var(--text-mute);margin-bottom:30px}
+  .rarrow b{color:var(--gold);font-weight:700}
+
+  .sec{margin-bottom:16px;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px}
+  .sec .slabel{font-size:11px;letter-spacing:.2em;color:var(--text-mute);font-weight:700;margin-bottom:14px}
+  .sec .stitle{font-size:17px;font-weight:800;letter-spacing:-.01em;margin-bottom:12px}
+  .sec p{font-size:14px;color:var(--text-dim);line-height:1.85;white-space:pre-line}
+
+  /* 온도 게이지 */
+  .temp-row{margin-bottom:16px}
+  .temp-row .tl{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:700;margin-bottom:7px}
+  .temp-row .tl b{font-family:var(--serif);font-size:22px;font-weight:600}
+  .temp-row.desire .tl b{color:var(--acc-2)}
+  .temp-row.express .tl b{color:#8fa7c9}
+  .tbar{height:9px;background:#2c2325;border-radius:999px;overflow:hidden}
+  .tbar i{display:block;height:100%;width:0;border-radius:999px;transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
+  .temp-row.desire .tbar i{background:linear-gradient(90deg,#8f3d3a,var(--acc-2))}
+  .temp-row.express .tbar i{background:linear-gradient(90deg,#41546e,#8fa7c9)}
+  .gapbox{margin-top:20px;padding:18px;border-radius:14px;background:var(--bg-2);border:1px solid var(--border);text-align:center}
+  .gapbox .gnum{font-family:var(--serif);font-size:40px;font-weight:600;line-height:1;color:var(--gold);margin-bottom:8px}
+  .gapbox .gnum small{font-size:16px;color:var(--text-mute)}
+  .gapbox p{font-size:13.5px;color:var(--text-dim);line-height:1.8;white-space:pre-line}
+
+  /* 시그널 */
+  .sig-dots{display:flex;gap:7px;margin-bottom:12px}
+  .sig-dots i{width:26px;height:8px;border-radius:999px;background:#2c2325}
+  .sig-dots i.on{background:var(--acc)}
+  .sig-label{font-size:15px;font-weight:800;margin-bottom:8px;color:var(--acc-2)}
+
+  /* 분석 */
+  .ana-block{padding:16px 0;border-top:1px solid var(--border)}
+  .ana-block:first-of-type{border-top:none;padding-top:0}
+  .ana-block h4{font-size:13.5px;font-weight:800;color:var(--text);margin-bottom:8px}
+  .ana-block h4 span{color:var(--acc-2);margin-right:6px;font-family:var(--serif);font-style:italic;font-weight:600}
+
+  /* 궁합 */
+  .chem-row{display:flex;gap:11px}
+  .chem{flex:1;background:var(--bg-2);border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
+  .chem .cl2{font-size:10.5px;letter-spacing:.16em;font-weight:700;margin-bottom:8px}
+  .chem.best .cl2{color:var(--gold)}
+  .chem.worst .cl2{color:#8a7b78}
+  .chem b{display:block;font-size:15px;font-weight:800;margin-bottom:3px}
+  .chem i{font-style:normal;font-size:11px;color:var(--text-mute);letter-spacing:.06em}
+
+  /* 페이월 */
+  .pay{margin-top:26px;background:linear-gradient(170deg,#241b14,#1d1517 70%);border:1px solid rgba(217,174,98,.35);border-radius:20px;padding:26px 22px;text-align:center}
+  .pay .plabel{font-size:11px;letter-spacing:.24em;color:var(--gold);font-weight:700;margin-bottom:12px}
+  .pay h3{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.4;margin-bottom:18px;white-space:pre-line}
+  .locklist{display:flex;flex-direction:column;gap:9px;margin-bottom:20px}
+  .lock{display:flex;align-items:center;gap:11px;background:rgba(0,0,0,.25);border:1px solid rgba(217,174,98,.18);border-radius:12px;padding:13px 15px;text-align:left}
+  .lock .ic{flex:0 0 auto;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:rgba(217,174,98,.12);color:var(--gold)}
+  .lock .ic svg{width:13px;height:13px}
+  .lock p{font-size:13px;color:#d8cbb4;line-height:1.5}
+  .price{margin-bottom:16px}
+  .price .was{font-size:13px;color:var(--text-mute);text-decoration:line-through;margin-right:8px}
+  .price .now{font-family:var(--serif);font-size:30px;font-weight:600;color:var(--gold-2)}
+  .price .won{font-size:14px;color:var(--gold)}
+  .paybtn{display:inline-flex;align-items:center;justify-content:center;width:100%;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:16px;padding:17px 24px;border-radius:14px;color:#231a10;background:linear-gradient(160deg,var(--gold-2),var(--gold) 60%,var(--gold-1));box-shadow:0 14px 30px -12px rgba(217,174,98,.45)}
+  .paybtn:active{transform:scale(.985)}
+  .socialproof{margin-top:18px;display:flex;flex-direction:column;gap:8px}
+  .socialproof p{font-size:12px;color:#a3937b;line-height:1.6;text-align:left;background:rgba(0,0,0,.2);border-radius:10px;padding:10px 13px}
+
+  .actions{display:flex;flex-direction:column;gap:11px;margin-top:26px}
+  .restart{margin-top:22px;text-align:center}
+  .restart button{background:none;border:none;color:var(--text-mute);font-family:inherit;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- 인트로 -->
+  <section id="intro" class="screen active">
+    <img src="assets/clavis-logo.png" alt="CLAVIS" />
+    <div class="eyebrow">SKINSHIP PERSONA TEST</div>
+    <h1>당신의 밤은,<br>낮과 <span class="em">같은 사람</span>인가.</h1>
+    <p class="sub">속도 · 주도권 · 표현 · 스위치.<br>네 가지 축으로 갈리는 16가지 스킨십 성향.<br>욕망 온도와 표출 온도, 그 사이의 갭까지 계산해드립니다.</p>
+    <div class="meta">16 TYPES · 9 STEPS · 3 MIN</div>
+    <div class="cta"><button class="btn" onclick="startQuiz()">내 성향 확인하기</button></div>
+    <p class="note">노골적인 문항은 없습니다. 그러나 답은 솔직해야 합니다.</p>
+  </section>
+
+  <!-- 퀴즈 -->
+  <section id="quiz" class="screen">
+    <div class="qhead">
+      <div class="qhead-sub"><span class="diag">스킨십 성향 테스트</span><span class="step">STEP <span id="cur">1</span> / <span id="total">9</span></span></div>
+      <div class="progress-track"><div class="progress-fill" id="bar"></div></div>
+    </div>
+    <div id="quiz-body"></div>
+  </section>
+
+  <!-- 로딩 -->
+  <section id="loading" class="screen">
+    <div class="spinner"></div>
+    <div class="load-title">성향을 분석하고 있습니다</div>
+    <div class="load-step" id="loadStep"></div>
+  </section>
+
+  <!-- 결과 -->
+  <section id="result" class="screen">
+    <img class="logo" src="assets/clavis-logo.png" alt="CLAVIS" />
+    <span class="rbadge">RESULT · 스킨십 성향</span>
+    <div class="code-row" id="codeRow"></div>
+    <div class="tname" id="tName"></div>
+    <p class="tline" id="tLine"></p>
+    <div class="tagrow" id="tagRow"></div>
+    <p class="rarrow">같은 유형은 <b id="rarPct"></b> — 16유형 중 <span id="rarRank"></span></p>
+
+    <!-- 온도 게이지 -->
+    <div class="sec">
+      <div class="slabel">TEMPERATURE</div>
+      <div class="stitle">욕망 온도 vs 표출 온도</div>
+      <div class="temp-row desire">
+        <div class="tl"><span>욕망 온도</span><b id="dNum">0°</b></div>
+        <div class="tbar"><i id="dBar"></i></div>
+      </div>
+      <div class="temp-row express">
+        <div class="tl"><span>표출 온도</span><b id="eNum">0°</b></div>
+        <div class="tbar"><i id="eBar"></i></div>
+      </div>
+      <div class="gapbox">
+        <div class="gnum"><span id="gapNum"></span><small>&nbsp;GAP</small></div>
+        <p id="gapText"></p>
+      </div>
+    </div>
+
+    <!-- 욕구 시그널 -->
+    <div class="sec">
+      <div class="slabel">DESIRE SIGNAL</div>
+      <div class="stitle">욕구 시그널 <span id="sigCount" style="color:var(--acc-2)"></span></div>
+      <div class="sig-dots" id="sigDots"></div>
+      <div class="sig-label" id="sigLabel"></div>
+      <p id="sigText"></p>
+    </div>
+
+    <!-- 판타지 프로필 -->
+    <div class="sec">
+      <div class="slabel">FANTASY PROFILE</div>
+      <div class="stitle" id="fantName"></div>
+      <p id="fantText"></p>
+    </div>
+
+    <!-- 분석 -->
+    <div class="sec">
+      <div class="slabel">ANALYSIS</div>
+      <div class="ana-block"><h4><span>01</span>작동 방식</h4><p id="aMech"></p></div>
+      <div class="ana-block"><h4><span>02</span>침대에서의 나</h4><p id="aBed"></p></div>
+      <div class="ana-block"><h4><span>03</span>이 유형의 지뢰</h4><p id="aMine"></p></div>
+      <div class="ana-block"><h4><span>04</span>당장 쓸 수 있는 한 수</h4><p id="aTip"></p></div>
+    </div>
+
+    <!-- 갇힌 구간 -->
+    <div class="sec">
+      <div class="slabel">STUCK POINT</div>
+      <div class="stitle" id="stageTitle"></div>
+      <p id="stageText"></p>
+    </div>
+
+    <!-- 궁합 -->
+    <div class="sec">
+      <div class="slabel">CHEMISTRY</div>
+      <div class="chem-row">
+        <div class="chem best"><div class="cl2">BEST MATCH</div><b id="bestName"></b><i id="bestCode"></i></div>
+        <div class="chem worst"><div class="cl2">WORST MATCH</div><b id="worstName"></b><i id="worstCode"></i></div>
+      </div>
+    </div>
+
+    <!-- 페이월 -->
+    <div class="pay">
+      <div class="plabel">FULL REPORT</div>
+      <h3 id="payHead"></h3>
+      <div class="locklist" id="lockList"></div>
+      <div class="price"><span class="was">89,000원</span><span class="now">49,000</span><span class="won">원</span></div>
+      <button class="paybtn" onclick="window.open('#')">잠긴 이야기 전부 열기</button>
+      <div class="socialproof">
+        <p>"결과지 보고 소름 돋아서 결제까지 안 넘어갈 수가 없었어요. 딱 제 얘기라서." — 20대 여성</p>
+        <p>"갭 34도 나왔는데, 해소 플랜 따라한 지 2주 만에 둘 분위기가 달라졌습니다." — 30대 남성</p>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost" onclick="shareResult()">친구에게 결과 공유하기</button>
+    </div>
+    <div class="restart"><button onclick="restart()">다시 측정하기</button></div>
+  </section>
+</div>
+
+<script>
+/* ==================== 데이터 ==================== */
+const AXES=[["B","C"],["L","R"],["O","H"],["S","U"]];
+const LETTER={B:"과감",C:"신중",L:"리드",R:"리시브",O:"발화",H:"은폐",S:"분리",U:"일체"};
+
+/* 축별 체크리스트 — 5문항 고정(홀수, 동점 불가). 3개 이상 체크 → 앞극 */
+const CHECKS=[
+ { ax:"속도", front:"B", title:"스킨십의 속도 앞에서\n나는 이런 사람이다", items:[
+   "분위기가 무르익으면 재기보다 몸이 먼저 움직인다",
+   "안 해본 스킨십 단계 앞에서는 망설임보다 설렘이 크다",
+   "밀당 계산이 길어지면 답답해서 내가 먼저 판을 깬다",
+   "타이밍을 놓치는 것보다 한 박자 빠른 쪽이 낫다",
+   "실수하더라도 일단 저지르고 수습하는 편이 낫다고 생각한다" ]},
+ { ax:"주도권", front:"L", title:"둘 사이의 주도권,\n나는 이런 사람이다", items:[
+   "첫 스킨십의 물꼬는 내가 트는 편이다",
+   "스킨십의 속도와 세기를 내 페이스로 끌고 갈 때 편하다",
+   "받는 쪽보다 하는 쪽일 때 몰입이 잘 된다",
+   "상대가 가만히 있으면 어색하기보다 오히려 내 무대라고 느낀다",
+   "데이트 동선을 짤 때 스킨십하기 좋은 자리까지 계산에 넣는다" ]},
+ { ax:"표현", front:"O", title:"원하는 것을 말하는 일,\n나는 이런 사람이다", items:[
+   "원하는 스킨십이 있으면 돌려 말하지 않고 입 밖으로 꺼낸다",
+   "좋으면 좋다고 소리나 말로 바로 표현되는 편이다",
+   "야한 농담이나 섹슈얼한 대화를 먼저 꺼내는 쪽이다",
+   "별로였던 건 별로였다고 그 자리에서 말한다",
+   "내 판타지를 연인에게 말하는 게 어렵지 않다" ]},
+ { ax:"스위치", front:"S", title:"평소의 나와 침대의 나,\n나는 이런 사람이다", items:[
+   "침대에서의 나는 평소의 나와 말투부터 다르다",
+   "스위치가 켜지는 순간, 분위기가 확 바뀌는 걸 스스로 느낀다",
+   "밖에서의 애정표현과 둘만 있을 때의 스킨십은 별개다",
+   "낮의 관계와 밤의 관계는 다른 룰로 움직인다고 생각한다",
+   "스킨십이 끝나면 언제 그랬냐는 듯 원래 모드로 돌아온다" ]}
+];
+
+/* 서브 지표 5개 — 전부 저자 콘텐츠 근거 */
+const SUBS=[
+ { key:"F1", ax:"판타지", title:"야한 상상이 켜질 때,\n장면에서 제일 중요한 것은?", opts:[
+   {t:"구체적인 행위 그 자체", c:"행위"},
+   {t:"몸의 특정 부위나 실루엣", c:"육체"},
+   {t:"무엇을 입고 있는지 — 옷·유니폼·코스튬", c:"의상"},
+   {t:"어디서 하는지 — 평소엔 못 갈 공간", c:"장소"},
+   {t:"하면 안 되는 상황이라는 사실 그 자체", c:"일탈"},
+   {t:"움직임을 막거나, 막히는 상황", c:"제한"} ]},
+ { key:"F2", ax:"취향", title:"야한 것을 찾아볼 때\n나는 어느 쪽인가?", opts:[
+   {t:"그날 눈에 걸리는 아무거나", v:0},
+   {t:"끌리는 분위기 정도는 있다", v:1},
+   {t:"검색어가 몇 개로 정해져 있다", v:2},
+   {t:"정확한 키워드 조합까지 고정돼 있다", v:3} ]},
+ { key:"F3", ax:"해소", title:"스트레스가 쌓이면\n주로 어떻게 푸는가?", opts:[
+   {t:"사람을 만나서 털어놓는다", v:0},
+   {t:"운동이나 취미에 몰입한다", v:0},
+   {t:"맵고 달고 자극적인 걸 몸에 넣는다", v:1},
+   {t:"술, 야식, 야한 것 — 몸이 원하는 1차원 자극으로 푼다", v:2} ]},
+ { key:"F4", ax:"우선순위", title:"셋 중 하나를 한 달간 끊어야 한다.\n제일 못 끊을 것 같은 것은?", opts:[
+   {t:"자극적인 음식", v:0},
+   {t:"휴대폰과 SNS", v:1},
+   {t:"연인과의 스킨십", v:2} ]},
+ { key:"F5", ax:"촉각", title:"연인과 나란히 있을 때\n내 손은 무엇을 하고 있는가?", opts:[
+   {t:"각자 제자리. 필요할 때만 움직인다", v:0},
+   {t:"잡은 손 정도면 충분하다", v:0},
+   {t:"머리카락, 손가락, 어깨 — 뭐라도 만지작거린다", v:1},
+   {t:"가만있는 게 더 어색하다. 계속 닿아 있어야 한다", v:1} ]}
+];
+
+/* 판타지 6분류 — 가중치: 일탈5 장소4 행위3 제한3 의상2 육체2 */
+const FANT={
+ "행위":{w:3,d:"머릿속 판타지의 중심이 '무엇을 하는가'에 있다.\n장면보다 동작이 먼저 그려지는 타입이다."},
+ "육체":{w:2,d:"시각적 디테일에 반응하는 타입이다.\n특정 부위, 실루엣, 질감이 스위치다."},
+ "의상":{w:2,d:"입혀진 상태가 벗겨진 상태보다 야하다는 걸 아는 타입이다.\n옷 한 벌이 판 전체의 온도를 바꾼다."},
+ "장소":{w:4,d:"공간이 바뀌면 사람이 바뀐다.\n낯선 장소가 이 타입에게는 최고의 최음제다."},
+ "일탈":{w:5,d:"'하면 안 된다'가 가장 강한 스위치다.\n금지선 그 자체가 흥분의 원료가 되는 타입이다."},
+ "제한":{w:3,d:"통제와 해방의 낙차에서 흥분을 느낀다.\n묶는 쪽이든 묶이는 쪽이든, 규칙이 있는 판을 좋아한다."}
+};
+
+/* 갇히는 구간 — 기승전결 정체 진단 (축1×축2) */
+const STAGE={
+ BL:{k:"전(轉)",d:"당신의 스킨십은 전(轉)에 갇혀 있다.\n달아오르는 것까지는 완벽한데, 절정 이후의 설계가 없다.\n클라이맥스만 있고 결말이 없는 영화를 반복 상영 중이다."},
+ BR:{k:"결(結)",d:"당신의 스킨십은 결(結)에 갇혀 있다.\n받아주고 마무리하는 건 좋은데, 정작 이야기를 시작하는 법이 없다.\n남이 써준 각본만 연기하는 배우로 남을 셈인가."},
+ CL:{k:"승(承)",d:"당신의 스킨십은 승(承)에 갇혀 있다.\n분위기는 기가 막히게 만드는데, 다음 장으로 넘기는 손이 늦다.\n무드 장인이 무드에서 멈추면 그냥 좋은 친구가 된다."},
+ CR:{k:"기(起)",d:"당신의 스킨십은 기(起)에 갇혀 있다.\n탐색만 하다가 판이 끝난다.\n시작의 문턱에서 쓰는 에너지가 본편보다 큰 구조다."}
+};
+
+/* 16유형 — 이름은 확정본. 희귀도 합계 100 */
+const TYPES={
+ BLOS:{n:"굶주린 포식자",rar:4,tag:["#직진본능","#선공필승","#스위치확실"],
+  line:"원하는 걸 정확히 알고, 말하고, 먼저 움직이는 타입",
+  mech:"끌리면 재지 않는다. 눈빛이 바뀌는 순간 이미 몸이 먼저 나가 있고, 원하는 건 입 밖으로 꺼내야 직성이 풀린다. 낮에는 멀쩡한 사회인, 스위치가 켜지면 완전히 다른 판이 시작된다.",
+  bed:"주도권은 협상 대상이 아니다. 속도, 순서, 강도까지 스스로 설계하고 상대의 반응을 끌어내는 데서 쾌감을 느낀다.",
+  mine:"문제는 속도다. 상대의 온도가 따라오기 전에 이미 세 걸음 앞에 가 있다. 포식자의 식탁에서 상대는 가끔 메뉴가 된 기분을 느낀다.",
+  tip:"한 박자만 늦춰라. 사냥의 쾌감은 속도가 아니라, 상대가 스스로 걸어 들어오게 만드는 데 있다."},
+ BROS:{n:"낮져밤이 반전러",rar:7,tag:["#반전매력","#받는쪽인데화끈","#표현확실"],
+  line:"시작은 상대에게 맡기지만, 일단 시작되면 누구보다 화끈해지는 타입",
+  mech:"먼저 나서는 건 어색한데, 판이 깔리면 망설임이 없다. 좋은 건 좋다고 바로 표현하고, 과감한 제안도 받아치는 쪽에서는 겁이 없다. 낮의 나와 밤의 나가 다르다는 걸 본인이 제일 잘 안다.",
+  bed:"리드는 넘기되 반응으로 판을 키운다. 표현이 살아 있어서 상대는 계속 다음 카드를 꺼내고 싶어진다.",
+  mine:"시작을 여는 손이 없으면 판 자체가 안 열린다. 소극적인 상대를 만나면 서로 눈치만 보다 밤이 끝난다.",
+  tip:"열 번 중 한 번만 먼저 열어봐라. 반전 매력은 순서가 뒤집히는 날 제일 세게 터진다."},
+ BLOU:{n:"브레이크 없는 직진러",rar:6,tag:["#언제나풀액셀","#숨김없음","#한결같은열정"],
+  line:"낮이든 밤이든 온도가 같은, 숨길 줄 모르는 정공법 타입",
+  mech:"좋으면 좋다고 말하고, 원하면 바로 움직인다. 침대 안팎의 온도차가 거의 없어서 애정표현과 스킨십의 경계도 흐릿하다. 계산이 없으니 상대는 이 사람의 진심을 의심할 일이 없다.",
+  bed:"스킨십이 일상의 연장이다. 갑자기 달아오르는 게 아니라, 하루 종일 데워져 있던 온도가 그대로 이어진다.",
+  mine:"브레이크가 없다는 건 완급도 없다는 뜻이다. 매번 풀액셀이면 상대는 특별한 날과 평일의 차이를 못 느낀다.",
+  tip:"가끔은 일부러 멈춰라. 직진러의 정지는 그 자체로 가장 강력한 예고편이 된다."},
+ BROU:{n:"올인하는 순정파",rar:9,tag:["#표현부자","#올인형","#애정과욕망사이"],
+  line:"사랑하면 다 주고, 그 마음을 숨기지도 못하는 타입",
+  mech:"주도권은 상대에게 있지만 감정과 표현은 늘 만수위다. 스킨십은 애정의 연장선이라, 마음이 식으면 몸도 같이 식는 정직한 구조를 갖고 있다.",
+  bed:"반응과 표현이 풍부해서 상대를 춤추게 한다. 테크닉보다 감정의 밀도로 승부하는 쪽이다.",
+  mine:"올인의 함정은 계좌가 하나라는 것이다. 관계가 흔들리면 스킨십부터 무너지고, 그게 다시 관계를 흔든다.",
+  tip:"마음과 몸을 한 계좌에 넣지 마라. 몸의 대화에는 몸의 언어를 따로 챙기는 것이 롱런의 조건이다."},
+ BLHS:{n:"가면 쓴 포식자",rar:3,tag:["#겉은신사","#속은맹수","#말없이행동파"],
+  line:"말로는 아무것도 드러내지 않지만, 행동은 이미 다음 단계에 가 있는 타입",
+  mech:"원하는 게 많고 선명한데 입 밖으로는 안 꺼낸다. 대신 손이, 동선이, 분위기가 말을 한다. 낮의 이미지가 반듯할수록 밤의 갭은 커진다.",
+  bed:"조용히, 그러나 확실하게 판을 끌고 간다. 말없이 진행되는 리드에 상대는 홀린 듯 따라오게 된다.",
+  mine:"말을 안 하니 상대는 늘 추측해야 한다. 추측이 빗나가는 날, 갭은 매력이 아니라 벽이 된다.",
+  tip:"열 마디 중 한 마디만 소리 내라. 포식자의 한마디는 백 번의 스킨십보다 상대를 깊게 흔든다."},
+ BRHS:{n:"숨죽인 야수",rar:5,tag:["#조용한불씨","#받으면터짐","#포커페이스"],
+  line:"겉은 잔잔한데, 불이 붙으면 걷잡을 수 없어지는 타입",
+  mech:"먼저 움직이지도, 말하지도 않는다. 하지만 상대가 정확한 지점을 건드리면 본인도 놀랄 만큼 과감해진다. 그 낙차가 이 유형의 정체성이다.",
+  bed:"평소의 침묵이 무색해지는 반전이 있다. 다만 그 반전은 안전하다고 느끼는 상대 앞에서만 열린다.",
+  mine:"불씨를 못 찾는 상대를 만나면 평생 잔잔한 사람으로 오해받는다. 손해는 본인이 제일 크게 본다.",
+  tip:"힌트를 흘려라. 야수의 문은 밖에서 못 연다. 열쇠 구멍 위치 정도는 알려줘야 사냥이 시작된다."},
+ BLHU:{n:"묵직한 불도저",rar:5,tag:["#말없이직진","#한결같은묵직함","#행동이언어"],
+  line:"말은 아끼지만 방향은 흔들리지 않는, 행동으로 증명하는 타입",
+  mech:"표현은 서툴러도 추진력은 최상위다. 낮과 밤의 온도가 같아서 좋아하는 마음이 스킨십으로 자연스럽게 이어진다. 다만 그 과정 전부가 무언으로 진행된다.",
+  bed:"화려한 말 대신 꾸준한 밀도. 서두르지 않지만 물러서지도 않는 뚝심이 침대에서도 그대로다.",
+  mine:"확인 없이 미는 불도저는 공사가 아니라 사고를 낸다. 상대의 신호를 읽는 속도가 추진력을 못 따라갈 때가 문제다.",
+  tip:"밀기 전에 한 번만 물어라. 좋냐는 한마디면 불도저는 흉기가 아니라 중장비가 된다."},
+ BRHU:{n:"고요한 관찰자",rar:8,tag:["#차분한온도","#깊게스며듦","#말보다눈"],
+  line:"조용히 받아들이면서도, 속으로는 대담한 그림을 그리는 타입",
+  mech:"표현도 리드도 최소한이지만 마음속 수위는 낮지 않다. 상대를 관찰하고 흡수하면서 천천히 자기 페이스로 스며든다. 낮과 밤이 크게 다르지 않은 항상성이 무기다.",
+  bed:"화려하진 않지만 상대의 리듬을 정확히 타는 쪽이다. 안정감이 이 유형의 최음제다.",
+  mine:"원하는 게 있어도 끝까지 말을 안 해서, 상대는 늘 반쪽짜리 답안지로 시험을 친다.",
+  tip:"관찰한 걸 한 번씩 발설해라. 너 이럴 때 좋아하더라, 이 한마디로 관찰자는 설계자가 된다."},
+ CLOS:{n:"계산적인 조련사",rar:4,tag:["#설계된리드","#말로먼저","#타이밍장인"],
+  line:"서두르지 않지만, 판은 언제나 본인이 짜는 타입",
+  mech:"스킨십의 속도와 단계를 머릿속에 그려두고 그대로 실행한다. 원하는 건 말로 정확히 전달하고, 상대의 반응을 보며 다음 수를 조정한다. 침대 안팎의 모드 전환도 명확하다.",
+  bed:"즉흥이 아니라 설계다. 상대가 뭘 좋아하는지 데이터를 쌓고, 그걸 정확한 타이밍에 꺼내 쓴다.",
+  mine:"계산이 보이는 순간 조련은 끝난다. 상대는 사랑받는 게 아니라 관리당한다고 느끼기 시작한다.",
+  tip:"설계도를 가끔 버려라. 계획에 없던 한 번이 백 번의 완벽한 플레이보다 오래 남는다."},
+ CROS:{n:"늦게 열리는 자물쇠",rar:8,tag:["#천천히확실하게","#열리면솔직","#신뢰가열쇠"],
+  line:"마음이 열리기 전까진 굳게 닫혀 있지만, 열리면 가장 솔직해지는 타입",
+  mech:"초반에는 받아주는 것도 조심스럽다. 하지만 신뢰가 쌓이면 원하는 것, 좋았던 것, 아쉬운 것까지 전부 말로 풀어내는 사람이 된다. 그 격차가 연인만 아는 매력이 된다.",
+  bed:"열리기 전과 후가 다른 사람 수준이다. 시간을 들인 상대만 진짜 버전을 만난다.",
+  mine:"자물쇠가 열리는 데 걸리는 시간을 못 버티는 상대는 겉만 보고 떠난다. 오해받은 채 끝나는 연애가 쌓인다.",
+  tip:"다 열지는 않더라도 열쇠가 존재한다는 건 알려라. 잠긴 문과 잠긴 척하는 문은 완전히 다른 대접을 받는다."},
+ CLOU:{n:"다정한 설계자",rar:7,tag:["#부드러운주도","#대화형스킨십","#일상이전희"],
+  line:"다정함으로 리드하고, 대화로 온도를 맞추는 타입",
+  mech:"몰아붙이는 리드가 아니라 손잡고 걷는 리드다. 원하는 걸 말하되 상대의 속도를 먼저 묻고, 일상의 애정표현과 침대의 온도가 하나로 이어져 있다.",
+  bed:"전희는 침대에서 시작되지 않는다는 걸 본능적으로 아는 유형이다. 하루 전체가 빌드업이다.",
+  mine:"너무 안전한 설계는 지루함과 한 끗 차이다. 배려가 반복되면 상대는 심장 뛸 일이 없어진다.",
+  tip:"설계에 사고 한 번을 넣어라. 예고 없는 한 장면이 다정함을 다시 설레게 만든다."},
+ CROU:{n:"포근한 안식처",rar:10,tag:["#스킨십은온기","#안정지향","#표현은솔직"],
+  line:"자극보다 온기, 정복보다 연결을 원하는 타입",
+  mech:"스킨십의 목적이 흥분이 아니라 안심이다. 받아주는 쪽이 편하고, 좋고 싫음은 부드럽지만 분명하게 말한다. 낮의 다정함이 밤까지 그대로 이어진다.",
+  bed:"격정보다 밀착. 끝나고 나서의 포옹까지가 이 유형에게는 본편이다.",
+  mine:"안식처의 함정은 당연해지는 것이다. 늘 열려 있는 품은 어느 순간 공기 취급을 받는다.",
+  tip:"가끔 문을 닫아라. 안식처에도 예약이 필요하다는 걸 알려주는 순간, 온기의 가격이 올라간다."},
+ CLHS:{n:"묵묵한 조각가",rar:5,tag:["#디테일장인","#말없는집중","#완성형리드"],
+  line:"조용히, 오래, 정교하게 상대를 알아가는 타입",
+  mech:"화려한 말도 급한 진도도 없다. 대신 상대의 반응 하나하나를 기억해두고 다음에 더 정확해진다. 스위치가 켜지면 평소의 무심함이 무색한 집중력이 나온다.",
+  bed:"과정 하나하나에 공을 들이는 장인형. 속도는 느리지만 완성도로 승부한다.",
+  mine:"작업 과정을 설명하지 않는 조각가는 오해받는다. 상대는 그 정성을 무심함으로 읽을 수 있다.",
+  tip:"작품 설명을 붙여라. 지금 뭘 아끼고 있는지 말해주는 순간, 느림은 배려로 번역된다."},
+ CRHS:{n:"잠자는 화산",rar:6,tag:["#겉은휴화산","#속은마그마","#터지는날온다"],
+  line:"아무 일 없어 보이지만, 속에는 뜨거운 것이 고여 있는 타입",
+  mech:"신중하고, 받아주는 쪽이고, 말도 아낀다. 삼중 잠금이다. 하지만 안쪽의 온도는 낮지 않다. 신뢰가 임계점을 넘는 순간, 아무도 예상 못 한 분출이 시작된다.",
+  bed:"평소를 아는 사람일수록 놀라는 반전이 있다. 다만 그 문이 열리는 데는 시간과 확신이 필요하다.",
+  mine:"분출을 본 적 없는 상대는 이 사람을 욕구 없는 사람으로 결론짓는다. 화산 입장에서는 억울한 오판이다.",
+  tip:"연기라도 피워라. 완전 분출은 아껴도 좋다. 하지만 살아 있는 화산이라는 신호는 관계를 살린다."},
+ CLHU:{n:"스며드는 신사",rar:6,tag:["#품격리드","#조용한한결같음","#깊게천천히"],
+  line:"티 내지 않고 이끌며, 어느새 상대의 일상에 스며드는 타입",
+  mech:"리드하되 밀어붙이지 않고, 원하는 게 있어도 소리 내지 않는다. 낮과 밤의 온도가 같아서 급발진도 급냉각도 없다. 시간이 지날수록 진가가 드러나는 구조다.",
+  bed:"정중함과 욕망이 공존한다. 서두르지 않는 손길이 오히려 상대의 조급함을 끌어낸다.",
+  mine:"스며드는 속도가 너무 느리면 상대는 물이 들어오는지도 모른다. 무드가 아니라 무존재감이 되는 순간이 위험하다.",
+  tip:"신사도 가끔 장갑을 벗어야 한다. 정제된 태도 사이로 날것 한 번이, 스며듦을 각인으로 바꾼다."},
+ CRHU:{n:"심해 로맨티스트",rar:7,tag:["#가장깊은바다","#느린만큼진심","#아는사람만안다"],
+  line:"가장 늦게 열리지만, 가장 깊게 사랑하는 타입",
+  mech:"네 개의 축이 전부 안쪽을 향해 있다. 신중하고, 받아들이고, 감추고, 한결같다. 겉으로는 잔잔한 수면이지만 그 아래에는 이 테스트에서 가장 깊은 감정의 수압이 있다.",
+  bed:"자극적인 그림은 없다. 대신 살이 닿는 것만으로 전해지는 밀도가 있다. 아는 사람만 아는 바다다.",
+  mine:"수압은 밖에서 안 보인다. 표현되지 않은 진심은 없는 것과 같은 취급을 받고, 심해는 혼자 실망을 쌓게 된다.",
+  tip:"수면 위로 가끔 올라와라. 깊이는 보여줘야 깊이다. 한 달에 한 번, 먼저 닿는 손이 바다의 존재를 증명한다."}
+};
+
+/* ==================== 상태 ==================== */
+const TOTAL=CHECKS.length+SUBS.length; // 9
+let step=0;
+let chk=CHECKS.map(()=>[false,false,false,false,false]);
+let sub=SUBS.map(()=>null);
+
+function go(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); document.getElementById(id).classList.add("active"); window.scrollTo({top:0,behavior:"instant"}); }
+function startQuiz(){ step=0; go("quiz"); render(); }
+
+function render(){
+  document.getElementById("cur").textContent=step+1;
+  document.getElementById("total").textContent=TOTAL;
+  document.getElementById("bar").style.width=(step/TOTAL*100)+"%";
+  let h="";
+  if(step<4){
+    const c=CHECKS[step];
+    h=`<div class="qcard"><div class="qnum">${String(step+1).padStart(2,"0")}</div>
+      <div class="qax">AXIS · ${c.ax}</div>
+      <div class="qtitle">${c.title}</div>
+      <div class="qhint"><span class="multi">해당하는 문장을 모두 선택</span> · 없으면 그대로 다음</div>
+      <div class="options">`;
+    c.items.forEach((t,i)=>{ h+=`<button class="opt check ${chk[step][i]?'selected':''}" onclick="toggle(${i})"><span class="olabel">${t}</span><span class="oradio"></span></button>`; });
+    h+=`</div><div class="qfoot">${step>0?'<button class="btn ghost back" onclick="prev()">이전</button>':''}
+        <button class="btn" onclick="next()">다음  →</button></div></div>`;
+  } else {
+    const s=SUBS[step-4], sel=sub[step-4];
+    h=`<div class="qcard"><div class="qnum">${String(step+1).padStart(2,"0")}</div>
+      <div class="qax">PROFILE · ${s.ax}</div>
+      <div class="qtitle">${s.title}</div>
+      <div class="qhint">하나만 선택하세요</div>
+      <div class="options">`;
+    s.opts.forEach((o,i)=>{ h+=`<button class="opt ${sel===i?'selected':''}" onclick="pick(${i})"><span class="olabel">${o.t}</span><span class="oradio"></span></button>`; });
+    h+=`</div><div class="qfoot"><button class="btn ghost back" onclick="prev()">이전</button>
+        <button class="btn" id="nextBtn" onclick="next()" ${sel===null?'disabled':''}>${step===TOTAL-1?'결과 보기':'다음  →'}</button></div></div>`;
+  }
+  document.getElementById("quiz-body").innerHTML=h;
+}
+function toggle(i){ chk[step][i]=!chk[step][i]; render(); }
+function pick(i){ sub[step-4]=i; render(); }
+function next(){
+  if(step>=4 && sub[step-4]===null) return;
+  if(step<TOTAL-1){ step++; render(); window.scrollTo({top:0,behavior:"instant"}); }
+  else finish();
+}
+function prev(){ if(step>0){ step--; render(); window.scrollTo({top:0,behavior:"instant"}); } }
+
+/* ==================== 계산 ==================== */
+function counts(){ return chk.map(a=>a.filter(Boolean).length); }
+function computeCode(){
+  const c=counts();
+  return AXES.map(([f,b],i)=> c[i]>=3?f:b).join("");
+}
+function fantCat(){ return SUBS[0].opts[sub[0]].c; }
+function fVal(n){ return SUBS[n].opts[sub[n]].v; } // n=1..4 → F2..F5
+function hits(){
+  const c=counts();
+  let n=0;
+  if(fVal(4)>=1) n++;          // F5 쉬지 않는 손
+  if(fVal(1)>=2) n++;          // F2 정해진 취향
+  if(c[1]>=3) n++;             // 리드 3개 이상
+  if(fVal(2)>=2) n++;          // F3 1차원 해소
+  if(fVal(3)===2) n++;         // F4 스킨십 못 끊음
+  return n;
+}
+function temps(){
+  const c=counts(), h=hits();
+  const desire=25 + h*9 + fVal(1)*4 + FANT[fantCat()].w*3;   // 31~97
+  const express=18 + c[2]*8 + c[0]*5 + c[1]*3;               // 18~98
+  return {desire,express,gap:desire-express,h};
+}
+function flip(ch){ for(const [a,b] of AXES){ if(ch===a) return b; if(ch===b) return a; } }
+function bestOf(code){ return flip(code[0])+flip(code[1])+code[2]+code[3]; }
+function worstOf(code){ return code[0]+code[1]+flip(code[2])+flip(code[3]); }
+function gapText(t){
+  if(t.gap>=25) return `욕망 ${t.desire}도 중 ${t.gap}도가 잠겨 있다.\n욕망이 피곤한 게 아니라, 자신을 드러내는 일이 피곤한 거다.`;
+  if(t.gap>=10) return `원하는 것보다 ${t.gap}도 낮게 표현되고 있다.\n매번 뭔가 아쉬운 느낌, 그 정체가 이 숫자다.`;
+  if(t.gap>=-9) return `원하는 것과 하는 것이 거의 일치한다.\n생각보다 드문 균형이다. 유지가 관건이다.`;
+  return `표출이 욕망보다 ${Math.abs(t.gap)}도 높다.\n원해서가 아니라 분위기 때문에 하고 있다는 신호다.`;
+}
+function sigInfo(h){
+  if(h>=3) return {label:"주체하기 어려운 구간", text:"다섯 개 지표 중 "+h+"개에 불이 들어왔다.\n이 에너지는 숨긴다고 사라지지 않는다. 방향을 정해주지 않으면 알아서 새는 것이 욕구의 성질이다."};
+  if(h===2) return {label:"왕성한 구간", text:"다섯 개 지표 중 2개에 불이 들어왔다.\n욕구 자체는 건강하게 왕성한 축이다. 관건은 크기가 아니라 드러내는 방식이다."};
+  return {label:"안정 구간", text:"다섯 개 지표 중 "+h+"개에 불이 들어왔다.\n지금은 욕망보다 상황이 앞서는 시기일 수 있다. 낮은 게 아니라 잠잠한 것이다."};
+}
+
+/* ==================== 결과 렌더 ==================== */
+function renderResult(code,t,cat,h){
+  const T=TYPES[code];
+  document.getElementById("codeRow").innerHTML=[...code].map(ch=>`<span class="cl"><b>${ch}</b><i>${LETTER[ch]}</i></span>`).join("");
+  document.getElementById("tName").textContent=T.n;
+  document.getElementById("tLine").textContent=T.line;
+  document.getElementById("tagRow").innerHTML=T.tag.map(x=>`<span>${x}</span>`).join("");
+  const rank=Object.values(TYPES).filter(x=>x.rar<T.rar).length+1;
+  document.getElementById("rarPct").textContent=T.rar+"%";
+  document.getElementById("rarRank").textContent=rank+"번째로 희귀한 유형";
+
+  document.getElementById("dNum").textContent=t.desire+"°";
+  document.getElementById("eNum").textContent=t.express+"°";
+  document.getElementById("gapNum").textContent=(t.gap>0?"+":"")+t.gap+"°";
+  document.getElementById("gapText").textContent=gapText(t);
+
+  const si=sigInfo(h);
+  document.getElementById("sigCount").textContent=h+" / 5";
+  document.getElementById("sigDots").innerHTML=[0,1,2,3,4].map(i=>`<i class="${i<h?'on':''}"></i>`).join("");
+  document.getElementById("sigLabel").textContent=si.label;
+  document.getElementById("sigText").textContent=si.text;
+
+  document.getElementById("fantName").textContent="판타지 축 — "+cat;
+  document.getElementById("fantText").textContent=FANT[cat].d;
+
+  document.getElementById("aMech").textContent=T.mech;
+  document.getElementById("aBed").textContent=T.bed;
+  document.getElementById("aMine").textContent=T.mine;
+  document.getElementById("aTip").textContent=T.tip;
+
+  const st=STAGE[code[0]+code[1]];
+  document.getElementById("stageTitle").textContent="당신이 갇힌 구간 — "+st.k;
+  document.getElementById("stageText").textContent=st.d;
+
+  const bc=bestOf(code), wc=worstOf(code);
+  document.getElementById("bestName").textContent=TYPES[bc].n;
+  document.getElementById("bestCode").textContent=bc;
+  document.getElementById("worstName").textContent=TYPES[wc].n;
+  document.getElementById("worstCode").textContent=wc;
+
+  document.getElementById("payHead").textContent = t.gap>=25
+    ? "당신은 온도가 낮은 게 아니라\n잠겨 있는 겁니다"
+    : T.n+"의\n나머지 이야기가 잠겨 있습니다";
+  const LOCK='<svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2.5" stroke="currentColor" stroke-width="1.8"/><path d="M8 10V7a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="1.8"/></svg>';
+  const locks=[
+    T.n+"의 실전 각본 — 오늘 밤 바로 쓰는 단계별 시나리오",
+    "온도 갭 "+Math.abs(t.gap)+"도 해소 플랜 — 잠긴 욕망을 여는 순서",
+    TYPES[bc].n+" 공략집 — 최고 궁합을 만났을 때 판 짜는 법",
+    st.k+" 탈출 루틴 — 갇힌 구간을 완성하는 기승전결 설계"
+  ];
+  document.getElementById("lockList").innerHTML=locks.map(x=>`<div class="lock"><span class="ic">${LOCK}</span><p>${x}</p></div>`).join("");
+
+  go("result");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.getElementById("dBar").style.width=t.desire+"%";
+    document.getElementById("eBar").style.width=t.express+"%";
+  }));
+}
+
+function finish(){
+  go("loading");
+  const msgs=["체크 패턴을 4축으로 분해하는 중","욕망 온도를 계산하는 중","표출 온도와의 갭을 재는 중","16유형 중 당신의 자리를 찾는 중"];
+  let i=0; document.getElementById("loadStep").textContent=msgs[0];
+  const iv=setInterval(()=>{ i=(i+1)%msgs.length; document.getElementById("loadStep").textContent=msgs[i]; },700);
+  setTimeout(()=>{ clearInterval(iv);
+    const code=computeCode(), t=temps();
+    renderResult(code,t,fantCat(),t.h);
+  },2600);
+}
+function restart(){
+  step=0; chk=CHECKS.map(()=>[false,false,false,false,false]); sub=SUBS.map(()=>null);
+  go("intro");
+}
+function shareResult(){
+  const name=document.getElementById("tName").textContent;
+  const data={ title:"스킨십 성향 테스트 | CLAVIS", text:`나의 스킨십 성향은 '${name}'. 당신의 밤은 낮과 같은 사람인가?`, url:location.origin+location.pathname };
+  if(navigator.share) navigator.share(data).catch(()=>{});
+  else { navigator.clipboard.writeText(data.url); alert("링크가 복사되었습니다."); }
+}
+
+/* ★ 결과지 바로보기(미리보기): ?type=BLOS  (+선택 &gap=hot|lock 로 갭 분기 확인) */
+(function(){
+  const p=new URLSearchParams(location.search);
+  let code=(p.get("type")||"").toUpperCase();
+  if(!TYPES[code]) return;
+  // 합성 응답: 코드 앞극이면 4체크, 뒷극이면 1체크
+  chk=AXES.map(([f],i)=> code[i]===f ? [1,1,1,1,0].map(Boolean) : [1,0,0,0,0].map(Boolean));
+  sub=[3,2,1,2,2]; // 장소 / F2=2 / F3=1 / F4=2 / F5=1
+  if(p.get("gap")==="lock"){ chk=AXES.map(()=>[1,0,0,0,0].map(Boolean)); sub=[4,3,3,2,3]; } // 욕망 높고 표출 낮음 → +25 이상(잠김) 분기
+  if(p.get("gap")==="cool"){ chk=AXES.map(()=>[1,1,1,1,1].map(Boolean)); sub=[1,0,0,0,0]; } // 표출이 욕망보다 높음 → -10 이하 분기
+  const t=temps();
+  renderResult(code,t,fantCat(),t.h);
+})();
+</script>
+</body>
+</html>
