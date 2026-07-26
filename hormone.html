@@ -716,6 +716,15 @@ function renderResult(){
   show('scr-result');
   window.scrollTo(0,0);
 }
+
+/* ★ 결과지 바로보기(미리보기): ?type=DEOP  (16유형 코드) */
+(function(){
+  const p=new URLSearchParams(location.search);
+  const code=(p.get("type")||"").toUpperCase();
+  if(!TYPES[code]) return;
+  Q.forEach((q,i)=>{ ans[i] = code.includes(q[0]) ? 0 : 4; });
+  renderResult();
+})();
 </script>
 
 <!-- 공유 시트 -->

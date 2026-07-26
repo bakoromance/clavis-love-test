@@ -15,12 +15,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" />
 <style>
   :root{
-    --bg:#f8f3ec; --bg-2:#f2eae0; --card:#ffffff; --card-bd:#e9ddd0;
-    --ink:#2b2220; --ink-2:#6d5c55; --muted:#a3907f; --line:#e6d8c9;
-    --rose:#b3505e; --rose-2:#d07a85; --rose-soft:rgba(179,80,94,.10);
-    --black:#171210; --white-line:#f4ede4;
-    --btn:#2b2220; --btn-ink:#f8f3ec;
-    --shadow:0 22px 50px -28px rgba(70,40,35,.30);
+    /* 미드나잇 벨벳 — 딥 버건디 브라운 + 샴페인 골드 */
+    --bg:#241318; --bg-2:#1c0e12; --card:#311b22; --card-bd:#482831;
+    --ink:#f4e9de; --ink-2:#cdb3aa; --muted:#997d76; --line:#432630;
+    --rose:#dcb97e; --rose-2:#eed3a1; --rose-soft:rgba(220,185,126,.10);
+    --black:#150c0e; --white-line:#f4ede4;
+    --btn:#d9b877; --btn-ink:#2a1512;
+    --shadow:0 24px 55px -26px rgba(0,0,0,.6);
     --serif:"Cormorant Garamond",serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -31,16 +32,16 @@
   .screen.active{display:flex;animation:fade .5s ease both}
   @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;border:none;cursor:pointer;background:var(--btn);color:var(--btn-ink);font-family:inherit;font-weight:700;font-size:16px;padding:17px 24px;border-radius:14px;transition:transform .15s,background .2s,opacity .2s}
-  .btn:hover{background:#3d312d}
+  .btn:hover{background:#e6c78b}
   .btn:active{transform:scale(.985)}
   .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink-2);font-weight:600}
-  .btn.ghost:hover{background:#fff}
+  .btn.ghost:hover{background:rgba(255,255,255,.05)}
 
   /* 인트로 */
   #intro{justify-content:center;align-items:center;text-align:center;padding:54px 28px}
   #intro img.logo{height:28px;margin-bottom:30px;opacity:.92}
   #intro .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--rose);background:var(--rose-soft);border:1px solid rgba(179,80,94,.25);padding:7px 14px;border-radius:999px;margin-bottom:24px;letter-spacing:.05em}
-  #intro .intro-illu{width:150px;height:150px;border-radius:24px;background:var(--black);display:flex;align-items:center;justify-content:center;margin-bottom:26px;box-shadow:var(--shadow)}
+  #intro .intro-illu{width:150px;height:150px;border-radius:24px;background:var(--black);border:1px solid rgba(220,185,126,.3);display:flex;align-items:center;justify-content:center;margin-bottom:26px;box-shadow:var(--shadow)}
   #intro .intro-illu svg{width:76%;height:76%}
   #intro h1{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.34;margin-bottom:16px}
   #intro h1 .em{font-family:var(--serif);font-style:italic;color:var(--rose)}
@@ -50,7 +51,7 @@
   #intro .note{margin-top:16px;font-size:12.5px;color:var(--muted)}
 
   /* 퀴즈 */
-  .qhead{position:sticky;top:0;z-index:5;background:var(--bg);padding:18px 22px 14px;box-shadow:0 8px 14px -12px rgba(70,40,35,.25)}
+  .qhead{position:sticky;top:0;z-index:5;background:var(--bg);padding:18px 22px 14px;box-shadow:0 10px 16px -12px rgba(0,0,0,.55)}
   .qhead-sub{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
   .qhead-sub .diag{font-size:12.5px;color:var(--ink-2);font-weight:600}
   .qhead-sub .step{font-size:11.5px;letter-spacing:.16em;color:var(--rose);font-weight:700}
@@ -65,11 +66,11 @@
   .qhint .multi{color:var(--rose);font-weight:700}
   .options{display:flex;flex-direction:column;gap:9px}
   .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--card-bd);color:var(--ink-2);padding:15px 17px;border-radius:14px;font-family:inherit;font-size:14.5px;font-weight:500;line-height:1.5;transition:border-color .16s,background .16s,color .16s,box-shadow .16s}
-  .opt:hover{border-color:#d9c4b2;box-shadow:0 8px 18px -14px rgba(70,40,35,.3)}
+  .opt:hover{border-color:#6a3b46;box-shadow:0 8px 18px -14px rgba(0,0,0,.5)}
   .opt .olabel{flex:1;white-space:pre-line}
-  .opt .oradio{flex:0 0 auto;width:21px;height:21px;border-radius:50%;border:1.8px solid #cdb8a6;position:relative;transition:.16s}
+  .opt .oradio{flex:0 0 auto;width:21px;height:21px;border-radius:50%;border:1.8px solid #6d4a52;position:relative;transition:.16s}
   .opt.check .oradio{border-radius:7px}
-  .opt.selected{background:#2b2220;border-color:#2b2220;color:#f4ede4;box-shadow:var(--shadow)}
+  .opt.selected{background:#402129;border-color:var(--rose);color:#f6ead9;box-shadow:var(--shadow)}
   .opt.selected .oradio{border-color:var(--rose-2)}
   .opt.selected .oradio::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--rose-2)}
   .opt.check.selected .oradio::after{border-radius:3px}
@@ -87,7 +88,7 @@
   #result{padding:38px 24px 44px}
   #result .logo{height:24px;margin:0 auto 22px;display:block;opacity:.9}
   .rbadge{display:block;text-align:center;font-size:11px;letter-spacing:.22em;color:var(--muted);font-weight:700;margin-bottom:18px}
-  .hero-illu{width:170px;height:170px;border-radius:26px;background:var(--black);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+  .hero-illu{width:170px;height:170px;border-radius:26px;background:var(--black);border:1px solid rgba(220,185,126,.3);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
   .hero-illu svg{width:78%;height:78%}
   .code-row{display:flex;justify-content:center;gap:14px;margin-bottom:4px}
   .code-row .cl{text-align:center}
@@ -110,7 +111,7 @@
   .temp-row .tl{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:700;margin-bottom:7px}
   .temp-row .tl b{font-family:var(--serif);font-size:22px;font-weight:600}
   .temp-row.desire .tl b{color:var(--rose)}
-  .temp-row.express .tl b{color:#7b8fae}
+  .temp-row.express .tl b{color:#9fb2cd}
   .tbar{height:9px;background:var(--bg-2);border-radius:999px;overflow:hidden}
   .tbar i{display:block;height:100%;width:0;border-radius:999px;transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
   .temp-row.desire .tbar i{background:linear-gradient(90deg,var(--rose),var(--rose-2))}
@@ -126,7 +127,7 @@
   .chem .cl2{font-size:10.5px;letter-spacing:.16em;font-weight:700;margin-bottom:10px}
   .chem.best .cl2{color:var(--rose)}
   .chem.worst .cl2{color:var(--muted)}
-  .chem .mini{width:78px;height:78px;border-radius:16px;background:var(--black);margin:0 auto 10px;display:flex;align-items:center;justify-content:center}
+  .chem .mini{width:78px;height:78px;border-radius:16px;background:var(--black);border:1px solid rgba(220,185,126,.22);margin:0 auto 10px;display:flex;align-items:center;justify-content:center}
   .chem .mini svg{width:78%;height:78%}
   .chem b{display:block;font-size:14.5px;font-weight:800;margin-bottom:3px}
   .chem i{font-style:normal;font-size:11px;color:var(--muted);letter-spacing:.06em}
@@ -148,7 +149,7 @@
   .bridge .bq{font-family:var(--serif);font-style:italic;font-size:13px;letter-spacing:.16em;color:var(--muted);margin-bottom:10px}
   .bridge h3{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.45;white-space:pre-line;margin-bottom:10px}
   .bridge p{font-size:13.5px;color:var(--ink-2);line-height:1.8;white-space:pre-line}
-  .bookbanner{display:block;text-decoration:none;background:var(--black);border-radius:20px;padding:22px 20px;margin-bottom:12px;color:var(--white-line);box-shadow:var(--shadow);transition:transform .15s}
+  .bookbanner{display:block;text-decoration:none;background:var(--black);border:1px solid rgba(220,185,126,.35);border-radius:20px;padding:22px 20px;margin-bottom:12px;color:var(--white-line);box-shadow:var(--shadow);transition:transform .15s}
   .bookbanner:active{transform:scale(.985)}
   .bb-top{display:flex;align-items:center;gap:16px;margin-bottom:14px}
   .bb-illu{flex:0 0 auto;width:64px;height:64px}
@@ -178,7 +179,7 @@
 
   <!-- 인트로 -->
   <section id="intro" class="screen active">
-    <img class="logo" src="assets/clavis-logo-black.png" alt="CLAVIS" />
+    <img class="logo" src="assets/clavis-logo.png" alt="CLAVIS" />
     <div class="eyebrow">SKINSHIP PERSONA TEST</div>
     <div class="intro-illu" id="introIllu"></div>
     <h1>당신의 밤은,<br>낮과 <span class="em">같은 사람</span>인가.</h1>
@@ -206,7 +207,7 @@
 
   <!-- 결과 -->
   <section id="result" class="screen">
-    <img class="logo" src="assets/clavis-logo-black.png" alt="CLAVIS" />
+    <img class="logo" src="assets/clavis-logo.png" alt="CLAVIS" />
     <span class="rbadge">RESULT · 스킨십 성향</span>
     <div class="hero-illu" id="heroIllu"></div>
     <div class="code-row" id="codeRow"></div>
