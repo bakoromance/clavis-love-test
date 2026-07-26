@@ -15,13 +15,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" />
 <style>
   :root{
-    /* 미드나잇 벨벳 — 딥 버건디 브라운 + 샴페인 골드 */
-    --bg:#241318; --bg-2:#1c0e12; --card:#311b22; --card-bd:#482831;
-    --ink:#f4e9de; --ink-2:#cdb3aa; --muted:#997d76; --line:#432630;
-    --rose:#dcb97e; --rose-2:#eed3a1; --rose-soft:rgba(220,185,126,.10);
-    --black:#150c0e; --white-line:#f4ede4;
-    --btn:#d9b877; --btn-ink:#2a1512;
-    --shadow:0 24px 55px -26px rgba(0,0,0,.6);
+    /* 모노크롬 에디토리얼 + 딥 립스틱 로즈 */
+    --bg:#f3f0ea; --bg-2:#eae4da; --card:#fbf9f5; --card-bd:#ddd5c8;
+    --ink:#14110f; --ink-2:#4e463f; --muted:#8b8177; --line:#ddd5c8;
+    --rose:#8e1f38; --rose-2:#a8324b; --rose-soft:rgba(142,31,56,.07);
+    --black:#14110f; --white-line:#f3f0ea; --on-black:#cf7f90;
+    --btn:#14110f; --btn-ink:#f3f0ea;
+    --shadow:0 22px 50px -28px rgba(20,17,15,.28);
     --serif:"Cormorant Garamond",serif;
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -32,16 +32,16 @@
   .screen.active{display:flex;animation:fade .5s ease both}
   @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;border:none;cursor:pointer;background:var(--btn);color:var(--btn-ink);font-family:inherit;font-weight:700;font-size:16px;padding:17px 24px;border-radius:14px;transition:transform .15s,background .2s,opacity .2s}
-  .btn:hover{background:#e6c78b}
+  .btn:hover{background:#2b2622}
   .btn:active{transform:scale(.985)}
   .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink-2);font-weight:600}
-  .btn.ghost:hover{background:rgba(255,255,255,.05)}
+  .btn.ghost:hover{background:#fff}
 
   /* 인트로 */
   #intro{justify-content:center;align-items:center;text-align:center;padding:54px 28px}
   #intro img.logo{height:28px;margin-bottom:30px;opacity:.92}
   #intro .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--rose);background:var(--rose-soft);border:1px solid rgba(179,80,94,.25);padding:7px 14px;border-radius:999px;margin-bottom:24px;letter-spacing:.05em}
-  #intro .intro-illu{width:150px;height:150px;border-radius:24px;background:var(--black);border:1px solid rgba(220,185,126,.3);display:flex;align-items:center;justify-content:center;margin-bottom:26px;box-shadow:var(--shadow)}
+  #intro .intro-illu{width:150px;height:150px;border-radius:24px;background:var(--black);display:flex;align-items:center;justify-content:center;margin-bottom:26px;box-shadow:var(--shadow)}
   #intro .intro-illu svg{width:76%;height:76%}
   #intro h1{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.34;margin-bottom:16px}
   #intro h1 .em{font-family:var(--serif);font-style:italic;color:var(--rose)}
@@ -51,7 +51,7 @@
   #intro .note{margin-top:16px;font-size:12.5px;color:var(--muted)}
 
   /* 퀴즈 */
-  .qhead{position:sticky;top:0;z-index:5;background:var(--bg);padding:18px 22px 14px;box-shadow:0 10px 16px -12px rgba(0,0,0,.55)}
+  .qhead{position:sticky;top:0;z-index:5;background:var(--bg);padding:18px 22px 14px;box-shadow:0 9px 14px -12px rgba(20,17,15,.3)}
   .qhead-sub{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
   .qhead-sub .diag{font-size:12.5px;color:var(--ink-2);font-weight:600}
   .qhead-sub .step{font-size:11.5px;letter-spacing:.16em;color:var(--rose);font-weight:700}
@@ -66,11 +66,11 @@
   .qhint .multi{color:var(--rose);font-weight:700}
   .options{display:flex;flex-direction:column;gap:9px}
   .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--card-bd);color:var(--ink-2);padding:15px 17px;border-radius:14px;font-family:inherit;font-size:14.5px;font-weight:500;line-height:1.5;transition:border-color .16s,background .16s,color .16s,box-shadow .16s}
-  .opt:hover{border-color:#6a3b46;box-shadow:0 8px 18px -14px rgba(0,0,0,.5)}
+  .opt:hover{border-color:#c6bbaa;box-shadow:0 8px 18px -14px rgba(20,17,15,.28)}
   .opt .olabel{flex:1;white-space:pre-line}
-  .opt .oradio{flex:0 0 auto;width:21px;height:21px;border-radius:50%;border:1.8px solid #6d4a52;position:relative;transition:.16s}
+  .opt .oradio{flex:0 0 auto;width:21px;height:21px;border-radius:50%;border:1.8px solid #c3b8a8;position:relative;transition:.16s}
   .opt.check .oradio{border-radius:7px}
-  .opt.selected{background:#402129;border-color:var(--rose);color:#f6ead9;box-shadow:var(--shadow)}
+  .opt.selected{background:var(--ink);border-color:var(--ink);color:#f3f0ea;box-shadow:var(--shadow)}
   .opt.selected .oradio{border-color:var(--rose-2)}
   .opt.selected .oradio::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--rose-2)}
   .opt.check.selected .oradio::after{border-radius:3px}
@@ -88,7 +88,7 @@
   #result{padding:38px 24px 44px}
   #result .logo{height:24px;margin:0 auto 22px;display:block;opacity:.9}
   .rbadge{display:block;text-align:center;font-size:11px;letter-spacing:.22em;color:var(--muted);font-weight:700;margin-bottom:18px}
-  .hero-illu{width:170px;height:170px;border-radius:26px;background:var(--black);border:1px solid rgba(220,185,126,.3);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+  .hero-illu{width:180px;height:180px;border-radius:26px;background:var(--black);margin:0 auto 20px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
   .hero-illu svg{width:78%;height:78%}
   .code-row{display:flex;justify-content:center;gap:14px;margin-bottom:4px}
   .code-row .cl{text-align:center}
@@ -111,11 +111,11 @@
   .temp-row .tl{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:700;margin-bottom:7px}
   .temp-row .tl b{font-family:var(--serif);font-size:22px;font-weight:600}
   .temp-row.desire .tl b{color:var(--rose)}
-  .temp-row.express .tl b{color:#9fb2cd}
+  .temp-row.express .tl b{color:#6f675e}
   .tbar{height:9px;background:var(--bg-2);border-radius:999px;overflow:hidden}
   .tbar i{display:block;height:100%;width:0;border-radius:999px;transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
   .temp-row.desire .tbar i{background:linear-gradient(90deg,var(--rose),var(--rose-2))}
-  .temp-row.express .tbar i{background:linear-gradient(90deg,#7b8fae,#a9bcd6)}
+  .temp-row.express .tbar i{background:linear-gradient(90deg,#6f675e,#a49a8e)}
   .gapbox{margin-top:20px;padding:18px;border-radius:14px;background:var(--bg-2);border:1px solid var(--line);text-align:center}
   .gapbox .gnum{font-family:var(--serif);font-size:38px;font-weight:600;line-height:1;color:var(--rose);margin-bottom:8px}
   .gapbox .gnum small{font-size:15px;color:var(--muted)}
@@ -127,7 +127,7 @@
   .chem .cl2{font-size:10.5px;letter-spacing:.16em;font-weight:700;margin-bottom:10px}
   .chem.best .cl2{color:var(--rose)}
   .chem.worst .cl2{color:var(--muted)}
-  .chem .mini{width:78px;height:78px;border-radius:16px;background:var(--black);border:1px solid rgba(220,185,126,.22);margin:0 auto 10px;display:flex;align-items:center;justify-content:center}
+  .chem .mini{width:80px;height:80px;border-radius:16px;background:var(--black);margin:0 auto 10px;display:flex;align-items:center;justify-content:center}
   .chem .mini svg{width:78%;height:78%}
   .chem b{display:block;font-size:14.5px;font-weight:800;margin-bottom:3px}
   .chem i{font-style:normal;font-size:11px;color:var(--muted);letter-spacing:.06em}
@@ -149,20 +149,20 @@
   .bridge .bq{font-family:var(--serif);font-style:italic;font-size:13px;letter-spacing:.16em;color:var(--muted);margin-bottom:10px}
   .bridge h3{font-size:20px;font-weight:800;letter-spacing:-.01em;line-height:1.45;white-space:pre-line;margin-bottom:10px}
   .bridge p{font-size:13.5px;color:var(--ink-2);line-height:1.8;white-space:pre-line}
-  .bookbanner{display:block;text-decoration:none;background:var(--black);border:1px solid rgba(220,185,126,.35);border-radius:20px;padding:22px 20px;margin-bottom:12px;color:var(--white-line);box-shadow:var(--shadow);transition:transform .15s}
+  .bookbanner{display:block;text-decoration:none;background:var(--black);border-radius:20px;padding:22px 20px;margin-bottom:12px;color:var(--white-line);box-shadow:var(--shadow);transition:transform .15s}
   .bookbanner:active{transform:scale(.985)}
   .bb-top{display:flex;align-items:center;gap:16px;margin-bottom:14px}
   .bb-illu{flex:0 0 auto;width:64px;height:64px}
   .bb-illu svg{width:100%;height:100%}
-  .bb-head .bl{font-size:10px;letter-spacing:.24em;color:var(--rose-2);font-weight:700;margin-bottom:5px}
+  .bb-head .bl{font-size:10px;letter-spacing:.24em;color:var(--on-black);font-weight:700;margin-bottom:5px}
   .bb-head b{display:block;font-size:19px;font-weight:800;letter-spacing:-.01em;color:#fff}
   .bb-head i{font-style:normal;font-size:12px;color:#c9bdb0}
   .bb-points{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
   .bb-points p{font-size:12.5px;color:#d8cec2;line-height:1.6;padding-left:14px;position:relative}
-  .bb-points p::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--rose-2)}
+  .bb-points p::before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:var(--on-black)}
   .bb-cta{display:flex;align-items:center;justify-content:space-between;border-top:1px solid rgba(244,237,228,.15);padding-top:14px}
   .bb-cta span{font-size:13px;font-weight:700;color:#fff}
-  .bb-cta em{font-style:normal;font-size:13px;font-weight:800;color:var(--rose-2)}
+  .bb-cta em{font-style:normal;font-size:13px;font-weight:800;color:var(--on-black)}
   .trust{display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin:14px 0 10px}
   .trust span{font-size:11.5px;font-weight:700;color:var(--ink-2);background:var(--card);border:1px solid var(--card-bd);padding:6px 11px;border-radius:999px}
   .reviews{display:flex;flex-direction:column;gap:8px;margin-bottom:6px}
@@ -179,7 +179,7 @@
 
   <!-- 인트로 -->
   <section id="intro" class="screen active">
-    <img class="logo" src="assets/clavis-logo.png" alt="CLAVIS" />
+    <img class="logo" src="assets/clavis-logo-black.png" alt="CLAVIS" />
     <div class="eyebrow">SKINSHIP PERSONA TEST</div>
     <div class="intro-illu" id="introIllu"></div>
     <h1>당신의 밤은,<br>낮과 <span class="em">같은 사람</span>인가.</h1>
@@ -207,7 +207,7 @@
 
   <!-- 결과 -->
   <section id="result" class="screen">
-    <img class="logo" src="assets/clavis-logo.png" alt="CLAVIS" />
+    <img class="logo" src="assets/clavis-logo-black.png" alt="CLAVIS" />
     <span class="rbadge">RESULT · 스킨십 성향</span>
     <div class="hero-illu" id="heroIllu"></div>
     <div class="code-row" id="codeRow"></div>
@@ -519,30 +519,49 @@ const TYPES={
   tip:"수면 위로 가끔 올라와라. 깊이는 보여줘야 깊이다. 한 달에 한 번, 먼저 닿는 손이 바다의 존재를 증명한다."}
 };
 
-/* ==================== 삽화 — 검정 배경 + 흰 선 스케치 ==================== */
-const SW='stroke="#f4ede4" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" fill="none"';
+/* ==================== 삽화 — 검정 배경 + 흰 선, 인체 단선 드로잉 ====================
+   원칙: 사람만 그린다. 동물·사물 금지. 얼굴·손·몸의 윤곽선으로만 의미를 전달한다.
+   피카소식 — 최소한의 획, 비대칭 이목구비, 한 선으로 흐르는 윤곽. */
+const SW='stroke="#f3f0ea" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" fill="none"';
+const DOT='fill="#f3f0ea"';
 const ILL={
- BLOS:`<path ${SW} d="M30,34 L42,12 L52,30 M68,30 L78,12 L90,34"/><path ${SW} d="M30,34 Q22,54 36,70 Q48,84 60,87 Q72,84 84,70 Q98,54 90,34 Q75,26 60,26 Q45,26 30,34 Z"/><path ${SW} d="M42,50 L54,54 M78,50 L66,54"/><path ${SW} d="M56,66 H64 L60,71 Z"/><path ${SW} d="M52,77 L54,84 M68,77 L66,84"/>`,
- BROS:`<circle ${SW} cx="60" cy="60" r="31"/><path ${SW} d="M60,29 V91"/><path ${SW} d="M24,60 H14 M31,41 L23,35 M31,79 L23,85"/><path ${SW} d="M76,44 A19,19 0 1,0 76,76 A14.5,14.5 0 1,1 76,44 Z"/><path ${SW} d="M88,38 v8 M84,42 h8"/>`,
- BLOU:`<path ${SW} d="M18,88 L82,40"/><path ${SW} d="M82,40 L63,43 M82,40 L77,59"/><path ${SW} d="M14,74 L46,50 M26,92 L58,68"/><path ${SW} d="M98,22 C95,17 88,19 89,25 C90,30 98,36 98,36 C98,36 106,30 107,25 C108,19 101,17 98,22 Z"/>`,
- BROU:`<path ${SW} d="M30,76 Q34,88 46,90 H74 Q86,88 90,76"/><path ${SW} d="M30,76 Q27,68 34,64 M90,76 Q93,68 86,64"/><path ${SW} d="M60,60 C54,52 42,54 43,63 C44,71 60,79 60,79 C60,79 76,71 77,63 C78,54 66,52 60,60 Z"/><path ${SW} d="M36,36 v8 M32,40 h8 M84,32 v8 M80,36 h8"/>`,
- BLHS:`<path ${SW} d="M25,48 Q35,38 50,42 Q60,45 70,42 Q85,38 95,48 Q97,58 88,63 Q75,69 60,65 Q45,69 32,63 Q23,58 25,48 Z"/><path ${SW} d="M42,52 L54,55 M78,52 L66,55"/><path ${SW} d="M56,74 L59,82 L62,74"/><path ${SW} d="M25,48 L13,44 M95,48 L107,44"/><path ${SW} d="M13,44 Q9,56 17,64 M107,44 Q111,56 103,64"/><path ${SW} d="M60,40 Q57,27 66,18"/>`,
- BRHS:`<path ${SW} d="M28,74 Q30,58 46,54 Q60,50 74,54 Q90,58 92,72 Q92,80 84,80 H36 Q28,80 28,74 Z"/><path ${SW} d="M44,54 L48,42 L55,52 M65,52 L72,42 L76,54"/><path ${SW} d="M47,65 Q51,68 55,65 M67,65 Q71,68 75,65"/><path ${SW} d="M92,70 Q105,68 103,55"/><path ${SW} d="M58,30 v8 M54,34 h8"/>`,
- BLHU:`<path ${SW} d="M22,70 Q22,50 42,46 Q62,42 76,48 Q84,52 87,58 Q85,72 74,75 H36 Q24,75 22,70 Z"/><path ${SW} d="M86,52 L100,36 M77,49 L84,40"/><circle cx="66" cy="57" r="2" fill="#f4ede4"/><path ${SW} d="M40,75 V86 M68,75 V86"/><path ${SW} d="M8,58 H18 M8,68 H16"/>`,
- BRHU:`<path ${SW} d="M22,60 Q60,32 98,60 Q60,88 22,60 Z"/><circle ${SW} cx="60" cy="60" r="11"/><circle cx="60" cy="60" r="4" fill="#f4ede4"/><path ${SW} d="M40,41 L36,32 M60,37 V28 M80,41 L84,32"/><path ${SW} d="M42,94 Q60,88 78,94 M48,103 Q60,98 72,103"/>`,
- CLOS:`<path ${SW} d="M42,88 H80"/><path ${SW} d="M48,88 L46,76 Q42,60 52,50 Q61,42 58,33 L65,29 Q80,38 80,54 Q80,66 71,72 L73,88"/><circle cx="62" cy="43" r="2" fill="#f4ede4"/><circle ${SW} cx="60" cy="60" r="37" stroke-dasharray="5 8" opacity=".65"/>`,
- CROS:`<rect ${SW} x="40" y="52" width="42" height="36" rx="8"/><path ${SW} d="M48,52 V42 Q48,27 61,27 Q74,27 74,42 V52"/><path ${SW} d="M61,64 C59,61 55,62 55.5,65 C56,68 61,71 61,71 C61,71 66,68 66.5,65 C67,62 63,61 61,64 Z M61,71 V78"/><circle ${SW} cx="17" cy="72" r="6"/><path ${SW} d="M23,72 H36 M31,72 V79"/>`,
- CLOU:`<circle ${SW} cx="60" cy="25" r="5"/><path ${SW} d="M56,29 L30,82 M64,29 L90,78"/><path ${SW} d="M28,86 Q42,100 60,92 Q78,100 92,82" stroke-dasharray="5 7"/><path ${SW} d="M60,54 C58,51 54,52 54.5,55 C55,58 60,61 60,61 C60,61 65,58 65.5,55 C66,52 62,51 60,54 Z"/>`,
- CROU:`<path ${SW} d="M34,54 H82 V80 Q82,92 70,92 H46 Q34,92 34,80 Z"/><path ${SW} d="M82,60 Q96,62 92,74 Q89,82 82,80"/><path ${SW} d="M58,40 C56,36 51,37 51.5,41 C52,45 58,48 58,48 C58,48 64,45 64.5,41 C65,37 60,36 58,40 Z"/><path ${SW} d="M42,44 Q38,36 44,28"/>`,
- CLHS:`<path ${SW} d="M34,42 H86 V88 H34 Z"/><path ${SW} d="M60,60 C57,56 51,57 52,62 C53,66 60,70 60,70 C60,70 67,66 68,62 C69,57 63,56 60,60 Z" stroke-dasharray="4 5"/><path ${SW} d="M98,20 L76,42 M72,46 L76,42"/><path ${SW} d="M86,42 L98,30"/>`,
- CRHS:`<path ${SW} d="M28,86 L50,40 H70 L92,86 Z"/><path ${SW} d="M54,34 Q50,26 56,19 M66,34 Q70,26 64,19"/><path ${SW} d="M60,64 C58,61 54,62 54.5,65 C55,68 60,71 60,71 C60,71 66,68 66.5,65 C67,62 62,61 60,64 Z" stroke-dasharray="3 4"/><path ${SW} d="M86,20 h10 l-10,10 h10"/>`,
- CLHU:`<path ${SW} d="M24,64 Q60,74 96,64"/><path ${SW} d="M38,64 Q36,44 50,39 Q60,35 70,39 Q84,44 82,64"/><path ${SW} d="M38,57 Q60,65 82,57"/><path ${SW} d="M60,82 Q52,92 60,99 Q68,92 60,82 Z"/><path ${SW} d="M44,107 Q60,101 76,107"/>`,
- CRHU:`<path ${SW} d="M30,62 Q42,46 62,46 Q84,48 90,60 Q84,74 62,74 Q42,74 30,62 Z"/><path ${SW} d="M30,62 L19,52 V72 Z"/><path ${SW} d="M62,46 Q57,32 72,26"/><path ${SW} d="M76,23 C74.5,20.5 71,21.5 71.5,24 C72,26.5 76,29 76,29 C76,29 80,26.5 80.5,24 C81,21.5 77.5,20.5 76,23 Z"/><circle cx="72" cy="58" r="2" fill="#f4ede4"/><path ${SW} d="M86,64 l4,3 -4,3"/><circle ${SW} cx="100" cy="42" r="3"/><circle ${SW} cx="106" cy="31" r="2"/>`
+ /* 앞으로 돌진하는 프로필, 벌어진 입, 뒤로 흩날리는 머리 */
+ BLOS:`<path ${SW} d="M80,18 C58,14 44,30 45,49 C46,58 39,59 39,65 C39,70 46,69 48,72"/><path ${SW} d="M47,77 C56,73 66,74 73,79"/><path ${SW} d="M48,84 C57,89 69,88 76,82"/><path ${SW} d="M58,45 C62,41 70,42 73,47 C68,50 60,50 58,45 Z"/><circle cx="66" cy="45" r="1.9" ${DOT}/><path ${SW} d="M80,18 C96,26 100,46 92,62"/><path ${SW} d="M92,62 C102,57 108,48 107,38"/><path ${SW} d="M52,92 C61,100 75,100 85,93"/>`,
+ /* 반반으로 갈린 두 얼굴 — 다문 쪽과 열린 쪽 */
+ BROS:`<path ${SW} d="M60,14 C42,16 32,32 34,52 C36,70 46,84 60,89"/><path ${SW} d="M60,14 C78,16 88,32 86,52 C84,70 74,84 60,89"/><path ${SW} d="M60,14 V89"/><path ${SW} d="M42,47 C46,43 53,44 56,48"/><path ${SW} d="M64,45 C68,41 76,42 79,47 C74,50 66,50 64,45 Z"/><circle cx="72" cy="45" r="1.9" ${DOT}/><path ${SW} d="M46,67 C51,65 56,66 58,68"/><path ${SW} d="M62,66 C68,63 76,65 79,69 C73,73 66,72 62,69"/>`,
+ /* 크게 뻗은 팔, 손끝이 앞으로 */
+ BLOU:`<path ${SW} d="M28,100 C28,78 34,60 47,52"/><path ${SW} d="M47,52 C58,44 74,38 92,33"/><path ${SW} d="M92,33 C97,31 101,28 104,24"/><path ${SW} d="M43,41 C43,28 51,19 62,19 C73,19 79,28 77,38 C75,47 66,51 57,49"/><circle cx="62" cy="34" r="1.9" ${DOT}/><path ${SW} d="M52,33 C56,30 62,30 66,33"/><path ${SW} d="M28,100 C41,105 57,104 68,97"/>`,
+ /* 감싸안는 두 인물 */
+ BROU:`<path ${SW} d="M44,40 C33,40 27,50 29,60 C31,71 42,77 52,72"/><path ${SW} d="M62,31 C75,31 83,42 81,54 C79,67 68,73 58,70"/><path ${SW} d="M52,72 C56,80 60,84 66,86"/><path ${SW} d="M24,90 C35,77 52,74 66,80 C81,87 90,80 94,67"/><circle cx="42" cy="56" r="1.8" ${DOT}/><circle cx="70" cy="48" r="1.8" ${DOT}/><path ${SW} d="M30,61 C38,58 46,60 50,64"/><path ${SW} d="M38,96 C55,103 76,101 88,92"/>`,
+ /* 프로필 위에 겹쳐진 또 하나의 얼굴선 — 가면 */
+ BLHS:`<path ${SW} d="M76,18 C56,16 42,32 43,50 C44,58 37,60 37,66 C37,71 44,70 46,73 C43,78 45,84 52,86"/><path ${SW} d="M76,18 C90,26 95,44 89,60 C84,72 75,80 65,84"/><path ${SW} d="M56,46 C60,42 68,43 71,48 C66,51 58,51 56,46 Z"/><circle cx="64" cy="46" r="1.9" ${DOT}/><path ${SW} d="M46,73 C54,70 64,71 70,75"/><path ${SW} d="M62,24 C45,24 33,38 33,54 C33,65 39,73 50,77"/><path ${SW} d="M39,52 C43,49 49,50 52,53"/>`,
+ /* 웅크린 몸, 감은 눈, 안쪽의 긴장선 */
+ BRHS:`<path ${SW} d="M32,100 C26,81 33,60 50,50 C62,43 78,45 86,55"/><path ${SW} d="M50,50 C48,37 56,27 68,27 C80,27 87,37 85,48 C83,57 74,61 66,58"/><path ${SW} d="M58,44 C62,41 68,41 72,45"/><path ${SW} d="M60,52 C64,50 70,51 73,54"/><path ${SW} d="M86,55 C95,65 93,81 82,93"/><path ${SW} d="M32,100 C48,106 70,104 82,93"/><path ${SW} d="M62,68 C69,75 73,84 72,92"/>`,
+ /* 앞으로 기운 상체, 묵직한 어깨선 */
+ BLHU:`<path ${SW} d="M22,102 C20,83 29,66 46,57"/><path ${SW} d="M46,57 C45,43 56,32 68,35 C81,38 87,50 82,61 C77,71 65,73 57,66"/><circle cx="68" cy="50" r="2" ${DOT}/><path ${SW} d="M57,49 C61,46 68,46 72,50"/><path ${SW} d="M62,60 C68,58 74,59 78,62"/><path ${SW} d="M46,57 C65,61 85,72 95,89"/><path ${SW} d="M22,102 C44,106 72,103 95,89"/>`,
+ /* 턱을 받친 정면 얼굴, 비대칭 두 눈 */
+ BRHU:`<path ${SW} d="M60,20 C42,20 32,34 32,52 C32,72 44,86 60,86 C76,86 88,72 88,52 C88,34 78,20 60,20 Z"/><path ${SW} d="M40,48 C46,42 58,42 63,49 C56,54 45,54 40,48 Z"/><circle cx="52" cy="48" r="2.2" ${DOT}/><path ${SW} d="M70,48 C74,45 80,46 82,49"/><path ${SW} d="M60,58 V68"/><path ${SW} d="M52,75 C58,73 66,74 70,76"/><path ${SW} d="M88,66 C97,74 97,89 88,97 C80,103 68,101 62,93"/><path ${SW} d="M74,93 C78,86 84,84 88,87"/>`,
+ /* 아래에서 올라와 턱을 들어올리는 손 */
+ CLOS:`<path ${SW} d="M74,22 C56,20 44,34 45,52 C46,62 39,64 40,70 C41,75 47,74 49,77 C46,82 48,88 55,90"/><path ${SW} d="M74,22 C88,30 93,48 87,64 C83,74 76,81 68,85"/><path ${SW} d="M58,48 C62,44 70,45 73,50 C68,53 60,53 58,48 Z"/><circle cx="66" cy="48" r="1.8" ${DOT}/><path ${SW} d="M49,77 C56,74 64,75 69,78"/><path ${SW} d="M18,106 C26,95 37,88 48,88"/><path ${SW} d="M48,88 C54,86 59,88 61,93"/><path ${SW} d="M52,88 C54,81 58,79 62,82"/><path ${SW} d="M57,89 C60,83 64,82 67,86"/>`,
+ /* 손가락 사이로 드러난 눈 */
+ CROS:`<path ${SW} d="M58,18 C40,18 30,32 30,52 C30,72 42,87 58,87 C74,87 86,72 86,52 C86,32 76,18 58,18 Z"/><path ${SW} d="M42,50 C48,44 58,45 62,51 C56,56 46,55 42,50 Z"/><circle cx="52" cy="50" r="2" ${DOT}/><path ${SW} d="M64,22 C61,42 61,64 66,85"/><path ${SW} d="M76,25 C73,44 73,64 78,83"/><path ${SW} d="M87,33 C86,50 86,66 89,77"/><path ${SW} d="M58,92 C71,96 84,92 91,81"/>`,
+ /* 이마를 맞댄 두 프로필 */
+ CLOU:`<path ${SW} d="M13,33 C26,22 43,27 49,42 C52,49 57,50 57,55 C57,59 51,59 49,62 C51,67 49,73 43,74"/><path ${SW} d="M107,33 C94,22 77,27 71,42 C68,49 63,50 63,55 C63,59 69,59 71,62 C69,67 71,73 77,74"/><circle cx="42" cy="46" r="1.8" ${DOT}/><circle cx="78" cy="46" r="1.8" ${DOT}/><path ${SW} d="M57,55 C58,52 62,52 63,55"/><path ${SW} d="M41,79 C34,88 26,92 17,94"/><path ${SW} d="M79,79 C86,88 94,92 103,94"/>`,
+ /* 어깨에 기댄 머리 */
+ CROU:`<path ${SW} d="M26,104 C26,85 39,72 58,70"/><path ${SW} d="M58,70 C71,68 83,75 89,87 C92,94 93,100 93,105"/><path ${SW} d="M45,49 C34,51 30,62 36,70 C43,79 55,76 59,68 C63,59 56,49 45,49 Z"/><path ${SW} d="M74,33 C62,35 57,48 65,56 C74,65 87,60 89,50 C91,39 83,31 74,33 Z"/><circle cx="42" cy="64" r="1.7" ${DOT}/><circle cx="76" cy="46" r="1.7" ${DOT}/><path ${SW} d="M32,91 C49,84 67,86 79,95"/>`,
+ /* 얼굴 윤곽을 따라 흐르는 손 */
+ CLHS:`<path ${SW} d="M72,20 C54,18 42,32 43,50 C44,60 37,62 38,68 C39,73 45,72 47,75 C44,80 46,87 53,88"/><path ${SW} d="M72,20 C86,28 91,46 85,62 C81,72 73,80 63,85"/><circle cx="62" cy="46" r="1.8" ${DOT}/><path ${SW} d="M47,75 C54,72 62,73 67,76"/><path ${SW} d="M98,38 C89,41 82,49 80,58"/><path ${SW} d="M87,43 C83,47 80,53 80,58"/><path ${SW} d="M98,38 C104,32 108,29 112,29"/><path ${SW} d="M80,58 C76,63 74,67 74,72"/>`,
+ /* 누운 프로필, 감은 눈, 안쪽에서 솟는 열기 */
+ CRHS:`<path ${SW} d="M16,76 C22,57 40,44 60,46 C77,48 88,58 91,73"/><path ${SW} d="M16,76 C31,86 53,90 71,85 C83,82 89,79 91,73"/><path ${SW} d="M39,63 C45,58 54,59 58,64"/><path ${SW} d="M62,71 C68,69 75,70 79,73"/><path ${SW} d="M55,44 C55,34 62,27 59,19 C57,13 61,9 66,9"/><path ${SW} d="M74,47 C77,38 83,34 80,25"/>`,
+ /* 두 프로필이 한 선으로 흘러 겹침 */
+ CLHU:`<path ${SW} d="M30,98 C23,77 30,54 46,42 C58,32 74,32 85,40"/><path ${SW} d="M85,40 C95,51 95,67 84,77 C74,87 57,85 51,74"/><path ${SW} d="M46,42 C53,54 53,67 46,77"/><circle cx="64" cy="50" r="1.8" ${DOT}/><circle cx="77" cy="59" r="1.8" ${DOT}/><path ${SW} d="M58,65 C64,63 70,64 75,67"/><path ${SW} d="M30,98 C48,104 71,102 85,91"/>`,
+ /* 수면 아래 잠긴 얼굴, 위로 향한 선 */
+ CRHU:`<path ${SW} d="M11,32 C25,24 40,36 54,30 C68,24 83,34 97,28 C104,25 108,22 111,20"/><path ${SW} d="M19,48 C32,42 45,52 59,46"/><path ${SW} d="M60,60 C44,60 34,72 34,86 C34,100 45,111 60,111 C75,111 86,100 86,86 C86,72 76,60 60,60 Z"/><path ${SW} d="M43,82 C49,78 57,79 61,84"/><path ${SW} d="M69,82 C73,79 80,80 83,83"/><path ${SW} d="M51,98 C58,96 66,97 71,100"/><path ${SW} d="M60,60 C59,55 59,52 60,49"/>`
 };
 function illSVG(code){ return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">${ILL[code]||""}</svg>`; }
-/* 배너용 아이콘 */
-const BOOK_ICON=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><path ${SW} d="M60,34 Q46,24 26,26 V88 Q46,86 60,94 Q74,86 94,88 V26 Q74,24 60,34 Z"/><path ${SW} d="M60,34 V94"/><path ${SW} d="M36,44 Q46,42 52,46 M36,56 Q46,54 52,58 M68,46 Q74,42 84,44 M68,58 Q74,54 84,56"/></svg>`;
-const BED_ICON=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><path ${SW} d="M22,44 V84 M22,72 H98 M98,84 V60 Q98,54 90,54 H52 Q44,54 44,60 V72"/><path ${SW} d="M22,50 Q22,40 32,40 Q40,40 40,48 Q40,54 34,56"/><path ${SW} d="M84,30 A11,11 0 1,0 92,44 A9,9 0 1,1 84,30 Z"/></svg>`;
+/* 배너용 — 서로 향해 뻗은 두 손 / 기대 누운 인체 */
+const BOOK_ICON=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><path ${SW} d="M8,94 C24,86 40,72 52,58"/><path ${SW} d="M52,58 C55,53 59,53 61,58"/><path ${SW} d="M54,57 C51,48 55,43 59,45"/><path ${SW} d="M112,94 C96,86 80,72 68,58"/><path ${SW} d="M68,58 C65,53 61,53 59,58"/><path ${SW} d="M66,57 C69,48 65,43 61,45"/><circle cx="60" cy="30" r="3" ${DOT}/></svg>`;
+const BED_ICON=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg"><path ${SW} d="M10,86 C24,86 30,73 41,66 C53,58 67,63 77,54 C87,45 84,31 94,25"/><path ${SW} d="M94,25 C100,21 107,24 109,30 C111,37 106,43 99,42 C93,41 90,34 92,29"/><path ${SW} d="M10,86 C27,95 53,95 69,86 C81,79 89,68 93,57"/><path ${SW} d="M41,66 C46,74 46,83 41,90"/></svg>`;
 
 /* ==================== 상태 ==================== */
 const TOTAL=CHECKS.length+SUBS.length; // 9
