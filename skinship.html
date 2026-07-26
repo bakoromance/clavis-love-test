@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>스킨십 성향 테스트 | CLAVIS</title>
 <meta property="og:type" content="website">
-<meta property="og:title" content="스킨십 성향 테스트 — 나는 어떤 유형일까">
-<meta property="og:description" content="스킨십에도 유형이 있다. 과감·신중, 리드·리시브, 말하는 타입·숨기는 타입 — 16가지 유형 진단. 12,000건 상담 데이터 기반.">
+<meta property="og:title" content="스킨십 성향 테스트 — 당신도 몰랐던 나의 스킨십 페르소나">
+<meta property="og:description" content="16가지 중에 나는 몇 번일까. 그 사람은 나를 어떤 타입으로 기억하고 있을까. 3분이면 나온다.">
 <link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin />
 <link rel="stylesheet" as="style" crossorigin
   href="https://fastly.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
@@ -182,11 +182,11 @@
     <img class="logo" src="assets/clavis-logo-black.png" alt="CLAVIS" />
     <div class="eyebrow">SKINSHIP PERSONA TEST</div>
     <div class="intro-illu" id="introIllu"></div>
-    <h1>스킨십에도<br><span class="em">유형</span>이 있다</h1>
-    <p class="sub">과감한지 신중한지, 리드인지 리시브인지,<br>말하는 타입인지 숨기는 타입인지.<br>아홉 번의 선택이면 당신의 유형이 나온다.</p>
+    <h1>당신도 몰랐던<br>나의 <span class="em">스킨십 페르소나</span></h1>
+    <p class="sub">16가지 중에 나는 몇 번일까.<br>그 사람은 나를 어떤 타입으로 기억하고 있을까.</p>
     <div class="meta">16 TYPES · 3 MIN</div>
-    <div class="cta"><button class="btn" onclick="startQuiz()">내 유형 확인하기</button></div>
-    <p class="note">노골적인 문항은 없다. 대신, 답은 솔직해야 한다.</p>
+    <div class="cta"><button class="btn" onclick="startQuiz()">내 페르소나 열어보기</button></div>
+    <p class="note">솔직하게 답할수록, 결과는 정확해진다.</p>
   </section>
 
   <!-- 퀴즈 -->
@@ -527,13 +527,13 @@ const DOT='fill="#f3f0ea"';
 /* 손 윤곽 — 손목에서 시작해 새끼·약지·중지·검지·엄지를 돌아 나오는 하나의 외곽선.
    기준 손바닥 중심 (70,80). 장면마다 translate/scale/rotate로 배치한다.
    배치 공식: scale S 일 때  translate(X-70S, Y-80S) scale(S) rotate(deg 70 80) */
-const HAND=`M44,116 C42,99 44,87 47,78
- C46,66 47,56 52,56 C57,56 56,68 55,78
- C54,64 55,50 61,50 C67,50 66,64 65,78
- C64,58 65,42 71,42 C77,42 76,58 75,78
- C74,50 77,44 82,45 C87,46 86,62 85,78
- C88,72 94,71 97,76 C100,81 95,90 88,93
- C90,101 91,109 91,117`;
+const HAND=`M52,120 C50,104 51,91 54,82
+ C53,70 53,59 56.5,59 C60,59 59.5,71 58,82
+ C57,68 57,52 61.5,52 C66,52 65.5,68 64,82
+ C63,60 63,41 68,41 C73,41 72.5,60 71,82
+ C70,52 72,45 75.5,46 C79,47 78.5,64 77,83
+ C80,77 86,75 89,80 C92,85 87.5,93 81,96
+ C83,105 84,113 84,121`;
 /* 말아 쥔 손 */
 const FIST=`M46,94 C44,84 47,74 54,69
  C52,63 57,58 63,60 C67,61 68,65 66,70
@@ -576,8 +576,8 @@ const ILL={
  CRHU:`${hand(34,78,.54,75)}${hand(86,54,.54,255)}`
 };
 function illSVG(code){ return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">${ILL[code]||""}</svg>`; }
-/* 인트로 대표 — 감싸 쥔 두 손 */
-const INTRO_ILL=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">${hand(48,80,.66,45)}${hand(78,56,.66,225)}</svg>`;
+/* 인트로 대표 — 손끝이 닿기 직전의 두 손 (대각 구도) */
+const INTRO_ILL=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">${hand(36,86,.78,45)}${hand(78,42,.78,225)}</svg>`;
 /* 배너용 — 손끝이 닿는 두 손 / 얽힌 다리 */
 const BOOK_ICON=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">${hand(32,80,.56,75)}${hand(88,52,.56,255)}</svg>`;
 const BED_ICON=`<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">${ILL.CRHS}</svg>`;
