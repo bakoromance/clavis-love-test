@@ -130,7 +130,7 @@
 .ep-sec{background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:20px 18px;margin-bottom:14px}
 .ep-h{font-size:12px;letter-spacing:.12em;font-weight:800;color:var(--rose);margin-bottom:14px}
 .ep-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
-.ep-lab{width:64px;flex:none;font-size:13px;font-weight:700;color:var(--ink-2)}
+.ep-lab{width:68px;flex:none;font-size:13px;font-weight:700;color:var(--ink-2)}
 .ep-track{flex:1;height:8px;border-radius:99px;background:var(--bg-2);overflow:hidden}
 .ep-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--rose-2),var(--rose));width:0;transition:width .9s cubic-bezier(.2,.7,.2,1)}
 .ep-val{width:30px;flex:none;text-align:right;font-size:13px;font-weight:800;color:var(--ink)}
@@ -152,7 +152,11 @@
 .ep-warn .ep-h{color:#c05064}
 .ep-drop{font-size:26px;font-weight:800;color:#c05064;margin:2px 0 8px}
 .ep-drop s{color:var(--muted);font-weight:700;font-size:20px;margin-right:8px}
-.ep-resume{margin-top:12px}
+.ep-head{text-align:center;margin:2px 0 18px}
+.ep-eyebrow{font-family:var(--serif);font-style:italic;font-weight:600;font-size:12.5px;letter-spacing:.24em;color:var(--rose);margin-bottom:5px}
+.ep-title{font-size:20px;font-weight:800;letter-spacing:.05em;color:var(--ink)}
+.ep-sub{margin-top:7px;font-size:12px;color:var(--muted);word-break:keep-all;padding:0 14px}
+.ep-head::after{content:"";display:block;width:36px;height:2px;border-radius:2px;background:var(--rose);margin:12px auto 0}
 </style>
 </head>
 <body>
@@ -207,17 +211,16 @@
     <!-- 감정 프로파일링 -->
     <div class="ep" id="epRoot" style="display:none">
       <div class="ep-sec">
-        <div class="ep-h">감정 프로파일</div>
+        <div class="ep-head">
+          <div class="ep-eyebrow">CLAVIS</div>
+          <div class="ep-title">감정 프로파일링</div>
+          <div class="ep-sub">실제 상담 현장에서 관계를 판별하는 클래비스 고유의 진단 체계</div>
+        </div>
         <div id="epBars"></div>
-        <div class="ep-note">처방은 항상 가장 낮은 지표에서 나와요</div>
       </div>
       <div class="ep-sec" id="epEvSec">
         <div class="ep-h">당신의 답에서 찾은 근거</div>
         <ul class="ep-ev" id="epEv"></ul>
-      </div>
-      <div class="ep-sec ep-rx">
-        <div class="ep-h">오늘의 처방</div>
-        <div id="epRxBody"></div>
       </div>
       <div class="ep-sec ep-warn" id="epWarnSec">
         <div class="ep-h">이대로 두면</div>
@@ -608,11 +611,9 @@ function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.
 (function loadKakao(){ if(!KAKAO_JS_KEY) return; const s=document.createElement("script"); s.src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"; s.crossOrigin="anonymous"; s.onload=()=>{ try{ if(window.Kakao&&!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY); }catch(e){} }; document.head.appendChild(s); })();
 </script>
 <script>
-/* ═══ 감정 프로파일링 엔진 (v2 전용) ═══
-   지표 5개(높을수록 좋음) · 처방은 가장 낮은 지표에서 · 판정마다 답변 인용
-   기류·적극성·밀도·진전도는 기존 판별 함수를 그대로 정규화해 노출한다. */
-const EP_KEY="clavis_ep_crush_v2";
-const EP_LABEL={vibe:"이성기류",init:"적극성",dens:"밀도",rom:"진전도",cond:"여건"};
+/* ═══ 감정 프로파일링 (v2 전용) ═══  지표 5개(높을수록 좋음) · 판정마다 답변 인용
+   이성기류·적극성·관계 밀도·진전도는 기존 판별 함수를 그대로 정규화해 노출한다. */
+const EP_LABEL={vibe:"이성기류",init:"적극성",dens:"관계 밀도",rom:"진전도",cond:"상황 조건"};
 
 function epPicked(qi,txt){ const q=QUESTIONS[qi]; if(!q) return false;
   const oi=q.opts.findIndex(o=>o[0].indexOf(txt)>=0); if(oi<0) return false;
@@ -633,7 +634,7 @@ function epEvidence(){
   if(epPicked(4,"상대가 먼저 다시")) pos.push("<b>「끊기면 상대가 먼저 다시 연락」</b> — 이 신호는 예의가 아니라 관심이에요.");
   if(epPicked(6,"외모·이성적 매력")) pos.push("<b>「외모·매력을 칭찬」</b> — 친구에게는 잘 쓰지 않는 언어예요.");
   if(epPicked(19,"이성적 호감을 여러 번")) pos.push("<b>「이성적 호감을 여러 번 표현」</b> — 해석이 필요 없는 수준의 신호예요.");
-  if(epPicked(14,"은근히")) pos.push("<b>「연애 얘기에 '우리'를 대입」</b> — 상대도 이 관계의 다음 장을 상상하고 있어요.");
+  if(epPicked(14,"은근히")) pos.push("<b>「연애 얘기에 \'우리\'를 대입」</b> — 상대도 이 관계의 다음 장을 상상하고 있어요.");
   if(epPicked(3,"느리거나")||epPicked(3,"단답")) neg.push("<b>「답장이 느리고 단답」</b> — 지금은 밀어붙일 타이밍이 아니라는 신호예요.");
   if(epPicked(18,"자주 그런다")||epPicked(18,"몇 번 있다")) neg.push("<b>「친구로 선을 그은 적 있음」</b> — 프레임을 바꾸는 건 고백이 아니라 반 발짝의 누적이에요.");
   if(epPicked(20,"사귀는 사람이 있다")) neg.push("<b>「상대에게 애인이 있음」</b> — 지금 움직이면 잃는 것만 있어요. 멈춤도 전략이에요.");
@@ -644,37 +645,9 @@ function epEvidence(){
   return out.slice(0,3);
 }
 
-const EP_RX={
-  vibe:[ {t:"오늘은 행동만 보기", b:"말과 해석 말고, 패턴만 봐요. 답장 속도, 먼저 꺼내는 화제.\n기류는 말이 아니라 반복에서 읽혀요."},
-         {t:"신호 하나에 해석 셋 붙이기", b:"가장 최근의 호감 신호 하나에 다른 해석 두 개를 붙여봐요.\n확신은 해석이 아니라 반복에서 와요."} ],
-  init:[ {t:"공 넘기고 기다리기", b:"오늘 대화는 질문 하나로 끝내고, 다음 턴은 상대에게 남겨요.\n상대의 속도는 공백에서만 측정돼요."},
-         {t:"선톡 하루 쉬기", b:"오늘은 먼저 연락하지 않아요.\n내가 채우던 자리를 비워야 상대의 진짜 속도가 보여요."} ],
-  dens:[ {t:"루틴 하나 심기", b:"정해진 시간대의 가벼운 대화 하나를 만들어봐요.\n밀도는 큰 이벤트가 아니라 반복에서 쌓여요."},
-         {t:"둘만의 코드 만들기", b:"오늘 대화에서 나온 농담 하나를, 다음 대화에서 다시 꺼내요.\n'우리만 아는 것'이 생기는 순간 관계는 특별해져요."} ],
-  rom:[ {t:"반 발짝 표현 시도", b:"성격 칭찬 말고, '오늘 분위기 좋다' 정도의 반 발짝 표현을 해봐요.\n진전은 고백이 아니라 반 발짝의 누적이에요."},
-        {t:"단둘 자리 제안하기", b:"여럿 말고 단둘의 가벼운 자리를 하나 제안해요.\n관계의 정의는 단둘일 때만 바뀌어요."} ],
-  cond:[ {t:"다음 만남의 명분 만들기", b:"빌려줄 것, 같이 갈 곳, 물어볼 것 — 하나를 오늘 만들어둬요.\n여건은 기다리는 게 아니라 설계하는 거예요."},
-         {t:"장애물 크기 재보기", b:"둘 사이의 현실 장애물을 적고, 진짜인지 핑계인지 표시해봐요.\n대부분은 생각보다 작아요."} ]
-};
-const EP_RX_D1={t:"오늘은 확인하려 들지 않기", b:"마음을 확인하고 싶은 날일수록 티가 나요.\n오늘은 평소처럼만. 측정은 이 프로파일이 대신할게요."};
-const EP_RX_D7={t:"7일 재평가 — 신호는 쌓였어요", b:"일주일의 기록이면 상대의 속도가 보였을 거예요.\n이제 남은 건 언제, 어떻게 반 발짝을 내딛느냐예요.\n여기서부터는 혼자 하지 않아도 돼요.", final:true};
-
-function epRxFor(p,day){
-  if(day<=1) return {k:null,...EP_RX_D1};
-  if(day>=7) return {k:null,...EP_RX_D7};
-  const order=Object.keys(p).sort((a,b)=>p[a]-p[b]);
-  const pat=[[0,0],[1,0],[0,1],[2,0],[1,1]];
-  const pk=pat[day-2], k=order[pk[0]];
-  return {k, ...EP_RX[k][pk[1]]};
-}
-function epMsToMidnight(){ const n=new Date(), m=new Date(n); m.setHours(24,0,0,0); return m-n; }
-function epSave(o){ try{ localStorage.setItem(EP_KEY, JSON.stringify(o)); }catch(e){} }
-function epLoad(){ try{ return JSON.parse(localStorage.getItem(EP_KEY)||"null"); }catch(e){ return null; } }
-function epDayOf(st){ const d0=new Date(st.t0); d0.setHours(0,0,0,0);
-  const n=new Date(); n.setHours(0,0,0,0); return Math.floor((n-d0)/86400000)+1; }
 function epParas(t){ return t.split("\n\n").map(p=>'<span class="rp">'+p.replace(/\n/g,"<br>")+"</span>").join(""); }
 
-function epRender(p,pct,day,opts){
+function epRender(p,pct,opts){
   opts=opts||{};
   document.getElementById("epRoot").style.display="block";
   const order=Object.keys(p).sort((a,b)=>p[a]-p[b]);
@@ -688,34 +661,23 @@ function epRender(p,pct,day,opts){
   if(ev.length){ document.getElementById("epEvSec").style.display="";
     document.getElementById("epEv").innerHTML=ev.map(e=>"<li>"+e+"</li>").join("");
   } else document.getElementById("epEvSec").style.display="none";
-  const d=Math.min(Math.max(1,day||1),7), rx=epRxFor(p,d), done=(day||1)>7;
-  let h='<span class="ep-day">DAY '+d+" / 7</span>";
-  if(rx.k) h+='<div class="ep-why">가장 낮은 지표 — '+EP_LABEL[rx.k]+"에서 나온 처방이에요</div>";
-  else if(d===1) h+='<div class="ep-why">모든 유형의 첫 처방은 같아요</div>';
-  h+='<div class="ep-rxt">'+rx.t+'</div><div class="ep-body">'+epParas(rx.b)+"</div>";
-  if(done) h+='<div class="ep-lock">7일 코스를 완주했어요. 관계도 그동안 움직였을 거예요. 다시 진단해서 새 프로파일로 시작하세요.</div>';
-  else if(d<7){ const ms=epMsToMidnight(), hh=Math.floor(ms/3600000), mm=Math.floor(ms%3600000/60000);
-    h+='<div class="ep-lock">🔒 DAY '+(d+1)+" 처방은 자정에 열려요 · "+hh+"시간 "+mm+"분 남음</div>"; }
-  document.getElementById("epRxBody").innerHTML=h;
   const cut=Math.max(8,Math.round((100-p.init)*.18+(100-p.dens)*.08));
   const low=Math.max(5,pct-cut);
   document.getElementById("epDrop").innerHTML="<s>"+pct+"%</s> ↓ "+low+"%";
   document.getElementById("epWarnBody").innerHTML=epParas("지금 온도 그대로 시간이 지날 때 내려갈 자리예요.\n썸을 끝내는 건 거절이 아니라 정체예요.");
 }
 
-/* 검사 완료: 원본 산출 로직 그대로 + 프로파일 저장/렌더 */
+/* 검사 완료: 원본 산출 로직 그대로 + 프로파일 렌더 */
 showResult=function(){
   let raw=0; QUESTIONS.forEach((q,qi)=>{ raw+=qPoints(q,answers[qi]); });
   let pct=15+Math.round((raw-MINSUM)/(MAXSUM-MINSUM)*84); pct=Math.max(15,Math.min(99,pct));
   const typeKey=computeCrushType(pct);
   saveResult(`${pct}% / ${CRUSH_TYPES[typeKey].name}`, collectSelectedTexts());
   renderResult(pct, typeKey);
-  const p=epProfile(), ev=epEvidence();
-  epSave({t0:Date.now(), pct:pct, prof:p, ev:ev, type:typeKey});
-  epRender(p,pct,1,{ev:ev,type:typeKey});
+  epRender(epProfile(), pct, {ev:epEvidence(), type:typeKey});
 };
 
-/* 미리보기: ?pct=70&type=SCOUTING&day=4 — 유형 표본 프로파일 */
+/* 미리보기: ?pct=70&type=SCOUTING — 유형 표본 프로파일 */
 (function(){
   const q=new URLSearchParams(location.search);
   if(!q.has("pct")&&!q.has("preview")) return;
@@ -723,22 +685,7 @@ showResult=function(){
   let t=(q.get("type")||"").toUpperCase(); if(!CRUSH_TYPES[t]) t = v>=85?"ALMOST":"SCOUTING";
   const DIP={FRIEND:["vibe","rom"],HESITANT:["rom"],UNEVEN:["init"],RIVAL:["cond"],REKINDLE:["init","vibe"]};
   const p={}; Object.keys(EP_LABEL).forEach(k=>{ p[k]=Math.max(8,Math.min(95,v-((DIP[t]||[]).includes(k)?26:0)+(k==="dens"?4:0))); });
-  const day=Math.max(1,Math.min(9,parseInt(q.get("day"))||1));
-  epRender(p,v,day,{type:t,ev:[]});
-})();
-
-/* 재방문: 저장된 프로파일이 있으면 인트로에 이어보기 버튼 */
-(function(){
-  const q=new URLSearchParams(location.search);
-  if(q.has("pct")||q.has("preview")) return;
-  const st=epLoad(); if(!st) return;
-  const day=epDayOf(st);
-  const sb=document.querySelector('#intro [onclick^="startQuiz"]'); if(!sb) return;
-  const b=document.createElement("button");
-  b.className="btn ghost ep-resume";
-  b.textContent = day>7 ? "지난 프로파일 다시 보기" : "DAY "+day+" 처방 확인하기 →";
-  b.onclick=function(){ renderResult(st.pct, st.type); epRender(st.prof, st.pct, day, {ev:st.ev,type:st.type}); };
-  sb.insertAdjacentElement("afterend", b);
+  epRender(p,v,{type:t,ev:[]});
 })();
 </script>
 </body>

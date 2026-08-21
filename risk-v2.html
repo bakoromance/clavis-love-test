@@ -162,7 +162,11 @@
 .ep-drop{font-size:24px;font-weight:800;color:#e08a84;margin:2px 0 8px}
 .ep-drop s{color:var(--text-mute);font-weight:700;font-size:19px;margin-right:8px}
 .ep-goal{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--accent-dim);font-size:12.5px;color:var(--accent-2);font-weight:700}
-.ep-resume{margin-top:12px}
+.ep-head{text-align:center;margin:2px 0 18px}
+.ep-eyebrow{font-family:var(--serif);font-style:italic;font-weight:600;font-size:12.5px;letter-spacing:.24em;color:var(--accent);margin-bottom:5px}
+.ep-title{font-size:20px;font-weight:800;letter-spacing:.05em;color:var(--text)}
+.ep-sub{margin-top:7px;font-size:12px;color:var(--text-mute);word-break:keep-all;padding:0 14px}
+.ep-head::after{content:"";display:block;width:36px;height:2px;border-radius:2px;background:var(--accent);margin:12px auto 0}
 </style>
 </head>
 <body>
@@ -218,17 +222,16 @@
     <!-- 감정 프로파일링 -->
     <div class="ep" id="epRoot" style="display:none">
       <div class="ep-sec">
-        <div class="ep-h">감정 프로파일</div>
+        <div class="ep-head">
+          <div class="ep-eyebrow">CLAVIS</div>
+          <div class="ep-title">감정 프로파일링</div>
+          <div class="ep-sub">실제 상담 현장에서 관계를 판별하는 클래비스 고유의 진단 체계</div>
+        </div>
         <div id="epBars"></div>
-        <div class="ep-note">처방은 항상 가장 낮은 지표에서 나와요</div>
       </div>
       <div class="ep-sec" id="epEvSec">
         <div class="ep-h">당신의 답에서 찾은 근거</div>
         <ul class="ep-ev" id="epEv"></ul>
-      </div>
-      <div class="ep-sec ep-rx">
-        <div class="ep-h">오늘의 처방</div>
-        <div id="epRxBody"></div>
       </div>
       <div class="ep-sec ep-warn" id="epWarnSec">
         <div class="ep-h">이대로 두면</div>
@@ -508,9 +511,7 @@ function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.
 (function loadKakao(){ if(!KAKAO_JS_KEY) return; const s=document.createElement("script"); s.src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"; s.crossOrigin="anonymous"; s.onload=()=>{ try{ if(window.Kakao&&!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY); }catch(e){} }; document.head.appendChild(s); })();
 </script>
 <script>
-/* ═══ 감정 프로파일링 엔진 (v2 전용) ═══
-   지표 5개(높을수록 좋음) · 처방은 가장 낮은 지표에서 · 판정마다 답변 인용 */
-const EP_KEY="clavis_ep_risk_v2";
+/* ═══ 감정 프로파일링 (v2 전용) ═══  지표 5개(높을수록 좋음) · 판정마다 답변 인용 */
 const EP_LABEL={comm:"소통력",resil:"회복탄력",affection:"애정온도",trust:"신뢰도",future:"미래확신"};
 const EP_GROUP={comm:[0,1,2,3],resil:[4,5,6],affection:[7,8,9,10],trust:[11,12,13,14],future:[15,17]};
 
@@ -524,7 +525,6 @@ function epProfile(){
     let raw=0, lo=0, hi=0;
     EP_GROUP[k].forEach(qi=>{ const q=QUESTIONS[qi]; const b=qBounds(q);
       raw+=qPoints(q,answers[qi]); lo+=b[0]; hi+=b[1]; });
-    // 위험 점수(높을수록 나쁨)를 뒤집어 0~100 지표(높을수록 좋음)로
     p[k]=Math.round(Math.max(5,Math.min(99,(1-(raw-lo)/(hi-lo))*100)));
   });
   return p;
@@ -549,39 +549,11 @@ function epEvidence(){
   return out.slice(0,3);
 }
 
-const EP_RX={
-  comm:[ {t:"질문 하나 바꿔보기", b:"오늘은 '뭐 해?' 대신 상대의 기분을 묻는 질문 하나를 던져요.\n대화의 온도는 질문의 방향에서 바뀌어요."},
-         {t:"대답 대신 반응하기", b:"상대 말에 정답을 주려 하지 말고, 먼저 반응만 해요.\n들어주는 감각이 끊긴 회로를 다시 잇는 첫 단계예요."} ],
-  resil:[ {t:"싸움 복기 한 줄 쓰기", b:"가장 최근 다툼에서 내가 정말 원했던 것 한 줄만 적어봐요.\n감정 밑의 요구를 알아야 같은 싸움이 멈춰요."},
-          {t:"끝맺음 문장 정하기", b:"다음 다툼을 어떻게 끝낼지 문장 하나를 미리 정해둬요.\n싸움의 시작은 못 골라도, 끝은 고를 수 있어요."} ],
-  affection:[ {t:"표현 하나 되살리기", b:"예전에 자주 하던 표현 중 하나를 오늘 한 번만 다시 써요.\n온도는 큰 이벤트가 아니라 반복되던 작은 것에서 떨어졌어요."},
-              {t:"둘만의 30분 예약하기", b:"휴대폰 없는 30분을 이번 주에 하나 잡아요.\n설렘은 이벤트보다 밀도에서 돌아와요."} ],
-  trust:[ {t:"의심을 말로 바꾸기", b:"추궁 대신, 내가 불안한 지점을 '나'를 주어로 말해요.\n의심은 확인할수록 자라고, 말할수록 줄어요."},
-          {t:"작은 약속 하나 지키기", b:"오늘 아주 작은 약속 하나를 만들고 지켜요.\n신뢰는 큰 다짐이 아니라 지켜진 약속의 개수예요."} ],
-  future:[ {t:"가까운 미래부터 말하기", b:"결혼·내년 말고, 2주 안의 계획 하나를 함께 정해요.\n먼 미래가 부담스러운 사람도 가까운 미래는 그릴 수 있어요."},
-           {t:"불안의 정체 적어보기", b:"상대의 회피가 나에 대한 답인지, 시기의 문제인지 적어봐요.\n불안은 구분되는 순간 절반이 되어요."} ]
-};
-const EP_RX_D1={t:"오늘은 결과지를 들이밀지 않기", b:"진단 직후 가장 흔한 실수는 이 결과로 상대를 추궁하는 거예요.\n오늘은 관찰만 해요. 처방은 내일부터 하나씩 손에 쥐여드릴게요."};
-const EP_RX_D7={t:"7일 재평가 — 패턴은 확인됐어요", b:"일주일이면 반복되는 지점이 눈에 들어왔을 거예요.\n이제 남은 건 대화의 설계예요.\n여기서부터는 혼자 하지 않아도 돼요.", final:true};
-
-function epRxFor(p,day){
-  if(day<=1) return {k:null,...EP_RX_D1};
-  if(day>=7) return {k:null,...EP_RX_D7};
-  const order=Object.keys(p).sort((a,b)=>p[a]-p[b]);
-  const pat=[[0,0],[1,0],[0,1],[2,0],[1,1]];
-  const pk=pat[day-2], k=order[pk[0]];
-  return {k, ...EP_RX[k][pk[1]]};
-}
-function epMsToMidnight(){ const n=new Date(), m=new Date(n); m.setHours(24,0,0,0); return m-n; }
-function epSave(o){ try{ localStorage.setItem(EP_KEY, JSON.stringify(o)); }catch(e){} }
-function epLoad(){ try{ return JSON.parse(localStorage.getItem(EP_KEY)||"null"); }catch(e){ return null; } }
-function epDayOf(st){ const d0=new Date(st.t0); d0.setHours(0,0,0,0);
-  const n=new Date(); n.setHours(0,0,0,0); return Math.floor((n-d0)/86400000)+1; }
 function epParas(t){ return t.split("\n\n").map(p=>'<span class="rp">'+p.replace(/\n/g,"<br>")+"</span>").join(""); }
 
-function epRender(p,lv,day,opts){
+function epRender(p,lv,opts){
   opts=opts||{};
-  if(opts.type==="DANGER"){ document.getElementById("epRoot").style.display="none"; return; }  // 안전 경고형엔 게임화 붙이지 않는다
+  if(opts.type==="DANGER"){ document.getElementById("epRoot").style.display="none"; return; }  // 안전 경고형엔 붙이지 않는다
   document.getElementById("epRoot").style.display="block";
   const order=Object.keys(p).sort((a,b)=>p[a]-p[b]);
   document.getElementById("epBars").innerHTML=Object.keys(EP_LABEL).map(k=>
@@ -594,22 +566,12 @@ function epRender(p,lv,day,opts){
   if(ev.length){ document.getElementById("epEvSec").style.display="";
     document.getElementById("epEv").innerHTML=ev.map(e=>"<li>"+e+"</li>").join("");
   } else document.getElementById("epEvSec").style.display="none";
-  const d=Math.min(Math.max(1,day||1),7), rx=epRxFor(p,d), done=(day||1)>7;
-  let h='<span class="ep-day">DAY '+d+" / 7</span>";
-  if(rx.k) h+='<div class="ep-why">가장 낮은 지표 — '+EP_LABEL[rx.k]+"에서 나온 처방이에요</div>";
-  else if(d===1) h+='<div class="ep-why">모든 유형의 첫 처방은 같아요</div>';
-  h+='<div class="ep-rxt">'+rx.t+'</div><div class="ep-body">'+epParas(rx.b)+"</div>";
-  h+='<div class="ep-goal">이 처방들의 목표는 LEVEL '+Math.max(1,lv-2)+"까지 내려가는 거예요</div>";
-  if(done) h+='<div class="ep-lock">7일 코스를 완주했어요. 관계도 그동안 움직였을 거예요. 다시 진단해서 새 프로파일로 시작하세요.</div>';
-  else if(d<7){ const ms=epMsToMidnight(), hh=Math.floor(ms/3600000), mm=Math.floor(ms%3600000/60000);
-    h+='<div class="ep-lock">🔒 DAY '+(d+1)+" 처방은 자정에 열려요 · "+hh+"시간 "+mm+"분 남음</div>"; }
-  document.getElementById("epRxBody").innerHTML=h;
   const rise=Math.min(10, lv+(p[order[0]]<35?2:1));
   document.getElementById("epDrop").innerHTML="<s>LEVEL "+lv+"</s> ↑ LEVEL "+rise;
-  document.getElementById("epWarnBody").innerHTML=epParas("처방 없이 지금 패턴이 반복될 때 올라설 자리예요.\n위험도를 키우는 건 사건이 아니라 방치예요.");
+  document.getElementById("epWarnBody").innerHTML=epParas("지금 패턴이 반복될 때 올라설 자리예요.\n위험도를 키우는 건 사건이 아니라 방치예요.");
 }
 
-/* 검사 완료: 원본 산출 로직 그대로 + 프로파일 저장/렌더 */
+/* 검사 완료: 원본 산출 로직 그대로 + 프로파일 렌더 */
 showResult=function(){
   let raw=0; QUESTIONS.forEach((q,qi)=>{ raw+=qPoints(q,answers[qi]); });
   let lv = Math.min(10, Math.max(1, 1+Math.round((raw-MINSUM)/(MAXSUM-MINSUM)*9)));
@@ -621,12 +583,10 @@ showResult=function(){
   else { const tp=computeType(); typeKey=tp.type || "STABLE"; }
   saveResult(`LEVEL ${lv}/10 · ${(RISK_TYPES[typeKey]||{}).name||""}`, collectSelectedTexts());
   renderResult(lv, typeKey);
-  const p=epProfile(), ev=epEvidence();
-  if(typeKey!=="DANGER") epSave({t0:Date.now(), lv:lv, prof:p, ev:ev, type:typeKey});
-  epRender(p,lv,1,{ev:ev,type:typeKey});
+  epRender(epProfile(), lv, {ev:epEvidence(), type:typeKey});
 };
 
-/* 미리보기: ?lv=6&type=CONFLICT&day=3 — 유형 표본 프로파일 */
+/* 미리보기: ?lv=6&type=CONFLICT — 유형 표본 프로파일 */
 (function(){
   const q=new URLSearchParams(location.search);
   if(!q.has("lv")&&!q.has("preview")) return;
@@ -637,22 +597,7 @@ showResult=function(){
   const DIP={COOL:["comm","affection"],CONFLICT:["resil"],AVOID:["resil","comm"],TRUST:["trust"],
              BORED:["affection"],FUTURE:["future"],BREAKUP:["comm","affection","future"],STABLE:[],DANGER:[]};
   const p={}; Object.keys(EP_LABEL).forEach(k=>{ p[k]=Math.max(8,base-((DIP[type]||[]).includes(k)?28:0)); });
-  const day=Math.max(1,Math.min(9,parseInt(q.get("day"))||1));
-  epRender(p,lv,day,{type:type,ev:[]});
-})();
-
-/* 재방문: 저장된 프로파일이 있으면 인트로에 이어보기 버튼 */
-(function(){
-  const q=new URLSearchParams(location.search);
-  if(q.has("lv")||q.has("preview")) return;
-  const st=epLoad(); if(!st) return;
-  const day=epDayOf(st);
-  const sb=document.querySelector('#intro [onclick^="startQuiz"]'); if(!sb) return;
-  const b=document.createElement("button");
-  b.className="btn ghost ep-resume";
-  b.textContent = day>7 ? "지난 프로파일 다시 보기" : "DAY "+day+" 처방 확인하기 →";
-  b.onclick=function(){ renderResult(st.lv, st.type); epRender(st.prof, st.lv, day, {ev:st.ev,type:st.type}); };
-  sb.insertAdjacentElement("afterend", b);
+  epRender(p,lv,{type:type,ev:[]});
 })();
 </script>
 </body>
