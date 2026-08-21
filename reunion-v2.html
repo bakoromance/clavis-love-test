@@ -683,7 +683,7 @@ function epRender(p,score,day,opts){
   const cut=Math.max(6,Math.round((100-p.restraint)*.28+(100-p.recovery)*.10));
   const low=Math.max(10,score-cut);
   document.getElementById("epDrop").innerHTML="<s>"+score+"%</s> ↓ "+low+"%";
-  document.getElementById("epWarnBody").innerHTML=epParas("지금 패턴이 반복되면 내려가게 되는 수치예요.\n그 사람의 마음을 밀어내는 건 시간이 아니라 방향이죠.");
+  document.getElementById("epWarnBody").innerHTML=epParas("지금처럼 대응하면 그 사람의 마음은 조금씩 더 멀어져요.\n마음을 밀어내는 건 시간이 아니라 방향이죠.");
 }
 
 /* 검사 완료 시: 프로파일 계산 + 저장 + 렌더 */
