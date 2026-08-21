@@ -156,7 +156,7 @@
   .sheet-close:hover{background:#ece5d6}
   .footer{text-align:center;font-size:11px;color:var(--muted);letter-spacing:.25em;padding:14px 0 28px;opacity:.7}
 /* ── 감정 프로파일링 ── */
-.ep{margin:26px 0 4px;text-align:left}
+.ep{margin:26px 0 4px;text-align:left;word-break:keep-all}
 .ep-sec{background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:20px 18px;margin-bottom:14px}
 .ep-h{font-size:12px;letter-spacing:.12em;font-weight:800;color:var(--gold);margin-bottom:14px}
 .ep-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
@@ -189,7 +189,7 @@
 .ep-title{font-size:20px;font-weight:800;letter-spacing:.05em;color:var(--ink)}
 .ep-sub{margin-top:7px;font-size:12px;color:var(--muted);word-break:keep-all;padding:0 14px}
 .ep-head::after{content:"";display:block;width:36px;height:2px;border-radius:2px;background:var(--gold);margin:12px auto 0}
-.ep-aid{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6}
+.ep-aid{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6;word-break:keep-all}
 </style>
 </head>
 <body>
@@ -619,7 +619,7 @@ const EP_RX={
            {t:"용건 만들어 연락하지 않기", b:"신호를 확인하려고 만든 용건은 상대도 알아차려요.\n신호는 만들어내는 게 아니라 기다려서 받는 거예요."} ],
   restraint:[ {t:"보내지 않는 편지 쓰기", b:"하고 싶은 말을 전부 적되, 보내지 않아요.\n충동은 없애는 게 아니라 배출하는 거예요."},
               {t:"지난 대화 다시 읽지 않기", b:"카톡 스크롤을 오늘은 멈춰요.\n과거를 다시 읽는 손이 실수를 만들어요."},
-              {t:"술자리 전 채팅방 숨기기", b:"오늘 술자리가 있다면 상대와의 채팅방을 잠시 숨겨둬요.\n밤의 충동이 낮의 노력을 지우지 않게요."} ],
+              {t:"새벽이 오기 전 채팅방 숨기기", b:"자기 전에 상대와의 채팅방을 잠시 숨겨둬요.\n새벽의 충동이 낮의 노력을 지우지 않게요."} ],
   recovery:[ {t:"나를 위한 일정 1개 잡기", b:"운동·모임·일, 뭐든 하나를 오늘 예약해요.\n회복 중인 모습이 상대에게 닿을 때 온도가 움직여요."},
              {t:"SNS에서 힘든 티 걷어내기", b:"슬픈 노래·감성 글귀를 내려요.\n지금 프로필은 상대가 나를 보는 유일한 창이에요."},
              {t:"먹고 자는 리듬부터 지키기", b:"오늘은 제때 먹고 제때 자는 것부터 지켜요.\n무너진 리듬은 표정과 말투로 드러나고, 상대는 그걸 읽어요."} ],
@@ -667,7 +667,7 @@ function epRender(p,score,day,opts){
   let h='<span class="ep-day">'+(d===1?"진단 첫날":"진단 "+d+"일째")+"</span>";
   if(rx.k) h+='<div class="ep-why">지금 제일 급한 지표 · '+EP_LABEL[rx.k]+"</div>";
   h+='<div class="ep-rxt">'+rx.t+'</div><div class="ep-body">'+epParas(rx.b)+"</div>";
-  h+='<div class="ep-aid">이 결과지를 들고 상담을 받으면, 내 상황에 맞는 다음 수를 훨씬 정확하게 잡을 수 있어요.</div>';
+  h+='<div class="ep-aid">상담을 통해, 내 상황에 맞는 더 정교한<br>행동지침을 받아보실 수 있습니다.</div>';
   { const ms=epMsToMidnight(), hh=Math.floor(ms/3600000), mm=Math.floor(ms%3600000/60000);
     h+='<div class="ep-lock">내일의 처방은 자정에 새로 도착해요 · '+hh+"시간 "+mm+"분 남음</div>"; }
   document.getElementById("epRxBody").innerHTML=h;
