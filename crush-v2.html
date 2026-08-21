@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>썸 / 짝사랑 정밀 진단 | CLAVIS 감정 프로파일링</title>
+<link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" as="style" crossorigin
+  href="https://fastly.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" />
+<style>
+  :root{
+    --bg:#f6eef0; --bg-2:#f1e6e9; --card:#ffffff; --card-bd:#ecdde1;
+    --ink:#23171b; --ink-2:#6a5a60; --muted:#a8979d; --line:#ead7db;
+    --rose:#d76b86; --rose-2:#e591a4; --rose-soft:rgba(215,107,134,.12);
+    --sel:#241319; --sel-ink:#fbeef1;
+    --btn:#241319; --btn-ink:#fbeef1; --btn-off:#ecdde1; --btn-off-ink:#b6a6ab;
+    --shadow:0 22px 50px -28px rgba(80,30,45,.35);
+    --serif:"Cormorant Garamond",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:"Pretendard",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .app{position:relative;max-width:480px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+  .wm{font-size:14px;font-weight:800;color:var(--ink);display:inline-flex;align-items:baseline;gap:6px}
+  .wm i{font-family:var(--serif);font-style:italic;font-weight:600;font-size:14px;letter-spacing:.14em;color:var(--rose)}
+  .screen{display:none;flex:1;flex-direction:column}
+  .screen.active{display:flex;animation:fade .5s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;width:100%;border:none;cursor:pointer;background:var(--btn);color:var(--btn-ink);font-family:inherit;font-weight:700;font-size:16px;padding:17px 24px;border-radius:14px;transition:transform .15s,background .2s,opacity .2s}
+  .btn:hover{background:#34202a}
+  .btn:active{transform:scale(.985)}
+  .btn:disabled{background:var(--btn-off);color:var(--btn-off-ink);cursor:not-allowed}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink-2);font-weight:600}
+  .btn.ghost:hover{background:#fff}
+
+  #intro{justify-content:center;align-items:center;text-align:center;padding:54px 28px}
+  #intro .logo{height:30px;margin-bottom:30px;opacity:.92}
+  #intro .eyebrow{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:var(--rose);background:var(--rose-soft);border:1px solid rgba(215,107,134,.28);padding:7px 14px;border-radius:999px;margin-bottom:24px}
+  #intro h1{font-size:36px;font-weight:800;letter-spacing:-.025em;line-height:1.2;margin-bottom:18px;text-align:center}
+  #intro h1 .em{font-weight:800;color:var(--rose)}
+  #intro .quote{font-family:var(--serif);font-style:italic;font-size:23px;margin:0 0 10px}
+  #intro .sub{color:var(--muted);font-size:14.5px;margin-bottom:40px;line-height:1.7}
+  #intro .cta{max-width:340px;width:100%}
+
+  .qhead{position:sticky;top:0;z-index:5;background:var(--bg);padding:18px 22px 14px;box-shadow:0 8px 14px -12px rgba(80,30,45,.25)}
+  .qhead-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .xclose{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink-2);font-size:13px;cursor:pointer;display:grid;place-items:center}
+  .qhead-sub{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+  .qhead-sub .diag{font-size:12.5px;color:var(--ink-2);font-weight:600}
+  .qhead-sub .step{font-size:11.5px;letter-spacing:.16em;color:var(--rose);font-weight:700}
+  .progress-track{height:3px;background:var(--line);border-radius:999px;overflow:hidden}
+  .progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--rose),var(--rose-2));border-radius:999px;transition:width .45s cubic-bezier(.4,0,.2,1)}
+  #quiz-body{padding:14px 22px 26px;flex:1}
+  .qcard{animation:fade .35s ease both}
+  .qnum{font-family:var(--serif);font-style:italic;font-size:32px;font-weight:600;color:var(--rose);line-height:1;margin-bottom:10px}
+  .qtitle{font-size:23px;font-weight:800;line-height:1.36;letter-spacing:-.02em;margin-bottom:8px}
+  .qhint{font-size:13px;color:var(--muted);margin-bottom:22px}
+  .options{display:flex;flex-direction:column;gap:9px}
+  .opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;background:var(--card);border:1px solid var(--card-bd);color:var(--ink-2);padding:16px 18px;border-radius:14px;font-family:inherit;font-size:15px;font-weight:500;line-height:1.45;transition:border-color .16s,background .16s,color .16s,box-shadow .16s}
+  .opt:hover{border-color:#e2c9cf;box-shadow:0 8px 18px -14px rgba(80,30,45,.3)}
+  .opt .olabel{flex:1}
+  .opt .oradio{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:1.8px solid #d8c4ca;position:relative;transition:.16s}
+  .opt.selected{background:var(--sel);border-color:var(--sel);color:var(--sel-ink);box-shadow:var(--shadow)}
+  .opt.selected .oradio{border-color:var(--rose-2)}
+  .opt.selected .oradio::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--rose-2)}
+  .qfoot{display:flex;gap:11px;margin-top:26px;padding-bottom:30px}
+  .qfoot .btn{flex:1}.qfoot .btn.back{flex:0 0 84px}
+
+  #result{padding:40px 24px 44px;text-align:center}
+  #result .logo{height:24px;margin:0 auto 22px;display:block;opacity:.9}
+  .gauge{position:relative;width:216px;height:216px;margin:0 auto 14px}
+  .gauge svg{transform:rotate(-90deg);width:100%;height:100%}
+  .gauge .track{fill:none;stroke:#ecdde1;stroke-width:10}
+  .gauge .bar{fill:none;stroke:url(#g);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.4s cubic-bezier(.2,.7,.2,1)}
+  .gauge .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .gauge .pct{font-family:var(--serif);font-weight:600;font-size:62px;line-height:1;display:flex;align-items:baseline}
+  .gauge .pct small{font-size:24px;color:var(--rose);font-weight:600;margin-left:2px}
+  .gauge .pl{font-size:12.5px;color:var(--muted);margin-top:8px;letter-spacing:.05em;font-weight:600}
+  #result .rtitle{font-size:23px;font-weight:800;line-height:1.45;letter-spacing:-.015em;margin:16px 0 20px}
+  #result .rtitle .em{font-family:var(--serif);font-style:italic;color:var(--rose)}
+  #result .rbody{text-align:left;background:#fff;border:1px solid var(--card-bd);border-radius:16px;padding:22px;color:var(--ink-2);font-size:14.5px;line-height:1.85;margin-bottom:24px;box-shadow:var(--shadow)}
+  #result .rbody .rp{display:block;white-space:pre-line}
+  #result .rbody .rp + .rp{margin-top:.4em}
+  /* 성사율 설명글과 구분되는 별도 항목 — 반투명 밝은 회색 패널 */
+  .type-card{--tc:var(--rose);background:rgba(106,90,96,.07);border:1px solid rgba(106,90,96,.14);border-radius:16px;padding:20px;margin-bottom:24px;text-align:center;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)}
+  .type-head{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
+  .type-ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:rgba(255,255,255,.55);border:1px solid rgba(106,90,96,.14);color:var(--tc)}
+  .type-ic svg{width:14px;height:14px}
+  .type-label{font-size:11px;letter-spacing:.14em;color:var(--muted);font-weight:700}
+  .type-name-row{display:flex;align-items:baseline;justify-content:center;gap:9px;flex-wrap:wrap;margin-bottom:10px}
+  .type-name{font-size:20px;font-weight:800;letter-spacing:-.01em;color:var(--tc)}
+  .type-en{font-size:11px;font-weight:800;letter-spacing:.16em;color:var(--tc)}
+  .type-desc{font-size:13.5px;color:var(--ink-2);line-height:1.75;white-space:pre-line}
+  .type-body{margin-top:6px;padding-top:16px;border-top:1px solid rgba(106,90,96,.16);text-align:left;font-size:13.5px;line-height:1.85;color:var(--ink-2)}
+  .type-body .rp{display:block;white-space:pre-line}
+  .type-body .rp + .rp{margin-top:.4em}
+  #result .cta-line{font-size:15px;font-weight:700;margin-bottom:14px}
+  #result .actions{display:flex;flex-direction:column;gap:11px}
+  #result .restart{margin-top:22px}
+  #result .restart button{background:none;border:none;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  #loading{justify-content:center;align-items:center;text-align:center;padding:54px 30px}
+  .spinner{width:54px;height:54px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--rose);animation:spin 1s linear infinite;margin-bottom:28px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .load-title{font-size:21px;font-weight:800;letter-spacing:-.01em;margin-bottom:14px}
+  .load-step{font-size:14.5px;color:var(--ink-2);min-height:22px;transition:opacity .2s;margin-bottom:26px}
+  .load-track{width:100%;max-width:280px;height:4px;background:var(--line);border-radius:999px;overflow:hidden;margin:0 auto 30px}
+  .load-fill{height:100%;width:0;background:linear-gradient(90deg,var(--rose),var(--rose-2));border-radius:999px}
+  .load-trust{max-width:330px;font-size:14px;line-height:1.75;color:var(--ink-2);background:#fff;border:1px solid var(--card-bd);border-radius:14px;padding:16px 20px}
+  .load-trust b{color:var(--rose);font-weight:700}
+  .footer{text-align:center;font-size:11px;color:var(--muted);letter-spacing:.25em;padding:14px 0 28px;opacity:.7}
+  .toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(18px);background:var(--sel);color:var(--sel-ink);padding:12px 20px;border-radius:999px;font-size:14px;font-weight:600;opacity:0;pointer-events:none;transition:.3s;z-index:70;box-shadow:var(--shadow)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .sheet-overlay{position:fixed;inset:0;z-index:60;background:rgba(60,25,35,.4);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center}
+  .sheet-overlay.show{display:flex;animation:fade .25s ease both}
+  .sheet{width:100%;max-width:480px;background:#fff;border-radius:22px 22px 0 0;padding:14px 22px calc(26px + env(safe-area-inset-bottom));box-shadow:var(--shadow);animation:up .3s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes up{from{transform:translateY(100%)}to{transform:none}}
+  .grip{width:40px;height:4px;border-radius:999px;background:var(--line);margin:4px auto 18px}
+  .sheet-title{text-align:center;font-size:16px;font-weight:700;margin-bottom:22px}
+  .sheet-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+  .share-item{display:flex;flex-direction:column;align-items:center;gap:9px;background:none;border:none;cursor:pointer;font-family:inherit;color:var(--ink-2);font-size:12px;font-weight:600;padding:6px 2px}
+  .share-ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;transition:transform .15s}
+  .share-item:active .share-ic{transform:scale(.92)}
+  .sheet-close{width:100%;background:var(--bg-2);border:1px solid var(--card-bd);color:var(--ink-2);font-family:inherit;font-size:15px;font-weight:600;padding:14px;border-radius:12px;cursor:pointer}
+/* ── 감정 프로파일링 ── */
+.ep{margin:24px 0 4px;text-align:left}
+.ep-sec{background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:20px 18px;margin-bottom:14px}
+.ep-h{font-size:12px;letter-spacing:.12em;font-weight:800;color:var(--rose);margin-bottom:14px}
+.ep-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.ep-lab{width:64px;flex:none;font-size:13px;font-weight:700;color:var(--ink-2)}
+.ep-track{flex:1;height:8px;border-radius:99px;background:var(--bg-2);overflow:hidden}
+.ep-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--rose-2),var(--rose));width:0;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.ep-val{width:30px;flex:none;text-align:right;font-size:13px;font-weight:800;color:var(--ink)}
+.ep-row.low .ep-lab,.ep-row.low .ep-val{color:var(--rose)}
+.ep-note{margin-top:10px;font-size:12px;color:var(--muted)}
+.ep-body{font-size:14.5px;color:var(--ink-2);line-height:1.75}
+.ep-body .rp{display:block}
+.ep-body .rp+.rp{margin-top:.4em}
+.ep-ev{margin:0;padding:0;list-style:none}
+.ep-ev li{position:relative;padding-left:14px;font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.ep-ev li+li{margin-top:8px}
+.ep-ev li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:99px;background:var(--rose)}
+.ep-ev b{color:var(--ink)}
+.ep-day{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.1em;color:#fff;background:var(--rose);border-radius:999px;padding:4px 10px;margin-bottom:10px}
+.ep-why{font-size:12.5px;color:var(--rose);font-weight:700;margin-bottom:6px}
+.ep-rxt{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:8px}
+.ep-lock{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--bg-2);font-size:12.5px;color:var(--ink-2)}
+.ep-warn{border-color:#ecc7ce;background:#fdf3f5}
+.ep-warn .ep-h{color:#c05064}
+.ep-drop{font-size:26px;font-weight:800;color:#c05064;margin:2px 0 8px}
+.ep-drop s{color:var(--muted);font-weight:700;font-size:20px;margin-right:8px}
+.ep-resume{margin-top:12px}
+</style>
+</head>
+<body>
+<div class="app">
+  <section id="intro" class="screen active">
+    <img class="logo" src="assets/clavis-logo-black.png" alt="CLAVIS" />
+    <span class="eyebrow">썸·짝사랑 시그널 데이터 진단</span>
+    <h1>썸 / 짝사랑<br><span class="em">성사율 계산하기</span></h1>
+    <p class="quote">“우리, 잘 될 수 있을까?”</p>
+    <p class="sub">상대의 반응을 입력하면<br>연인으로 발전할 확률을 계산해 드려요.</p>
+    <div class="cta"><button class="btn" onclick="startQuiz()">계산 시작&nbsp;&nbsp;→</button></div>
+  </section>
+
+  <section id="quiz" class="screen">
+    <div class="qhead">
+      <div class="qhead-top"><span class="wm">클래비스 <i>CLAVIS</i></span><button class="xclose" onclick="restart()">✕</button></div>
+      <div class="qhead-sub"><span class="diag">썸 / 짝사랑 성사율 진단</span><span class="step">STEP <b id="cur">01</b> / <span id="total">26</span></span></div>
+      <div class="progress-track"><div class="progress-fill" id="bar"></div></div>
+    </div>
+    <div id="quiz-body"></div>
+  </section>
+
+  <section id="loading" class="screen">
+    <div class="spinner"></div>
+    <div class="load-title">성사 가능성을 분석 중입니다.</div>
+    <div class="load-step" id="loadStep"></div>
+    <div class="load-track"><div class="load-fill" id="loadFill"></div></div>
+    <div class="load-trust">혼자 애태우지 말고,<br><b>결정적인 타이밍을 놓치기 전</b> 전문가의 조언을 받아보세요.</div>
+  </section>
+
+  <section id="result" class="screen">
+    <img class="logo" src="assets/clavis-logo-black.png" alt="CLAVIS" />
+    <div class="gauge">
+      <svg viewBox="0 0 216 216"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e591a4"/><stop offset="100%" stop-color="#d76b86"/></linearGradient></defs>
+        <circle class="track" cx="108" cy="108" r="96"/><circle class="bar" id="gaugeBar" cx="108" cy="108" r="96"/></svg>
+      <div class="center"><div class="pct"><span id="pctNum">0</span><small>%</small></div><div class="pl">제대로 했을 때 성사 가능성</div></div>
+    </div>
+    <h2 class="rtitle" id="rtitle"></h2>
+    <div class="rbody" id="rbody"></div>
+    <div class="type-card" id="typeCard" style="display:none">
+      <div class="type-head">
+        <span class="type-ic" id="typeIc"></span>
+        <span class="type-label">썸 유형</span>
+      </div>
+      <div class="type-name-row">
+        <span class="type-name" id="typeName"></span>
+        <span class="type-en" id="typeEn"></span>
+      </div>
+      <div class="type-body" id="typeBody"></div>
+    </div>
+
+    <!-- 감정 프로파일링 -->
+    <div class="ep" id="epRoot" style="display:none">
+      <div class="ep-sec">
+        <div class="ep-h">감정 프로파일</div>
+        <div id="epBars"></div>
+        <div class="ep-note">처방은 항상 가장 낮은 지표에서 나와요</div>
+      </div>
+      <div class="ep-sec" id="epEvSec">
+        <div class="ep-h">당신의 답에서 찾은 근거</div>
+        <ul class="ep-ev" id="epEv"></ul>
+      </div>
+      <div class="ep-sec ep-rx">
+        <div class="ep-h">오늘의 처방</div>
+        <div id="epRxBody"></div>
+      </div>
+      <div class="ep-sec ep-warn" id="epWarnSec">
+        <div class="ep-h">이대로 두면</div>
+        <div class="ep-drop" id="epDrop"></div>
+        <div class="ep-body" id="epWarnBody"></div>
+      </div>
+    </div>
+
+    <p class="cta-line" id="ctaLine"></p>
+    <div class="actions">
+      <a class="btn" id="consultBtn" target="_top">1:1 맞춤상담 신청하기</a>
+      <button class="btn ghost" onclick="shareResult()">친구에게 결과 공유하기</button>
+    </div>
+    <div class="restart"><button onclick="restart()">다시 측정하기</button></div>
+  </section>
+  <div class="footer">CLAVIS</div>
+</div>
+
+<div class="sheet-overlay" id="shareSheet" onclick="if(event.target===this)closeShare()">
+  <div class="sheet">
+    <div class="grip"></div>
+    <div class="sheet-title">결과 공유하기</div>
+    <div class="sheet-grid">
+      <button class="share-item" onclick="shareNative()"><span class="share-ic" style="background:#241319">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 3v12M12 3l-4 4M12 3l4 4" stroke="#fbeef1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 12v6a2 2 0 002 2h10a2 2 0 002-2v-6" stroke="#fbeef1" stroke-width="2" stroke-linecap="round"/></svg>
+      </span><span>공유하기</span></button>
+      <button class="share-item" onclick="shareKakao()"><span class="share-ic" style="background:#FEE500">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3.5C6.86 3.5 2.7 6.79 2.7 10.85c0 2.63 1.75 4.94 4.38 6.25-.19.69-.7 2.55-.8 2.95-.13.49.18.48.38.35.16-.1 2.5-1.7 3.51-2.39.6.09 1.21.13 1.83.13 5.14 0 9.3-3.29 9.3-7.35S17.14 3.5 12 3.5z"/></svg>
+      </span><span>카카오톡</span></button>
+      <button class="share-item" onclick="shareInstagram()"><span class="share-ic" style="background:linear-gradient(45deg,#feda75,#fa7e1e,#d62976,#962fbf,#4f5bd5)">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5.5" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#fff" stroke-width="2"/><circle cx="17.3" cy="6.7" r="1.3" fill="#fff"/></svg>
+      </span><span>인스타그램</span></button>
+      <button class="share-item" onclick="copyLink()"><span class="share-ic" style="background:var(--bg-2);border:1px solid var(--card-bd)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M9 12a3 3 0 003 3h3a3 3 0 100-6h-1" stroke="#23171b" stroke-width="2" stroke-linecap="round"/><path d="M15 12a3 3 0 00-3-3H9a3 3 0 100 6h1" stroke="#23171b" stroke-width="2" stroke-linecap="round"/></svg>
+      </span><span>링크 복사</span></button>
+    </div>
+    <button class="sheet-close" onclick="closeShare()">닫기</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const CONSULT_URL = "https://clavis.love/";
+const KAKAO_JS_KEY = "";
+/* Google 설문지 저장 (entry 번호 채우면 활성화) */
+const FORM_ACTION = "";
+const FORM_FIELDS = { name:"", phone:"", email:"", score:"", items:"" };
+
+const MEMBER = (function(){
+  const p = new URLSearchParams(location.search);
+  return { uid:(p.get("uid")||"").trim(), name:(p.get("name")||"").trim(),
+           phone:(p.get("phone")||"").trim(), email:(p.get("email")||"").trim() };
+})();
+window.addEventListener("message",(e)=>{ const d=e.data;
+  if(d&&d.type==="clavis-member"){ ["uid","name","phone","email"].forEach(k=>{ if(d[k]) MEMBER[k]=String(d[k]).trim(); }); }});
+
+/* v3 26문항. type: 없음=단일 / multiSum(합산,cap 상한) / multiDepth(최고단계만). opt 3번째 "solo"=배타선택. 점수는 정규화(하단 MINSUM/MAXSUM). */
+const QUESTIONS = [
+  { t:"썸 분위기가 생긴 뒤 얼마나 지났나요?", opts:[["썸이라 할 분위기는 없었다",-2,"FRIEND"],["1주 이내",0,"SCOUTING"],["2주 ~ 2개월",3],["2 ~ 4개월",1],["4 ~ 6개월",2],["6개월 이상",-1]]},
+  { t:"최근 일주일 기준, 이전보다 연락·대화 분위기가 변했나요?", opts:[["비슷하게 유지 중",1],["더 좋아졌다",3],["상대 텐션이 낮아졌다",-2,"UNEVEN"],["대화가 끊겼다",-3],["빈도는 줄었지만 분위기는 나쁘지 않다",0,"SCOUTING"],["애초에 사적인 분위기는 없었다",-3,"FRIEND"]]},
+  { t:"둘이 나누는 대화의 결은?", type:"multiDepth", opts:[["사적인 연락 자체가 거의 없다",-2,"solo","FRIEND"],["업무·용건·정보성",0,"HESITANT"],["시시콜콜한 잡담",1,"ACCESS","FRIEND"],["일상 공유",2,"SCOUTING"],["개인적·속깊은 이야기",3,"ALMOST"]]},
+  { t:"상대의 답장·리액션 스타일은?", type:"multiSum", cap:3, opts:[["답장이 느리거나 자주 씹는다",-2,"UNEVEN"],["단답 위주다",-1,"UNEVEN"],["리액션이 좋다",1,"ACCESS"],["나에게 먼저 질문한다",1,"SCOUTING"],["내 말에서 대화를 확장한다",2],["묻지 않은 자기 얘기를 꺼낸다",2,"ALMOST"]]},
+  { t:"대화가 끊기거나 연락이 뜸해지면 상대는?", type:"multiSum", cap:3, opts:[["그대로 흐지부지 끝난다",-2,"UNEVEN"],["무응답(읽씹·안읽씹) 한다",-3,"UNEVEN"],["내가 다시 말하면 평범하게 받는다",1],["내가 말하면 달갑게 받아준다",2,"ACCESS"],["상대가 먼저 다시 말을 건다",3,"SCOUTING"],["끊긴 적이 없어 판단이 어렵다",1,"solo"]]},
+  { t:"상대가 나의 정보나 감정 상태를 얼마나 신경 쓰나요?", opts:[["거의 묻지 않거나, 기억 못한다",-2,"UNEVEN"],["큼직한 것만 기억하거나, 반응한다",0,"ACCESS"],["흘리듯 말한 것도 기억한다",2,"ALMOST"],["먼저 알아채거나, 기억해서 챙겨준다",3,"ALMOST"]]},
+  { t:"상대가 나를 칭찬하는 방식은?", type:"multiSum", cap:4, opts:[["칭찬은커녕 비난·지적이 많다",-2,"solo","FRIEND"],["거의 없다",-1],["능력·성격 등 일반적 칭찬",1,"ACCESS","FRIEND"],["‘이런 점이 좋다’는 개인화된 칭찬",2,"ACCESS"],["외모·이성적 매력을 언급",3,"SCOUTING"]]},
+  { t:"단둘이 만난 빈도는?", opts:[["아직 없다 (우연히 마주친 정도 포함)",0],["곧 만날 약속이 있다",1,"ACCESS"],["한두 번 있었다",2],["가끔 만난다",2,"SCOUTING"],["자주 만난다",3,"ALMOST"]]},
+  { t:"상대가 나와의 만남에 얼마나 적극적인가요?", opts:[["제안하면 피하거나 넘긴다",-2,"RIVAL"],["공적인 자리에서만 본다",-1,"RIVAL"],["제안하면 가능한 한 응한다",1],["날짜·장소를 함께 조율한다",2],["상대가 먼저 보자고 제안한다",3,"SCOUTING"],["만나자는 얘기가 나온 적 없다",-3,"HESITANT"]]},
+  { t:"가장 최근 만남 이후 상대의 반응은?", type:"multiSum", cap:3, opts:[["상대가 거리를 두기 시작했다",-3,"RIVAL"],["오히려 연락 공백이 생겼다",-2,"UNEVEN"],["평소와 똑같다",0],["잘 들어가라는 인사 정도",0],["다음 약속을 기약했다",2,"SCOUTING"],["연락 빈도·친밀도가 올라갔다",2]]},
+  { t:"나의 플러팅·장난에 대한 반응은?", type:"multiSum", cap:3, opts:[["정색하거나 피한다",-3,"UNEVEN"],["못 들은 척 넘긴다",-1,"RIVAL"],["웃으며 받아넘긴다",1,"RIVAL"],["리액션을 잘 해준다",2],["적극적으로 받아주고 맞받아친다",3,"ACCESS"],["아직 시도해본 적 없다",0,"solo","HESITANT"]]},
+  { t:"지금까지의 스킨십 최대 진도는?", opts:[["없다",0,"FRIEND"],["자주 눈 마주침",1,"HESITANT"],["가벼운 접촉",2,"ACCESS"],["장난스러운 터치가 오감",3,"SCOUTING"],["손잡기·팔짱",4,"SCOUTING"],["뽀뽀·키스",6,"ALMOST"],["그 이상",8,"ALMOST"]]},
+  { t:"둘만의 반복되는 루틴이 있나요? (연락 시간대, 자주 가는 곳 등)", opts:[["없다",0],["가끔씩 몇 번",1,"ACCESS"],["틈틈이 있다",2,"SCOUTING"],["끊기면 어색할 정도로 자리잡았다",3,"ALMOST"]]},
+  { t:"둘만 아는 농담·호칭이나, 둘만 나눈 깊은 이야기가 있나요?", opts:[["둘 다 없다",-1],["같은 집단에서 생긴 농담 정도",0,"FRIEND"],["둘만의 농담·가벼운 고민 공유",1,"ACCESS"],["자주 반복되는 둘만의 코드 있음",2,"SCOUTING"],["둘만의 별명·호칭 or 속깊은 이야기",3,"ALMOST"]]},
+  { t:"상대가 연애 주제를 꺼내는 방식은?", type:"multiSum", cap:3, opts:[["연애 얘기를 꺼낸 적 없다",-2,"solo","FRIEND"],["자기 전연인·고민 상담 위주",0,"RIVAL"],["일반적인 연애관 얘기",0],["내 연애 스타일을 궁금해한다",2,"ACCESS"],["은근히 ‘우리’를 대입하며 말한다",3,"ALMOST"]]},
+  { t:"상대가 나의 연애관·이상형에 관심을 보이나요?", opts:[["물어본 적 없다",-1],["가볍게 물어본 적 있다",1],["구체적으로 궁금해한다",2,"SCOUTING"],["내 대답에 자신을 대입시킨다",3,"ALMOST"]]},
+  { t:"나는 상대의 이상형에 얼마나 부합하나요?", opts:[["전혀 다르다 / 이성으로 안 본다",-2,"RIVAL"],["잘 모르겠다 / 상대 이상형을 모른다",0,"HESITANT"],["일부 비슷한 점이 있다",1,"UNEVEN"],["가까운 점이 많다",2],["상대가 나를 이상형에 끼워 맞추는 느낌이다",3,"ALMOST"]]},
+  { t:"미래를 함께하는 약속·언급이 있나요?", opts:[["아직 없다",-2],["말뿐이고 실행은 없다",-1,"RIVAL"],["가끔 있다",1],["실제 약속으로 이어진다",2,"SCOUTING"],["상대가 반복적으로 제안한다",3,"ALMOST"]]},
+  { t:"상대가 나를 ‘친구·지인’으로 선을 그은 적이 있나요?", opts:[["자주 그런다",-3,"FRIEND"],["몇 번 있다",-2,"FRIEND"],["애매하다",-1,"UNEVEN","RIVAL"],["그런 표현은 없었다",1],["오히려 이성적 긴장감이 있다",2,"ALMOST"]]},
+  { t:"상대가 나를 이성으로서 어떻게 평가하나요?", opts:[["절대 이성으로 안 보인다고 말한다",-1,"FRIEND"],["별 말 없다 / 잘 모르겠다",0],["괜찮은 사람, 좋은 사람이라고 했다",0,"UNEVEN"],["성격·대화가 잘 통한다고 한다",1,"RIVAL"],["외모·분위기·매력을 언급한 적 있다",2,"SCOUTING"],["이성적 호감을 여러 번 표현했다",3,"ALMOST"]]},
+  { t:"상대가 지금 연애할 수 있는 상태인가요?", opts:[["사귀는 사람이 있다",-4,"RIVAL"],["다른 썸·호감 대상이 있어 보인다",-2,"RIVAL"],["잘 모르겠다",0,"HESITANT"],["솔로지만 연애 생각은 없어 보인다",1,"RIVAL"],["솔로이고 연애에 열려 있다",3,"ACCESS"]]},
+  { t:"상대가 최근 외로움이나 연애 욕구를 내비친 적이 있나요?", opts:[["전혀 없다",-2],["일반적인 푸념 정도",-1],["알 수 없다",0,"HESITANT"],["연애하고 싶다는 말을 한다",1],["굉장히 외로워한다",2]]},
+  { t:"상대가 나와 사귈 때 걸리는 현실 장애물은?", opts:[["꽤 크다 (거리·직장·주변 시선 등)",-3,"RIVAL"],["약간 있다",-1],["거의 없다",0],["오히려 유리한 상황이다",2]]},
+  { t:"앞으로도 자연스럽게 만날 명분·접점이 있나요?", type:"multiSum", cap:4, opts:[["앞으로 볼 수 있을지 미지수다",-3,"solo","RIVAL"],["전혀 없다",-2,"solo"],["공적으로 있다 (업무·학교 등)",1],["사적으로 있다 (친구·모임 등)",2],["명분 없이도 만날 수 있다",3,"RISING"]]},
+  { t:"상대가 내 영역(취향·사람·공간)에 들어오려는 행동이 있나요?", opts:[["없다",-2,"FRIEND"],["물어본 적은 있다",0,"ACCESS"],["적극적으로 물어본다",1,"SCOUTING"],["함께 하자고 말한다",2,"RISING"],["실제로 함께 시도한 적 있다",3,"RISING"]]},
+  { t:"둘 사이에 대한 주변의 반응은?", type:"multiSum", cap:3, opts:[["부정적인 반응이 있다",-2,"solo"],["별 반응 없다",0],["둘이 친해 보인다고 한다",1],["잘 어울린다고 한다",2,"RISING"],["둘을 밀어주려 한다",1,"RISING"]]}
+];
+const TIERS = [
+  { max:29, title:`아직은 친구,\n그 어딘가입니다.`,
+    body:`호감 신호가 약한 단계예요.\n상대는 당신을 편한 사람으로\n보고 있을 가능성이 큽니다.\n\n지금은 부담을 주지 않으면서,\n자연스러운 접점을 늘려가는 게 핵심입니다.`, cta:`친구에서 확실하게 벗어나고 싶다면?` },
+  { max:44, title:`관심은 있지만,\n시그널이 약한 상태예요.`,
+    body:`미세한 호감은 보이지만 아직 확신은 이릅니다.\n상대도 당신을 탐색하는 중일 수 있어요.\n\n조급하게 다가가면 오히려 멀어질 수 있죠.\n이성으로서의 매력을 '더 보여주는 게' 중요합니다.`, cta:`애매한 관계를 진전시키고 싶다면?` },
+  { max:60, title:`호감과 망설임이\n공존하는 단계입니다.`,
+    body:`상대는 분명 당신을 의식하고 있어요.\n다만 마음을 열다가도\n한 발 물러서기를 반복하는 중이죠.\n\n이제 막 가까워졌든, 한 번 식었다 다시 살아나는 중이든\n상대의 망설임이 어디서 오는지부터 읽어야 합니다.`, cta:`상대의 마음을 확실하게 흔들고 싶다면?` },
+  { max:75, title:`상대의 마음이\n당신에게 기울고 있습니다.`,
+    body:`호감은 분명하지만,\n상대도 마음의 확신을 재는 시기예요.\n따라서 관계의 온도가\n올랐다 내렸다 반복될 수 있습니다.\n\n기다리기만 해서는 지금 온도에 머물 뿐,\n결정적 계기를 만들어 한 걸음 더 가까워져야 합니다.`, cta:`'확실한 계기' 만드는 방법을 모르겠다면?` },
+  { max:90, title:`이미 서로\n마음이 통하는 중입니다.`,
+    body:`말만 꺼내지 않았을 뿐, 서로 통하고 있습니다.\n흐름만 잘 타면 연인이 되는 건 시간 문제예요.\n\n다만 여기서 멈추면 '좋은 사람'으로 남을 뿐,\n연인이 되는 건 마지막 '한 끗 차이'입니다.`, cta:`한 끗을 확실하게 잡고 싶다면?` },
+  { max:100, title:`사실상\n연인 직전입니다.`,
+    body:`서로의 마음은 이미 확인된 것과 다름없어요.\n용기 내어 한 걸음만 다가가면,\n\n자연스럽게 연인으로 이어질 거예요.\n지금의 온도가 식기 전에, 확실하게 매듭지으세요.`, cta:`'관계 확정' 타이밍을 놓치고 싶지 않다면?` }
+];
+
+/* ── 썸 유형 6종 ── */
+/* 워딩 원칙: '판정'이 아니라 '현재 구도 + 바꿀 수 있는 지점'을 말한다.
+   유저가 절망하면 상담으로 오지 않는다. 모든 유형은 다음 한 수가 보이게 쓴다. */
+const CRUSH_TYPES = {
+  FRIEND:   { en:"FRIEND",   name:"편안함 우위형",
+    body:`지금 이 관계는 설렘보다 편안함이 앞서 있는 구도입니다.\n끌림이 없어서가 아니라,\n편안함에 묻혀 감정이 더 쌓이지 못하는 상태예요.\n\n이 구도는 시간이 지난다고 저절로 바뀌지 않습니다.\n익숙한 거리를 의도적으로 흔들어야\n관계가 다시 움직이기 시작합니다.` },
+  SCOUTING: { en:"SCOUTING", name:"탐색기",
+    body:`아직 서로에 대한 판단이 끝나지 않은 시기입니다.\n어느 정도 호감은 있지만,\n관계에 대해 확신할 정도는 아니에요.\n\n이 시기엔 밀어붙이는 쪽보다\n더 알고 싶게 만드는 쪽이 이깁니다.\n지금 쌓는 인상이 이후 관계의 방향을 거의 결정합니다.` },
+  UNEVEN:   { en:"UNEVEN",   name:"온도차형",
+    body:`내 마음이 상대보다 조금 앞서 있는 구도입니다.\n상대가 식은 게 아니라,\n아직 나만큼 올라오지 않은 것에 가까워요.\n\n이럴 때 조급함이 드러나면 상대는 부담부터 느낍니다.\n마음을 줄이는 게 아니라,\n드러내는 방식을 바꿔야 할 때입니다.` },
+  RIVAL:    { en:"PRIORITY", name:"비중 편차형",
+    body:`상대의 시간과 관심이 여러 곳에 나뉘어 있는 구도입니다.\n내 신호가 약한 게 아니라,\n우선순위에서 밀려 있는 것에 가까워요.\n\n비중은 매달릴수록 내려가고,\n대체하기 어려워질수록 올라갑니다.\n더 잘해주는 것보다 존재감의 방향을 바꾸는 것이 먼저입니다.` },
+  HESITANT: { en:"HESITANT", name:"자기 검열형",
+    body:`상대는 이미 문을 열어두고 있는데,\n내 쪽에서 확신이 설 때까지 기다리고 있는 구도입니다.\n\n확신은 기다린다고 오지 않고, 움직인 뒤에 따라옵니다.\n상대의 신호를 더 재는 것보다 한 걸음이 필요한 시점이에요.` },
+  SHIFT:    { en:"SHIFT",    name:"기류 전환기",
+    body:`오래 알고 지낸 사이에\n이제 막 다른 기류가 생기기 시작했습니다.\n\n아직 확신할 단계는 아니지만, 가능성이 열린 건 분명해요.\n이 시기를 어떻게 다루느냐가 관계의 방향을 정합니다.` },
+  RISING:   { en:"RISING",   name:"호감 상승기",
+    body:`둘 사이의 분위기가 확실히 올라가고 있는 구도입니다.\n확정된 단계는 아니지만, 방향은 분명히 맞습니다.\n\n다만 이 흐름은 가만히 두면 그대로 유지되지 않습니다.\n올라온 온도를 관계로 굳히는 계기가 필요한 시점이에요.` },
+  ALMOST:   { en:"ALMOST",   name:"확정 직전형",
+    body:`서로의 마음은 이미 확인된 것과 다름없는 구도입니다.\n남은 건 관계를 정의할 '한 번의 계기'뿐이에요.\n\n다만 이 구간이 길어지면 설렘은 관성으로 바뀝니다.\n타이밍을 놓치지 않는 것이 사실상 유일한 변수입니다.` },
+  ACCESS:   { en:"ACCESS",   name:"접점 형성기",
+    body:`아직 둘 사이에 쌓인 접점이 많지 않은 단계입니다.\n상대가 관심이 없어서가 아니라,\n서로를 알아갈 기회 자체가 적었던 거예요.\n\n이 단계에서는 마음보다 '만날 이유'가 먼저입니다.\n자연스럽게 마주칠 접점을 늘리는 것부터가 시작이에요.` },
+  REKINDLE: { en:"REKINDLE", name:"재점화 구간",
+    body:`분명히 가까웠던 시기가 있었던 관계입니다.\n좋았던 기억이 남아 있다는 건 그 자체로 큰 자산이에요.\n\n다만 예전 방식 그대로 다가가면 같은 결과가 반복됩니다.\n식은 이유를 정확히 짚는 것이 재점화의 출발점입니다.` }
+};
+/* 유형 컬러 = 성사율 구간 컬러와 통일 (TIERS와 같은 순서) */
+const TIER_COLORS = ["#a8979d","#c9a0aa","#d692a5","#dd7f99","#d76b86","#c4526d"];
+
+function isMulti(q){ return q.type==="multiSum"||q.type==="multiDepth"; }
+let idx=0; const answers=QUESTIONS.map(q=> isMulti(q)?[]:null);
+function go(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); document.getElementById(id).classList.add("active"); window.scrollTo({top:0,behavior:"instant"}); }
+function startQuiz(){ idx=0; go("quiz"); render(); }
+function pad(n){ return (n<10?"0":"")+n; }
+function render(){ const q=QUESTIONS[idx],total=QUESTIONS.length,multi=isMulti(q);
+  document.getElementById("cur").textContent=pad(idx+1); document.getElementById("total").textContent=total;
+  document.getElementById("bar").style.width=(idx/total*100)+"%";
+  const hint = multi ? '<span style="color:var(--rose);font-weight:700">중복 선택 가능</span> · 해당하는 항목을 모두 선택' : '하나만 선택하세요';
+  let h=`<div class="qcard"><div class="qnum">Q${idx+1}</div><div class="qtitle">${q.t}</div><div class="qhint">${hint}</div><div class="options">`;
+  q.opts.forEach((o,i)=>{ const sel=multi?answers[idx].includes(i):answers[idx]===i;
+    h+=`<button class="opt ${sel?'selected':''}" onclick="pick(${i})"><span class="olabel">${o[0]}</span><span class="oradio"></span></button>`; });
+  h+=`</div><div class="qfoot">${idx>0?'<button class="btn ghost back" onclick="prev()">이전</button>':''}<button class="btn" id="nextBtn" onclick="next()">${idx===total-1?'결과 보기':'다음  →'}</button></div></div>`;
+  document.getElementById("quiz-body").innerHTML=h; updateNext();
+}
+function pick(i){ const q=QUESTIONS[idx];
+  if(!isMulti(q)){ answers[idx]=i; }
+  else { const arr=answers[idx], isSolo=q.opts[i][2]==="solo";
+    if(isSolo){ answers[idx]=arr.includes(i)?[]:[i]; }
+    else { const soloIdxs=q.opts.map((o,j)=>o[2]==="solo"?j:-1).filter(j=>j>=0); let nx=arr.filter(x=>!soloIdxs.includes(x));
+      if(nx.includes(i)) nx=nx.filter(x=>x!==i); else nx.push(i); answers[idx]=nx; } }
+  refreshOptions(); updateNext();
+}
+function refreshOptions(){ const q=QUESTIONS[idx],multi=isMulti(q);
+  document.querySelectorAll("#quiz-body .opt").forEach((el,i)=>el.classList.toggle("selected", multi?answers[idx].includes(i):answers[idx]===i)); }
+function answered(){ const q=QUESTIONS[idx]; return isMulti(q)?answers[idx].length>0:answers[idx]!==null; }
+function updateNext(){ document.getElementById("nextBtn").disabled=!answered(); }
+function next(){ if(!answered()) return; if(idx<QUESTIONS.length-1){ idx++; render(); window.scrollTo({top:0,behavior:"instant"}); } else finish(); }
+function prev(){ if(idx>0){ idx--; render(); window.scrollTo({top:0,behavior:"instant"}); } }
+const LOAD_STEPS=["상대의 답장과 연락 신호를 읽고 있어요","만남과 호감의 시그널을 해석하고 있어요","마음의 거리를 가늠하고 있어요","연인으로 발전할 확률을 계산하고 있어요"];
+function finish(){ go("loading"); runLoading(); }
+function runLoading(){
+  const stepEl=document.getElementById("loadStep"), fill=document.getElementById("loadFill");
+  let i=0; stepEl.style.opacity="1"; stepEl.textContent=LOAD_STEPS[0];
+  fill.style.transition="none"; fill.style.width="0%";
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ fill.style.transition="width 7s linear"; fill.style.width="100%"; }));
+  const iv=setInterval(()=>{ i=(i+1)%LOAD_STEPS.length; stepEl.style.opacity="0"; setTimeout(()=>{ stepEl.textContent=LOAD_STEPS[i]; stepEl.style.opacity="1"; },180); },1600);
+  clearTimeout(window._loadT); window._loadT=setTimeout(()=>{ clearInterval(iv); showResult(); },7000);
+}
+function collectSelectedTexts(){ const out=[];
+  QUESTIONS.forEach((q,qi)=>{ const a=answers[qi];
+    if(isMulti(q)){ a.forEach(i=>out.push(`Q${qi+1}. ${q.opts[i][0]}`)); }
+    else if(a!==null){ out.push(`Q${qi+1}. ${q.opts[a][0]}`); } }); return out; }
+function saveResult(score, items){ if(!FORM_ACTION||!FORM_FIELDS.score) return;
+  const fd=new URLSearchParams();
+  [[FORM_FIELDS.name,MEMBER.name],[FORM_FIELDS.phone,MEMBER.phone],[FORM_FIELDS.email,MEMBER.email],[FORM_FIELDS.score,String(score)],[FORM_FIELDS.items,(items||[]).join("\n")]]
+    .forEach(p=>{ if(p[0]) fd.append(p[0], p[1]==null?"":p[1]); });
+  try{ fetch(FORM_ACTION,{method:"POST",mode:"no-cors",headers:{"Content-Type":"application/x-www-form-urlencoded;charset=UTF-8"},body:fd.toString(),keepalive:true}).catch(()=>{}); }catch(e){} }
+/* 문항 점수: 단일=선택값 / multiDepth=선택 중 최고 / multiSum=합산(상한 cap) */
+function qPoints(q,a){
+  if(!isMulti(q)) return a===null?0:q.opts[a][1];
+  if(!a.length) return 0;
+  const pts=a.map(i=>q.opts[i][1]);
+  if(q.type==="multiDepth") return Math.max(...pts);
+  return Math.min(q.cap, pts.reduce((x,y)=>x+y,0));
+}
+function qBounds(q){
+  const pts=q.opts.map(o=>o[1]);
+  if(!isMulti(q)||q.type==="multiDepth") return [Math.min(...pts), Math.max(...pts)];
+  const solo=q.opts.filter(o=>o[2]==="solo").map(o=>o[1]);
+  const posNon=q.opts.filter(o=>o[2]!=="solo"&&o[1]>0).reduce((s,o)=>s+o[1],0);
+  const negNon=q.opts.filter(o=>o[2]!=="solo"&&o[1]<0).reduce((s,o)=>s+o[1],0);
+  return [ Math.min(negNon, ...(solo.length?solo:[0])), Math.min(q.cap, posNon) ];
+}
+const MINSUM=QUESTIONS.reduce((s,q)=>s+qBounds(q)[0],0);
+const MAXSUM=QUESTIONS.reduce((s,q)=>s+qBounds(q)[1],0);
+/* ── 유형 판별 ── */
+function qIdx(txt){ return QUESTIONS.findIndex(q=>q.t.indexOf(txt)>=0); }
+function picked(qi,txt){ if(qi<0) return false;
+  const oi=QUESTIONS[qi].opts.findIndex(o=>o[0].indexOf(txt)>=0); if(oi<0) return false;
+  const a=answers[qi]; return Array.isArray(a)?a.includes(oi):a===oi; }
+/* 이성으로서의 진전 정도 — 친밀도(친구로서 친함)와 분리해서 측정한다.
+   같은 '오래 알고 지낸 사이'라도 이 값이 0이면 친구지대, 낮으면 이제 막 온도가 오르는 중,
+   높으면 사실상 연인 직전이라는 뜻이므로 유형이 완전히 달라진다. */
+function romanceScore(){
+  let r=0;
+  const q12=qIdx("스킨십");
+  if(picked(q12,"뽀뽀")||picked(q12,"그 이상")) r+=3;
+  else if(picked(q12,"손잡기")) r+=2;
+  else if(picked(q12,"가벼운 접촉")||picked(q12,"장난스러운 터치")) r+=1;
+  const q20=qIdx("이성으로서 어떻게 평가");
+  if(picked(q20,"이성적 호감을 여러 번")) r+=2;
+  else if(picked(q20,"외모·분위기·매력")) r+=1;
+  if(picked(qIdx("플러팅"),"적극적으로 받아주고")) r++;
+  if(picked(qIdx("칭찬하는 방식"),"외모·이성적 매력")) r++;
+  if(picked(qIdx("‘친구·지인’으로 선"),"오히려 이성적 긴장감")) r++;
+  if(picked(qIdx("연애 주제를 꺼내는"),"은근히")) r++;
+  if(picked(qIdx("연애관·이상형에 관심"),"내 대답에 자신을 대입")) r++;
+  if(picked(qIdx("이상형에 얼마나 부합"),"상대가 나를 이상형에")) r++;
+  if(picked(qIdx("미래를 함께하는"),"상대가 반복적으로 제안")) r++;
+  return r;
+}
+/* 객관적 이성 기류 — 답변자의 주관적 해석이 들어갈 수 있는 항목은 빼고,
+   '실제로 있었던 일'만 문항 단위로 센다. (0~5)
+   제외 항목: 이성적 긴장감이 있다 / 은근히 '우리'를 대입 / 내 대답에 자신을 대입 /
+             이상형에 끼워 맞추는 느낌  — 전부 본인 해석이 개입한다. */
+function objectiveRomance(){
+  let r=0;
+  const q12=qIdx("스킨십"), q20=qIdx("이성으로서 어떻게 평가");
+  if(["가벼운 접촉","장난스러운 터치","손잡기","뽀뽀","그 이상"].some(t=>picked(q12,t))) r++;
+  if(["외모·분위기·매력","이성적 호감을 여러 번"].some(t=>picked(q20,t))) r++;
+  if(picked(qIdx("플러팅"),"적극적으로 받아주고")) r++;
+  if(picked(qIdx("칭찬하는 방식"),"외모·이성적 매력")) r++;
+  if(picked(qIdx("미래를 함께하는"),"상대가 반복적으로 제안")) r++;
+  return r;
+}
+/* 상대의 능동성 — 상대가 먼저 다가오는 행동이 몇 문항에서 잡히는지. (0~6)
+   같은 밀도·같은 이성 기류라도, 상대가 먼저 움직이면 '탐색기 이상'이고
+   내가 끌고 가는 쪽이면 아직 '접점 형성기'다. 이 둘을 가르는 기준. */
+function partnerInitiative(){
+  let n=0;
+  if(["나에게 먼저 질문한다","묻지 않은 자기 얘기"].some(t=>picked(qIdx("답장·리액션 스타일"),t))) n++;
+  if(picked(qIdx("연락이 뜸해지면"),"상대가 먼저 다시 말을 건다")) n++;
+  if(picked(qIdx("만남에 얼마나 적극적"),"상대가 먼저 보자고")) n++;
+  if(["다음 약속을 기약","연락 빈도·친밀도가 올라갔다"].some(t=>picked(qIdx("최근 만남 이후"),t))) n++;
+  if(["함께 하자고 말한다","실제로 함께 시도"].some(t=>picked(qIdx("영역(취향·사람·공간)"),t))) n++;
+  if(picked(qIdx("미래를 함께하는"),"상대가 반복적으로 제안")) n++;
+  return n;
+}
+/* 관계 밀도 — 둘 사이에 실제로 쌓인 접점의 양(대화의 깊이·만남·루틴·둘만의 코드).
+   접점 형성기 < 탐색기 순서를 고정하는 데 쓴다.
+   접점 형성기 = 아직 접점을 만들어가는 단계 / 탐색기 = 접점이 쌓여 본격적으로 서로 알아가는 단계 */
+function closeness(){
+  function idx(qi){ if(qi<0) return 0; const a=answers[qi];
+    if(a===null||a===undefined) return 0;
+    return Array.isArray(a) ? (a.length?Math.max.apply(null,a):0) : a; }
+  return idx(qIdx("대화의 결")) + idx(qIdx("단둘이 만난 빈도"))
+       + idx(qIdx("반복되는 루틴")) + idx(qIdx("둘만 아는 농담"));  // 0~15
+}
+function computeCrushType(pct){
+  // 1) 상대에게 애인이 있으면 무조건 어장의심형 (가장 강한 사실 신호)
+  if(picked(qIdx("연애할 수 있는 상태"),"사귀는 사람이 있다")) return "RIVAL";
+  // 2) 과거엔 가까웠는데 지금 식었으면 재점화 구간 (냉각 신호 + 과거 친밀 흔적이 함께 있어야 함)
+  let cool=0, past=0;
+  ["상대 텐션이 낮아졌다","대화가 끊겼다"].forEach(t=>{ if(picked(qIdx("대화 분위기가 변했"),t)) cool++; });
+  ["상대가 거리를 두기","오히려 연락 공백"].forEach(t=>{ if(picked(qIdx("최근 만남 이후"),t)) cool++; });
+  ["그대로 흐지부지","무응답"].forEach(t=>{ if(picked(qIdx("연락이 뜸해지면"),t)) cool++; });
+  if(picked(qIdx("만남에 얼마나 적극적"),"제안하면 피하거나")) cool++;
+  ["한두 번 있었다","가끔 만난다","자주 만난다"].forEach(t=>{ if(picked(qIdx("단둘이 만난 빈도"),t)) past++; });
+  ["가벼운 접촉","장난스러운 터치","손잡기","뽀뽀","그 이상"].forEach(t=>{ if(picked(qIdx("스킨십"),t)) past++; });
+  ["가끔씩 몇 번","틈틈이 있다","끊기면 어색할"].forEach(t=>{ if(picked(qIdx("반복되는 루틴"),t)) past++; });
+  ["둘만의 농담","자주 반복되는 둘만의 코드","둘만의 별명"].forEach(t=>{ if(picked(qIdx("둘만 아는 농담"),t)) past++; });
+  if(cool>=3 && past>=2 && pct<70) return "REKINDLE";
+  // 3) 상대 신호는 좋은데 내 진도가 전부 멈춰 있으면 자기 검열형
+  //    (셋 다 0이어야 하고, 상대 신호가 실제로 좋을 때만)
+  let stalled=0;
+  if(picked(qIdx("단둘이 만난 빈도"),"아직 없다")) stalled++;
+  if(picked(qIdx("플러팅"),"아직 시도해본 적 없다")) stalled++;
+  if(picked(qIdx("스킨십"),"없다")) stalled++;
+  if(stalled>=3 && pct>=60) return "HESITANT";
+  // 4) 오래 알고 지낸 사이(6개월+, 친밀 흔적 있음)는 '이성 진전 정도'로 세 갈래로 나뉜다.
+  //    친밀함과 이성적 진전은 별개이므로, 같은 장기 관계라도 여기서 유형이 완전히 갈린다.
+  const rom=romanceScore();
+  // 기간과 무관하게, 관계 밀도는 쌓였는데 이성적 끌림 요소가 하나도 없으면 편안함 우위형.
+  // 오래된 지인이 아니어도 '그냥 지인 사이'면 여기 해당한다.
+  if(rom===0 && closeness()>=8) return "FRIEND";
+  if(picked(qIdx("얼마나 지났나요"),"6개월 이상")){
+    let familiar=0;
+    ["한두 번 있었다","가끔 만난다","자주 만난다"].forEach(t=>{ if(picked(qIdx("단둘이 만난 빈도"),t)) familiar++; });
+    ["가끔씩 몇 번","틈틈이 있다","끊기면 어색할"].forEach(t=>{ if(picked(qIdx("반복되는 루틴"),t)) familiar++; });
+    ["같은 집단에서 생긴","둘만의 농담","자주 반복되는","둘만의 별명"].forEach(t=>{ if(picked(qIdx("둘만 아는 농담"),t)) familiar++; });
+    if(familiar>=2){
+      // 이성 진전 0 → 친구지대 고착. ('접점 형성기'로 빠지면 안 되는 케이스)
+      if(rom===0) return "FRIEND";
+      // 이성 진전이 이제 막 시작 → 기류 전환기.
+      // '나만 달아오름'(온도차형)과 방향이 반대다. 여기는 정체돼 있던 관계에
+      // 이성적 신호가 이제 막 생겨 가능성이 열리기 시작한 단계.
+      if(rom<=2) return "SHIFT";
+      // 오래 알고 지낸 사이는 전환에 시간이 더 걸린다. 진전이 꽤 쌓였어도
+      // 그것만으로 '확정 직전'은 아니고, 잘 되어가는 중(호감 상승기)으로 본다.
+      if(rom<10) return "RISING";
+      // 연인 수준 신호가 거의 다 모인 경우에만 아래 보정에서 확정 직전형이 된다.
+    }
+  }
+  // 4-2) 지인 수준으로 가까운 사이인데, 객관적인 이성 기류가 2개 문항 이상 잡히면
+  //      이성으로서의 접점이 이제 막 생기는 단계 → 접점 형성기.
+  //      (장기 관계는 위에서 기류 전환기로 이미 걸러진다)
+  if(closeness()>=8 && objectiveRomance()>=2 && partnerInitiative()<=1 && pct<80) return "ACCESS";
+  // 5) 태그 우세형 — 한 선택지에 유형을 여러 개 붙일 수 있다(예: 애매하다 → 온도차형+비중 편차형)
+  const sc={};
+  QUESTIONS.forEach((q,qi)=>{ const a=answers[qi]; const sel=Array.isArray(a)?a:(a===null?[]:[a]);
+    sel.forEach(i=>{ const o=q.opts[i]; if(!o) return;
+      // 가중치 상한 3 — 문항별 점수 스케일 차이(예: 스킨십 0~8점)로 특정 유형이 과대대표되는 것 방지
+      const w=Math.min(3,Math.max(1,Math.abs(o[1])));
+      o.slice(2).forEach(t=>{ if(typeof t==="string" && t!=="solo") sc[t]=(sc[t]||0)+w; }); }); });
+  let best=null,bs=0,tie=false;
+  Object.keys(sc).forEach(k=>{ if(sc[k]>bs){ bs=sc[k]; best=k; tie=false; } else if(sc[k]===bs) tie=true; });
+  // 6) 확정 직전형 = "거의 연인"만이 아니라, 한쪽이 한 발짝만 내딛으면 급진전될 상황까지 포함한다.
+  //    성사율이 아주 높거나(80%+), 이성 진전이 충분히 쌓인 채 성사율도 받쳐줄 때(rom 4+ & 70%+).
+  // 주관적 해석 항목만으로는 '확정 직전'이라 볼 수 없다. 객관 신호가 최소 2개는 있어야 한다.
+  const isAlmost = (pct>=80) || (rom>=4 && objectiveRomance()>=2 && pct>=70);
+  // 7) 신호가 약하거나(3점 미만) 동점이면 태그 순서로 임의 결정되므로, 성사율 기준으로 보수적 판정
+  if(!best || bs<3 || tie) return isAlmost ? "ALMOST" : (pct>=65 ? "RISING" : (pct>=50 ? "SCOUTING" : "UNEVEN"));
+  // 8) 진행 단계 유형은 성사율·진전도와 어긋나면 안 된다.
+  //    (78%인데 "아직 알아가는 초입", 반대로 40%인데 "확정 직전"이 나오는 모순 방지)
+  //    편안함/온도차/비중편차/자기검열/재점화는 '구도' 유형이라 성사율과 무관하게 그대로 둔다.
+  const STAGE={ACCESS:1,SCOUTING:2,RISING:3,ALMOST:4};
+  if(STAGE[best]){
+    if(isAlmost) return "ALMOST";
+    if(pct>=65) return "RISING";
+    // 접점 형성기와 탐색기는 같은 밴드라 태그 점수만으론 갈리지 않는다.
+    // 실제로 쌓인 접점의 양으로 가른다 — 탐색기가 접점 형성기보다 가까운 단계.
+    if(best==="ACCESS"||best==="SCOUTING") return closeness()<=7 ? "ACCESS" : "SCOUTING";
+    return best;
+  }
+  return best;
+}
+const ICON_HEART='<svg viewBox="0 0 24 24" fill="none"><path d="M12 20s-7-4.4-7-9.4A3.6 3.6 0 0 1 12 8.2a3.6 3.6 0 0 1 7 2.4c0 5-7 9.4-7 9.4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+const ICON_HEART_FILL='<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-9.4A3.6 3.6 0 0 1 12 8.2a3.6 3.6 0 0 1 7 2.4c0 5-7 9.4-7 9.4z" fill="currentColor"/></svg>';
+
+function renderResult(pct, typeKey){
+  const ti=TIERS.findIndex(t=>pct<=t.max);
+  const T=TIERS[ti<0?TIERS.length-1:ti];
+  const color=TIER_COLORS[ti<0?TIER_COLORS.length-1:ti];
+  // 유형 카드
+  const CT=CRUSH_TYPES[typeKey]||CRUSH_TYPES.SCOUTING;
+  const typeCard=document.getElementById("typeCard");
+  typeCard.style.setProperty("--tc", color);
+  document.getElementById("typeIc").innerHTML = (typeKey==="ALMOST") ? ICON_HEART_FILL : ICON_HEART;
+  document.getElementById("typeName").textContent=CT.name;
+  document.getElementById("typeEn").textContent=CT.en;
+  document.getElementById("typeBody").innerHTML=(CT.body||"").split("\n\n").map(function(p){ return '<span class="rp">'+p+'</span>'; }).join("");
+  typeCard.style.display="block";
+  document.getElementById("rtitle").innerHTML=`<span class="em">${T.title.replace(/\n/g,'<br>')}</span>`;
+  document.getElementById("rbody").innerHTML=T.body.split("\n\n").map(function(p){ return '<span class="rp">'+p+'</span>'; }).join("");
+  document.getElementById("ctaLine").textContent=T.cta;
+  document.getElementById("consultBtn").href=CONSULT_URL;
+  go("result");
+  const bar=document.getElementById("gaugeBar"),r=96,c=2*Math.PI*r;
+  bar.style.strokeDasharray=c; bar.style.strokeDashoffset=c;
+  const numEl=document.getElementById("pctNum");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{ bar.style.strokeDashoffset=c*(1-pct/100); }));
+  let dur=1400,start=performance.now();
+  function tick(now){ const p=Math.min(1,(now-start)/dur),e=1-Math.pow(1-p,3); numEl.textContent=Math.round(pct*e); if(p<1) requestAnimationFrame(tick); else numEl.textContent=pct; }
+  requestAnimationFrame(tick);
+}
+function showResult(){
+  let raw=0; QUESTIONS.forEach((q,qi)=>{ raw+=qPoints(q,answers[qi]); });
+  let pct=15+Math.round((raw-MINSUM)/(MAXSUM-MINSUM)*84); pct=Math.max(15,Math.min(99,pct));
+  const typeKey=computeCrushType(pct);
+  saveResult(`${pct}% / ${CRUSH_TYPES[typeKey].name}`, collectSelectedTexts());
+  renderResult(pct, typeKey);
+}
+/* ★ 결과지 바로보기(미리보기): ?pct=74 / ?pct=74&type=FRIEND */
+(function(){ const p=new URLSearchParams(location.search); if(!p.has("pct")&&!p.has("preview")) return;
+  let v=parseInt(p.get("pct")); if(isNaN(v)) v=74; v=Math.max(15,Math.min(99,v));
+  let t=(p.get("type")||"").toUpperCase(); if(!CRUSH_TYPES[t]) t = v>=85?"ALMOST":"SCOUTING";
+  renderResult(v,t); })();
+function restart(){ idx=0; QUESTIONS.forEach((q,i)=>answers[i]=isMulti(q)?[]:null); go("intro"); }
+
+function shareData(){ const s=document.getElementById("pctNum").textContent; return { title:"썸 / 짝사랑 성사율 계산하기 | CLAVIS", text:`나의 썸·짝사랑 성사율은 ${s}%! 당신도 측정해보세요.`, url:location.href }; }
+function shareResult(){ document.getElementById("shareSheet").classList.add("show"); document.body.style.overflow="hidden"; }
+function closeShare(){ document.getElementById("shareSheet").classList.remove("show"); document.body.style.overflow=""; }
+async function shareNative(){ const d=shareData(); if(navigator.share){ try{ await navigator.share(d); closeShare(); return; }catch(e){ if(e&&e.name==="AbortError") return; } } await copyToClipboard(`${d.text} ${d.url}`); toast("이 기기는 기본 공유를 지원하지 않아 링크를 복사했어요"); closeShare(); }
+async function shareKakao(){ const d=shareData(); if(KAKAO_JS_KEY&&window.Kakao&&window.Kakao.isInitialized&&window.Kakao.isInitialized()){ try{ window.Kakao.Share.sendDefault({objectType:"text",text:`${d.title}\n${d.text}`,link:{mobileWebUrl:d.url,webUrl:d.url}}); closeShare(); return; }catch(e){} } await copyToClipboard(`${d.text} ${d.url}`); toast("링크를 복사했어요. 카카오톡에 붙여넣어 공유하세요"); closeShare(); }
+async function shareInstagram(){ const d=shareData(); if(navigator.share){ try{ await navigator.share(d); closeShare(); return; }catch(e){ if(e&&e.name==="AbortError") return; } } await copyToClipboard(`${d.text} ${d.url}`); toast("링크를 복사했어요. 인스타그램 스토리·DM에 붙여넣어 공유하세요"); closeShare(); }
+async function copyToClipboard(t){ try{ await navigator.clipboard.writeText(t); return true; }catch(e){ const ta=document.createElement("textarea"); ta.value=t; ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta); ta.select(); let ok=false; try{ ok=document.execCommand("copy"); }catch(_){ } document.body.removeChild(ta); return ok; } }
+async function copyLink(){ const d=shareData(); const ok=await copyToClipboard(`${d.text} ${d.url}`); toast(ok?"링크가 복사되었습니다":"복사에 실패했습니다"); closeShare(); }
+function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
+(function loadKakao(){ if(!KAKAO_JS_KEY) return; const s=document.createElement("script"); s.src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"; s.crossOrigin="anonymous"; s.onload=()=>{ try{ if(window.Kakao&&!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY); }catch(e){} }; document.head.appendChild(s); })();
+</script>
+<script>
+/* ═══ 감정 프로파일링 엔진 (v2 전용) ═══
+   지표 5개(높을수록 좋음) · 처방은 가장 낮은 지표에서 · 판정마다 답변 인용
+   기류·적극성·밀도·진전도는 기존 판별 함수를 그대로 정규화해 노출한다. */
+const EP_KEY="clavis_ep_crush_v2";
+const EP_LABEL={vibe:"이성기류",init:"적극성",dens:"밀도",rom:"진전도",cond:"여건"};
+
+function epPicked(qi,txt){ const q=QUESTIONS[qi]; if(!q) return false;
+  const oi=q.opts.findIndex(o=>o[0].indexOf(txt)>=0); if(oi<0) return false;
+  const a=answers[qi]; return Array.isArray(a)?a.includes(oi):a===oi; }
+function epNorm(raw,lo,hi){ return Math.round(Math.max(5,Math.min(99,(raw-lo)/(hi-lo)*100))); }
+
+function epProfile(){
+  let cRaw=0,cLo=0,cHi=0;
+  [20,22,23].forEach(qi=>{ const q=QUESTIONS[qi], b=qBounds(q);       // 연애 가능 상태 · 장애물 · 접점
+    cRaw+=qPoints(q,answers[qi]); cLo+=b[0]; cHi+=b[1]; });
+  return { vibe:epNorm(objectiveRomance(),0,5), init:epNorm(partnerInitiative(),0,6),
+           dens:epNorm(closeness(),0,15), rom:epNorm(romanceScore(),0,12),
+           cond:epNorm(cRaw,cLo,cHi) };
+}
+
+function epEvidence(){
+  const pos=[],neg=[];
+  if(epPicked(4,"상대가 먼저 다시")) pos.push("<b>「끊기면 상대가 먼저 다시 연락」</b> — 이 신호는 예의가 아니라 관심이에요.");
+  if(epPicked(6,"외모·이성적 매력")) pos.push("<b>「외모·매력을 칭찬」</b> — 친구에게는 잘 쓰지 않는 언어예요.");
+  if(epPicked(19,"이성적 호감을 여러 번")) pos.push("<b>「이성적 호감을 여러 번 표현」</b> — 해석이 필요 없는 수준의 신호예요.");
+  if(epPicked(14,"은근히")) pos.push("<b>「연애 얘기에 '우리'를 대입」</b> — 상대도 이 관계의 다음 장을 상상하고 있어요.");
+  if(epPicked(3,"느리거나")||epPicked(3,"단답")) neg.push("<b>「답장이 느리고 단답」</b> — 지금은 밀어붙일 타이밍이 아니라는 신호예요.");
+  if(epPicked(18,"자주 그런다")||epPicked(18,"몇 번 있다")) neg.push("<b>「친구로 선을 그은 적 있음」</b> — 프레임을 바꾸는 건 고백이 아니라 반 발짝의 누적이에요.");
+  if(epPicked(20,"사귀는 사람이 있다")) neg.push("<b>「상대에게 애인이 있음」</b> — 지금 움직이면 잃는 것만 있어요. 멈춤도 전략이에요.");
+  if(epPicked(10,"아직 시도해본 적 없다")&&epPicked(7,"아직 없다")) neg.push("<b>「진도가 전부 내 쪽에서 멈춰 있음」</b> — 브레이크를 밟고 있는 건 상대가 아니라 나예요.");
+  if(epPicked(1,"상대 텐션이 낮아졌다")||epPicked(1,"대화가 끊겼다")) neg.push("<b>「최근 온도가 내려감」</b> — 식은 게 아니라 확신을 잃었을 가능성부터 봐야 해요.");
+  const out=[]; if(pos[0]) out.push(pos[0]); if(neg[0]) out.push(neg[0]);
+  if(pos[1]) out.push(pos[1]); else if(neg[1]) out.push(neg[1]);
+  return out.slice(0,3);
+}
+
+const EP_RX={
+  vibe:[ {t:"오늘은 행동만 보기", b:"말과 해석 말고, 패턴만 봐요. 답장 속도, 먼저 꺼내는 화제.\n기류는 말이 아니라 반복에서 읽혀요."},
+         {t:"신호 하나에 해석 셋 붙이기", b:"가장 최근의 호감 신호 하나에 다른 해석 두 개를 붙여봐요.\n확신은 해석이 아니라 반복에서 와요."} ],
+  init:[ {t:"공 넘기고 기다리기", b:"오늘 대화는 질문 하나로 끝내고, 다음 턴은 상대에게 남겨요.\n상대의 속도는 공백에서만 측정돼요."},
+         {t:"선톡 하루 쉬기", b:"오늘은 먼저 연락하지 않아요.\n내가 채우던 자리를 비워야 상대의 진짜 속도가 보여요."} ],
+  dens:[ {t:"루틴 하나 심기", b:"정해진 시간대의 가벼운 대화 하나를 만들어봐요.\n밀도는 큰 이벤트가 아니라 반복에서 쌓여요."},
+         {t:"둘만의 코드 만들기", b:"오늘 대화에서 나온 농담 하나를, 다음 대화에서 다시 꺼내요.\n'우리만 아는 것'이 생기는 순간 관계는 특별해져요."} ],
+  rom:[ {t:"반 발짝 표현 시도", b:"성격 칭찬 말고, '오늘 분위기 좋다' 정도의 반 발짝 표현을 해봐요.\n진전은 고백이 아니라 반 발짝의 누적이에요."},
+        {t:"단둘 자리 제안하기", b:"여럿 말고 단둘의 가벼운 자리를 하나 제안해요.\n관계의 정의는 단둘일 때만 바뀌어요."} ],
+  cond:[ {t:"다음 만남의 명분 만들기", b:"빌려줄 것, 같이 갈 곳, 물어볼 것 — 하나를 오늘 만들어둬요.\n여건은 기다리는 게 아니라 설계하는 거예요."},
+         {t:"장애물 크기 재보기", b:"둘 사이의 현실 장애물을 적고, 진짜인지 핑계인지 표시해봐요.\n대부분은 생각보다 작아요."} ]
+};
+const EP_RX_D1={t:"오늘은 확인하려 들지 않기", b:"마음을 확인하고 싶은 날일수록 티가 나요.\n오늘은 평소처럼만. 측정은 이 프로파일이 대신할게요."};
+const EP_RX_D7={t:"7일 재평가 — 신호는 쌓였어요", b:"일주일의 기록이면 상대의 속도가 보였을 거예요.\n이제 남은 건 언제, 어떻게 반 발짝을 내딛느냐예요.\n여기서부터는 혼자 하지 않아도 돼요.", final:true};
+
+function epRxFor(p,day){
+  if(day<=1) return {k:null,...EP_RX_D1};
+  if(day>=7) return {k:null,...EP_RX_D7};
+  const order=Object.keys(p).sort((a,b)=>p[a]-p[b]);
+  const pat=[[0,0],[1,0],[0,1],[2,0],[1,1]];
+  const pk=pat[day-2], k=order[pk[0]];
+  return {k, ...EP_RX[k][pk[1]]};
+}
+function epMsToMidnight(){ const n=new Date(), m=new Date(n); m.setHours(24,0,0,0); return m-n; }
+function epSave(o){ try{ localStorage.setItem(EP_KEY, JSON.stringify(o)); }catch(e){} }
+function epLoad(){ try{ return JSON.parse(localStorage.getItem(EP_KEY)||"null"); }catch(e){ return null; } }
+function epDayOf(st){ const d0=new Date(st.t0); d0.setHours(0,0,0,0);
+  const n=new Date(); n.setHours(0,0,0,0); return Math.floor((n-d0)/86400000)+1; }
+function epParas(t){ return t.split("\n\n").map(p=>'<span class="rp">'+p.replace(/\n/g,"<br>")+"</span>").join(""); }
+
+function epRender(p,pct,day,opts){
+  opts=opts||{};
+  document.getElementById("epRoot").style.display="block";
+  const order=Object.keys(p).sort((a,b)=>p[a]-p[b]);
+  document.getElementById("epBars").innerHTML=Object.keys(EP_LABEL).map(k=>
+    '<div class="ep-row'+(k===order[0]?" low":"")+'"><span class="ep-lab">'+EP_LABEL[k]+'</span>'+
+    '<span class="ep-track"><span class="ep-fill" data-w="'+p[k]+'"></span></span>'+
+    '<span class="ep-val">'+p[k]+"</span></div>").join("");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.querySelectorAll("#epBars .ep-fill").forEach(el=>el.style.width=el.dataset.w+"%"); }));
+  const ev=opts.ev||[];
+  if(ev.length){ document.getElementById("epEvSec").style.display="";
+    document.getElementById("epEv").innerHTML=ev.map(e=>"<li>"+e+"</li>").join("");
+  } else document.getElementById("epEvSec").style.display="none";
+  const d=Math.min(Math.max(1,day||1),7), rx=epRxFor(p,d), done=(day||1)>7;
+  let h='<span class="ep-day">DAY '+d+" / 7</span>";
+  if(rx.k) h+='<div class="ep-why">가장 낮은 지표 — '+EP_LABEL[rx.k]+"에서 나온 처방이에요</div>";
+  else if(d===1) h+='<div class="ep-why">모든 유형의 첫 처방은 같아요</div>';
+  h+='<div class="ep-rxt">'+rx.t+'</div><div class="ep-body">'+epParas(rx.b)+"</div>";
+  if(done) h+='<div class="ep-lock">7일 코스를 완주했어요. 관계도 그동안 움직였을 거예요. 다시 진단해서 새 프로파일로 시작하세요.</div>';
+  else if(d<7){ const ms=epMsToMidnight(), hh=Math.floor(ms/3600000), mm=Math.floor(ms%3600000/60000);
+    h+='<div class="ep-lock">🔒 DAY '+(d+1)+" 처방은 자정에 열려요 · "+hh+"시간 "+mm+"분 남음</div>"; }
+  document.getElementById("epRxBody").innerHTML=h;
+  const cut=Math.max(8,Math.round((100-p.init)*.18+(100-p.dens)*.08));
+  const low=Math.max(5,pct-cut);
+  document.getElementById("epDrop").innerHTML="<s>"+pct+"%</s> ↓ "+low+"%";
+  document.getElementById("epWarnBody").innerHTML=epParas("지금 온도 그대로 시간이 지날 때 내려갈 자리예요.\n썸을 끝내는 건 거절이 아니라 정체예요.");
+}
+
+/* 검사 완료: 원본 산출 로직 그대로 + 프로파일 저장/렌더 */
+showResult=function(){
+  let raw=0; QUESTIONS.forEach((q,qi)=>{ raw+=qPoints(q,answers[qi]); });
+  let pct=15+Math.round((raw-MINSUM)/(MAXSUM-MINSUM)*84); pct=Math.max(15,Math.min(99,pct));
+  const typeKey=computeCrushType(pct);
+  saveResult(`${pct}% / ${CRUSH_TYPES[typeKey].name}`, collectSelectedTexts());
+  renderResult(pct, typeKey);
+  const p=epProfile(), ev=epEvidence();
+  epSave({t0:Date.now(), pct:pct, prof:p, ev:ev, type:typeKey});
+  epRender(p,pct,1,{ev:ev,type:typeKey});
+};
+
+/* 미리보기: ?pct=70&type=SCOUTING&day=4 — 유형 표본 프로파일 */
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(!q.has("pct")&&!q.has("preview")) return;
+  let v=parseInt(q.get("pct")); if(isNaN(v)) v=74; v=Math.max(15,Math.min(99,v));
+  let t=(q.get("type")||"").toUpperCase(); if(!CRUSH_TYPES[t]) t = v>=85?"ALMOST":"SCOUTING";
+  const DIP={FRIEND:["vibe","rom"],HESITANT:["rom"],UNEVEN:["init"],RIVAL:["cond"],REKINDLE:["init","vibe"]};
+  const p={}; Object.keys(EP_LABEL).forEach(k=>{ p[k]=Math.max(8,Math.min(95,v-((DIP[t]||[]).includes(k)?26:0)+(k==="dens"?4:0))); });
+  const day=Math.max(1,Math.min(9,parseInt(q.get("day"))||1));
+  epRender(p,v,day,{type:t,ev:[]});
+})();
+
+/* 재방문: 저장된 프로파일이 있으면 인트로에 이어보기 버튼 */
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(q.has("pct")||q.has("preview")) return;
+  const st=epLoad(); if(!st) return;
+  const day=epDayOf(st);
+  const sb=document.querySelector('#intro [onclick^="startQuiz"]'); if(!sb) return;
+  const b=document.createElement("button");
+  b.className="btn ghost ep-resume";
+  b.textContent = day>7 ? "지난 프로파일 다시 보기" : "DAY "+day+" 처방 확인하기 →";
+  b.onclick=function(){ renderResult(st.pct, st.type); epRender(st.prof, st.pct, day, {ev:st.ev,type:st.type}); };
+  sb.insertAdjacentElement("afterend", b);
+})();
+</script>
+</body>
+</html>
