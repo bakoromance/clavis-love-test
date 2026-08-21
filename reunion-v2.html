@@ -161,8 +161,8 @@
 .ep-h{font-size:12px;letter-spacing:.12em;font-weight:800;color:var(--gold);margin-bottom:14px}
 .ep-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
 .ep-lab{width:64px;flex:none;font-size:13px;font-weight:700;color:var(--ink-2)}
-.ep-track{flex:1;height:8px;border-radius:99px;background:var(--bg-2);overflow:hidden}
-.ep-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold-2),var(--gold));width:0;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.ep-track{flex:1;height:11px;border-radius:99px;background:var(--bg-2);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(60,48,20,.08)}
+.ep-fill{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold-2),var(--gold));width:0;transition:width .9s cubic-bezier(.2,.7,.2,1)}
 .ep-val{width:30px;flex:none;text-align:right;font-size:13px;font-weight:800;color:var(--ink)}
 .ep-row.low .ep-lab,.ep-row.low .ep-val{color:var(--gold)}
 .ep-note{margin-top:10px;font-size:12px;color:var(--muted)}
@@ -189,7 +189,7 @@
 .ep-title{font-size:20px;font-weight:800;letter-spacing:.05em;color:var(--ink)}
 .ep-sub{margin-top:7px;font-size:12px;color:var(--muted);word-break:keep-all;padding:0 14px}
 .ep-head::after{content:"";display:block;width:36px;height:2px;border-radius:2px;background:var(--gold);margin:12px auto 0}
-.ep-next{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--gold-soft);font-size:12.5px;color:var(--gold);font-weight:700;line-height:1.6}
+.ep-aid{margin-top:12px;font-size:12px;color:var(--muted);line-height:1.6}
 </style>
 </head>
 <body>
@@ -260,7 +260,7 @@
         <div class="ep-head">
           <div class="ep-eyebrow">CLAVIS</div>
           <div class="ep-title">감정 프로파일링</div>
-          <div class="ep-sub">실제 상담 현장에서 관계를 판별하는 클래비스 고유의 진단 체계</div>
+          <div class="ep-sub">관계구도, 감정을 정밀하게 분석하여 상대의 심리와 행동을 컨트롤하는 체계</div>
         </div>
         <div id="epBars"></div>
       </div>
@@ -612,23 +612,28 @@ function epEvidence(){
 
 const EP_RX={
   warm:[ {t:"상대 근황을 캐지 않기", b:"오늘 하루, 스토리·프로필 확인을 멈춰요.\n온도는 지켜본다고 오르지 않아요. 내 쪽 신호가 바뀌어야 올라요."},
-         {t:"우연을 설계하지 않기", b:"지금 만들어낸 우연은 상대에게 부담으로 읽혀요.\n접촉은 온도가 오른 뒤의 일이에요."} ],
+         {t:"우연을 설계하지 않기", b:"지금 만들어낸 우연은 상대에게 부담으로 읽혀요.\n접촉은 온도가 오른 뒤의 일이에요."},
+         {t:"소식이 들려도 반응하지 않기", b:"지인에게 상대 얘기를 듣게 되면, 듣기만 해요.\n내 반응은 어떤 식으로든 상대에게 되돌아가요."} ],
   signal:[ {t:"답장 원칙 세우기", b:"연락이 오면 반갑게, 짧게, 먼저 끊어요.\n신호는 내가 늘리는 게 아니라 상대가 늘리게 두는 거예요."},
-           {t:"신호 기록 시작하기", b:"오늘부터 상대의 반응을 메모 한 줄로 남겨요.\n감이 아니라 기록이 타이밍을 알려줘요."} ],
+           {t:"신호 기록 시작하기", b:"오늘부터 상대의 반응을 메모 한 줄로 남겨요.\n감이 아니라 기록이 타이밍을 알려줘요."},
+           {t:"용건 만들어 연락하지 않기", b:"신호를 확인하려고 만든 용건은 상대도 알아차려요.\n신호는 만들어내는 게 아니라 기다려서 받는 거예요."} ],
   restraint:[ {t:"보내지 않는 편지 쓰기", b:"하고 싶은 말을 전부 적되, 보내지 않아요.\n충동은 없애는 게 아니라 배출하는 거예요."},
-              {t:"지난 대화 다시 읽지 않기", b:"카톡 스크롤을 오늘은 멈춰요.\n과거를 다시 읽는 손이 실수를 만들어요."} ],
+              {t:"지난 대화 다시 읽지 않기", b:"카톡 스크롤을 오늘은 멈춰요.\n과거를 다시 읽는 손이 실수를 만들어요."},
+              {t:"술자리 전 채팅방 숨기기", b:"오늘 술자리가 있다면 상대와의 채팅방을 잠시 숨겨둬요.\n밤의 충동이 낮의 노력을 지우지 않게요."} ],
   recovery:[ {t:"나를 위한 일정 1개 잡기", b:"운동·모임·일, 뭐든 하나를 오늘 예약해요.\n회복 중인 모습이 상대에게 닿을 때 온도가 움직여요."},
-             {t:"SNS에서 힘든 티 걷어내기", b:"슬픈 노래·감성 글귀를 내려요.\n지금 프로필은 상대가 나를 보는 유일한 창이에요."} ],
+             {t:"SNS에서 힘든 티 걷어내기", b:"슬픈 노래·감성 글귀를 내려요.\n지금 프로필은 상대가 나를 보는 유일한 창이에요."},
+             {t:"먹고 자는 리듬부터 지키기", b:"오늘은 제때 먹고 제때 자는 것부터 지켜요.\n무너진 리듬은 표정과 말투로 드러나고, 상대는 그걸 읽어요."} ],
   link:[ {t:"연결점 목록 만들기", b:"공통 지인·돌려줄 물건·겹치는 공간을 적어만 둬요.\n실행은 아직이에요. 지도는 먼저 그려두는 거예요."},
-         {t:"지인 관계 데워두기", b:"둘을 아는 지인과 가볍게 안부를 나눠요.\n다리는 필요할 때 만드는 게 아니라 미리 놓는 거예요."} ]
+         {t:"지인 관계 데워두기", b:"둘을 아는 지인과 가볍게 안부를 나눠요.\n다리는 필요할 때 만드는 게 아니라 미리 놓는 거예요."},
+         {t:"겹치는 동선 정리해두기", b:"상대와 겹치는 공간·모임을 머릿속으로만 정리해요.\n찾아가라는 게 아니라, 기회가 왔을 때 놓치지 않기 위해서예요."} ]
 };
 const EP_RX_D1={t:"오늘은 먼저 연락하지 않기", b:"상대의 마음이 움직일 시간을 확보하는 게 오늘의 전부예요.\n연락하고 싶어지면, 그 마음은 내일의 처방에 쓸 거예요."};
 
 function epRxFor(p,day){
   if(day<=1) return {k:null,...EP_RX_D1};
   const order=Object.keys(p).sort((a,b)=>p[a]-p[b]);
-  // 낮은 지표일수록 먼저·자주 나오도록 10개 풀을 순환 — 코스가 아니라 매일 갱신되는 처방
-  const pool=[[0,0],[1,0],[0,1],[2,0],[1,1],[3,0],[2,1],[4,0],[3,1],[4,1]];
+  // 낮은 지표일수록 먼저·자주 나오도록 15개 풀을 순환 — 코스가 아니라 매일 갱신되는 처방
+  const pool=[[0,0],[1,0],[0,1],[2,0],[1,1],[3,0],[0,2],[2,1],[4,0],[1,2],[3,1],[2,2],[4,1],[3,2],[4,2]];
   const pk=pool[(day-2)%pool.length], k=order[pk[0]];
   return {k, ...EP_RX[k][pk[1]]};
 }
@@ -650,6 +655,7 @@ function epRender(p,score,day,opts){
     '<span class="ep-val">'+p[k]+"</span></div>").join("");
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     document.querySelectorAll("#epBars .ep-fill").forEach(el=>el.style.width=el.dataset.w+"%"); }));
+  setTimeout(()=>{ document.querySelectorAll("#epBars .ep-fill").forEach(el=>el.style.width=el.dataset.w+"%"); },450);
   const tk=opts.type||epType(p), T=EP_TYPES[tk];
   document.getElementById("epTypeName").textContent=T.name;
   document.getElementById("epTypeBody").innerHTML=epParas(T.body);
@@ -661,7 +667,7 @@ function epRender(p,score,day,opts){
   let h='<span class="ep-day">'+(d===1?"진단 첫날":"진단 "+d+"일째")+"</span>";
   if(rx.k) h+='<div class="ep-why">지금 제일 급한 지표 · '+EP_LABEL[rx.k]+"</div>";
   h+='<div class="ep-rxt">'+rx.t+'</div><div class="ep-body">'+epParas(rx.b)+"</div>";
-  if(d>=6) h+='<div class="ep-next">처방을 따라온 만큼 구도는 이미 움직이고 있어요. 다음 단계인 타이밍 설계부터는 상담에서 함께 정하는 쪽이 빨라요.</div>';
+  h+='<div class="ep-aid">이 결과지를 들고 상담을 받으면, 내 상황에 맞는 다음 수를 훨씬 정확하게 잡을 수 있어요.</div>';
   { const ms=epMsToMidnight(), hh=Math.floor(ms/3600000), mm=Math.floor(ms%3600000/60000);
     h+='<div class="ep-lock">내일의 처방은 자정에 새로 도착해요 · '+hh+"시간 "+mm+"분 남음</div>"; }
   document.getElementById("epRxBody").innerHTML=h;
