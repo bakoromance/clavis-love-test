@@ -168,7 +168,7 @@
 .ep-val{width:30px;flex:none;text-align:right;font-size:13px;font-weight:800;color:var(--ink)}
 .ep-row.low .ep-lab,.ep-row.low .ep-val{color:var(--gold)}
 .ep-note{margin-top:10px;font-size:12px;color:var(--muted)}
-.ep-name{font-family:var(--serif);font-size:24px;font-weight:700;color:var(--ink);margin:2px 0 10px}
+.ep-name{font-family:var(--serif);font-size:24px;font-weight:700;color:var(--ink);margin:2px 0 12px;text-align:center}
 .ep-body{font-size:14.5px;color:var(--ink-2);line-height:1.75}
 .ep-body .rp{display:block}
 .ep-body .rp+.rp{margin-top:.4em}
@@ -180,7 +180,7 @@
 .ep-dayrow{display:flex;flex-direction:column;align-items:center;gap:7px;margin-bottom:14px;text-align:center}
 .ep-day{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.1em;color:#fff;background:var(--gold);border-radius:999px;padding:4px 10px}
 .ep-why{font-size:12.5px;color:var(--gold);font-weight:700}
-.ep-rxt{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:8px}
+.ep-rxt{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:8px;text-align:center}
 .ep-lock{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--bg-2);font-size:12.5px;color:var(--ink-2);display:flex;justify-content:space-between;align-items:center;gap:10px}
 .ep-timer{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-size:14px;font-weight:700;color:var(--ink);letter-spacing:.08em;font-variant-numeric:tabular-nums}
 .ep-warn{border-color:#e6c9c4;background:#fdf6f4}
@@ -672,9 +672,7 @@ function epRender(p,score,day,opts){
     document.getElementById("epEv").innerHTML=ev.map(e=>"<li>"+e+"</li>").join("");
   } else document.getElementById("epEvSec").style.display="none";
   const d=Math.max(1,day||1), rx=epRxFor(p,d);
-  let h='<div class="ep-dayrow"><span class="ep-day">'+(d===1?"진단 첫날":"진단 "+d+"일째")+"</span>";
-  if(rx.k) h+='<span class="ep-why">지금 제일 급한 지표 · '+EP_LABEL[rx.k]+"</span>";
-  h+="</div>";
+  let h='<div class="ep-dayrow"><span class="ep-day">'+(d===1?"진단 첫날":"진단 "+d+"일째")+"</span></div>";
   h+='<div class="ep-rxt">'+rx.t+'</div><div class="ep-body">'+epParas(rx.b)+"</div>";
   h+='<div class="ep-lock"><span>내일의 처방은 자정에 도착</span><span class="ep-timer" id="epTimer"></span></div>';
   h+='<div class="ep-aid">상담을 통해, 내 상황에 맞는<br>더 정교한 행동지침을 받아보실 수 있습니다.</div>';
@@ -683,7 +681,7 @@ function epRender(p,score,day,opts){
   const cut=Math.max(6,Math.round((100-p.restraint)*.28+(100-p.recovery)*.10));
   const low=Math.max(10,score-cut);
   document.getElementById("epDrop").innerHTML="<s>"+score+"%</s> ↓ "+low+"%";
-  document.getElementById("epWarnBody").innerHTML=epParas("지금 패턴이 반복될 때 내려가는 자리입니다.\n시간이 아니라 방향이 그 사람의 마음을 밀어냅니다.");
+  document.getElementById("epWarnBody").innerHTML=epParas("지금 패턴이 반복되면 내려가게 되는 수치예요.\n그 사람의 마음을 밀어내는 건 시간이 아니라 방향이죠.");
 }
 
 /* 검사 완료 시: 프로파일 계산 + 저장 + 렌더 */

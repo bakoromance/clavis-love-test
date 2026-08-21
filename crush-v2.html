@@ -667,7 +667,7 @@ function epRender(p,pct,opts){
   const cut=Math.max(8,Math.round((100-p.init)*.18+(100-p.dens)*.08));
   const low=Math.max(5,pct-cut);
   document.getElementById("epDrop").innerHTML="<s>"+pct+"%</s> ↓ "+low+"%";
-  document.getElementById("epWarnBody").innerHTML=epParas("지금 온도 그대로 시간이 지날 때 내려갈 자리예요.\n썸을 끝내는 건 거절이 아니라 정체예요.");
+  document.getElementById("epWarnBody").innerHTML=epParas("지금 온도 그대로 시간이 지나면 내려가게 되는 수치입니다.\n썸이 끝나는 건 거절당해서가 아니라, 그냥 멈춰 있어서죠.");
 }
 
 /* 검사 완료: 원본 산출 로직 그대로 + 프로파일 렌더 */

@@ -571,7 +571,7 @@ function epRender(p,lv,opts){
   } else document.getElementById("epEvSec").style.display="none";
   const rise=Math.min(10, lv+(p[order[0]]<35?2:1));
   document.getElementById("epDrop").innerHTML="<s>LEVEL "+lv+"</s> ↑ LEVEL "+rise;
-  document.getElementById("epWarnBody").innerHTML=epParas("지금 패턴이 반복될 때 올라설 자리예요.\n위험도를 키우는 건 사건이 아니라 방치예요.");
+  document.getElementById("epWarnBody").innerHTML=epParas("지금 패턴이 반복되면 올라가게 되는 단계입니다.\n관계를 무너뜨리는 건 큰 사건이 아니라 방치죠.");
 }
 
 /* 검사 완료: 원본 산출 로직 그대로 + 프로파일 렌더 */
