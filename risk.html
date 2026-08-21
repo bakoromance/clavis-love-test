@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>관계 위험레벨 측정하기 | CLAVIS</title>
+<title>관계 위험레벨 정밀 진단 | CLAVIS 감정 프로파일링</title>
 <link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -134,6 +134,42 @@
   .share-item:active .share-ic{transform:scale(.92)}
   .sheet-close{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);font-family:inherit;font-size:15px;font-weight:600;padding:14px;border-radius:12px;cursor:pointer}
   .sheet-close:hover{background:var(--surface-2);color:var(--text)}
+/* ── 감정 프로파일링 ── */
+.ep{margin:24px 0 4px;text-align:left;word-break:keep-all}
+.ep-sec{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 18px;margin-bottom:14px}
+.ep-h{font-size:17px;letter-spacing:.01em;font-weight:800;color:var(--text);margin-bottom:14px;display:flex;align-items:center}
+.ep-h::before{content:"";width:4px;height:15px;border-radius:2px;background:var(--accent);margin-right:9px}
+.ep-warn .ep-h::before{background:#e08a84}
+.ep-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.ep-lab{width:64px;flex:none;font-size:13px;font-weight:700;color:var(--text-dim)}
+.ep-track{flex:1;height:11px;border-radius:99px;background:var(--surface-2);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+.ep-fill{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent-2),var(--accent));width:0;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.ep-val{width:30px;flex:none;text-align:right;font-size:13px;font-weight:800;color:var(--text)}
+.ep-row.low .ep-lab,.ep-row.low .ep-val{color:var(--accent-2)}
+.ep-note{margin-top:10px;font-size:12px;color:var(--text-mute)}
+.ep-body{font-size:14.5px;color:var(--text-dim);line-height:1.75}
+.ep-body .rp{display:block}
+.ep-body .rp+.rp{margin-top:.4em}
+.ep-ev{margin:0;padding:0;list-style:none}
+.ep-ev li{position:relative;padding-left:14px;font-size:13.5px;color:var(--text-dim);line-height:1.6}
+.ep-ev li+li{margin-top:8px}
+.ep-ev li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:99px;background:var(--accent)}
+.ep-ev b{color:var(--text)}
+.ep-day{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.1em;color:var(--on-accent);background:var(--accent);border-radius:999px;padding:4px 10px;margin-bottom:10px}
+.ep-why{font-size:12.5px;color:var(--accent-2);font-weight:700;margin-bottom:6px}
+.ep-rxt{font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px}
+.ep-lock{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--surface-2);font-size:12.5px;color:var(--text-dim)}
+.ep-warn{border-color:rgba(217,84,78,.4);background:rgba(217,84,78,.08)}
+.ep-warn .ep-body{text-align:center}
+.ep-warn .ep-h{color:#e08a84}
+.ep-drop{font-size:24px;font-weight:800;color:#e08a84;margin:2px 0 8px;text-align:center}
+.ep-drop s{color:var(--text-dim);font-weight:800;margin-right:8px}
+.ep-goal{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--accent-dim);font-size:12.5px;color:var(--accent-2);font-weight:700}
+.ep-head{text-align:center;margin:2px 0 18px}
+.ep-eyebrow{font-family:var(--serif);font-style:italic;font-weight:600;font-size:12.5px;letter-spacing:.24em;color:var(--accent);margin-bottom:5px}
+.ep-title{font-size:20px;font-weight:800;letter-spacing:.05em;color:var(--text)}
+.ep-sub{margin-top:7px;font-size:12px;color:var(--text-mute);word-break:keep-all;padding:0 14px}
+.ep-head::after{content:"";display:block;width:36px;height:2px;border-radius:2px;background:var(--accent);margin:12px auto 0}
 </style>
 </head>
 <body>
@@ -185,6 +221,28 @@
       <div class="type-desc" id="typeDesc"></div>
     </div>
     <div class="rbody" id="rbody"></div>
+
+    <!-- 감정 프로파일링 -->
+    <div class="ep" id="epRoot" style="display:none">
+      <div class="ep-sec ep-warn" id="epWarnSec">
+        <div class="ep-h">이대로 두면</div>
+        <div class="ep-drop" id="epDrop"></div>
+        <div class="ep-body" id="epWarnBody"></div>
+      </div>
+      <div class="ep-sec">
+        <div class="ep-head">
+          <div class="ep-eyebrow">CLAVIS</div>
+          <div class="ep-title">감정 프로파일링</div>
+          <div class="ep-sub">관계 구도, 감정을 정밀하게 분석하여<br>상대의 심리와 행동을 컨트롤하는 클래비스의 체계</div>
+        </div>
+        <div id="epBars"></div>
+      </div>
+      <div class="ep-sec" id="epEvSec">
+        <div class="ep-h">당신의 답에서 찾은 근거</div>
+        <ul class="ep-ev" id="epEv"></ul>
+      </div>
+    </div>
+
     <p class="cta-line" id="ctaLine"></p>
     <div class="actions">
       <a class="btn" id="consultBtn" target="_top">1:1 맞춤상담 신청하기</a>
@@ -454,6 +512,97 @@ async function copyToClipboard(t){ try{ await navigator.clipboard.writeText(t); 
 async function copyLink(){ const d=shareData(); const ok=await copyToClipboard(`${d.text} ${d.url}`); toast(ok?"링크가 복사되었습니다":"복사에 실패했습니다"); closeShare(); }
 function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
 (function loadKakao(){ if(!KAKAO_JS_KEY) return; const s=document.createElement("script"); s.src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"; s.crossOrigin="anonymous"; s.onload=()=>{ try{ if(window.Kakao&&!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY); }catch(e){} }; document.head.appendChild(s); })();
+</script>
+<script>
+/* ═══ 감정 프로파일링 (v2 전용) ═══  지표 5개(높을수록 좋음) · 판정마다 답변 인용 */
+const EP_LABEL={comm:"소통력",resil:"회복탄력",affection:"애정온도",trust:"신뢰도",future:"미래확신"};
+const EP_GROUP={comm:[0,1,2,3],resil:[4,5,6],affection:[7,8,9,10],trust:[11,12,13,14],future:[15,17]};
+
+function epPicked(qi,txt){ const q=QUESTIONS[qi]; if(!q) return false;
+  const oi=q.opts.findIndex(o=>o[0].indexOf(txt)>=0); if(oi<0) return false;
+  const a=answers[qi]; return Array.isArray(a)?a.includes(oi):a===oi; }
+
+function epProfile(){
+  const p={};
+  Object.keys(EP_GROUP).forEach(k=>{
+    let raw=0, lo=0, hi=0;
+    EP_GROUP[k].forEach(qi=>{ const q=QUESTIONS[qi]; const b=qBounds(q);
+      raw+=qPoints(q,answers[qi]); lo+=b[0]; hi+=b[1]; });
+    p[k]=Math.round(Math.max(5,Math.min(99,(1-(raw-lo)/(hi-lo))*100)));
+  });
+  return p;
+}
+
+function epEvidence(){
+  const pos=[],neg=[];
+  const prot=(answers[17]||[]).filter(i=>QUESTIONS[17].opts[i][2]!=="solo").length;
+  if(prot>=2) pos.push("<b>관계를 지키는 힘 "+prot+"개</b> — 무너뜨리는 힘만큼, 지키는 힘도 실재해요.");
+  if(epPicked(4,"잘 조율한다")) pos.push("<b>「다퉈도 잘 조율한다」</b> — 회복의 바탕이 아직 살아 있어요.");
+  if(epPicked(7,"여전하다")||epPicked(7,"더 늘었다")) pos.push("<b>「애정 표현이 유지되고 있다」</b> — 온도의 뿌리는 아직 마르지 않았어요.");
+  if(epPicked(2,"내가 이어가지 않으면")) neg.push("<b>「내가 이어가야 이어지는 대화」</b> — 대화의 온도가 한쪽에서만 나오고 있어요.");
+  if(epPicked(4,"비슷한 문제로 반복")) neg.push("<b>「같은 문제로 반복되는 다툼」</b> — 갈등의 내용이 아니라 구조가 문제라는 신호예요.");
+  if(epPicked(6,"말로만 인정")||epPicked(6,"내 탓으로")) neg.push("<b>「사과가 반복을 못 멈춤」</b> — 말의 문제가 아니라 패턴의 문제예요.");
+  if(epPicked(9,"가족·친구처럼만")) neg.push("<b>「가족·친구처럼만 느껴짐」</b> — 편안함이 설렘을 대체하기 시작했어요.");
+  if(epPicked(10,"혼자인 느낌")) neg.push("<b>「연애 중인데도 혼자인 느낌」</b> — 가장 먼저 돌봐야 할 신호예요.");
+  if(epPicked(11,"크게 깨진 사건")) neg.push("<b>「신뢰가 크게 깨진 사건」</b> — 감정 회복보다 신뢰 회복이 먼저인 이유예요.");
+  if(epPicked(15,"말을 돌리거나 회피")) neg.push("<b>「미래 얘기를 회피함」</b> — 거절이 아니라 부담일 수 있어요. 확인이 필요한 지점이에요.");
+  if(epPicked(16,"진지하게 한 번")||epPicked(16,"여러 번 반복")) neg.push("<b>「이별 얘기가 실제로 나옴」</b> — 감정 호소보다 냉정한 설계가 필요한 단계예요.");
+  const out=[]; if(pos[0]) out.push(pos[0]); if(neg[0]) out.push(neg[0]);
+  if(neg[1]) out.push(neg[1]); else if(pos[1]) out.push(pos[1]);
+  return out.slice(0,3);
+}
+
+function epParas(t){ return t.split("\n\n").map(p=>'<span class="rp">'+p.replace(/\n/g,"<br>")+"</span>").join(""); }
+
+function epRender(p,lv,opts){
+  opts=opts||{};
+  if(opts.type==="DANGER"){ document.getElementById("epRoot").style.display="none"; return; }  // 안전 경고형엔 붙이지 않는다
+  document.getElementById("epRoot").style.display="block";
+  const order=Object.keys(p).sort((a,b)=>p[a]-p[b]);
+  document.getElementById("epBars").innerHTML=Object.keys(EP_LABEL).map(k=>
+    '<div class="ep-row'+(k===order[0]?" low":"")+'"><span class="ep-lab">'+EP_LABEL[k]+'</span>'+
+    '<span class="ep-track"><span class="ep-fill" data-w="'+p[k]+'"></span></span>'+
+    '<span class="ep-val">'+p[k]+"</span></div>").join("");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.querySelectorAll("#epBars .ep-fill").forEach(el=>el.style.width=el.dataset.w+"%"); }));
+  setTimeout(()=>{ document.querySelectorAll("#epBars .ep-fill").forEach(el=>el.style.width=el.dataset.w+"%"); },450);
+  const ev=opts.ev||[];
+  if(ev.length){ document.getElementById("epEvSec").style.display="";
+    document.getElementById("epEv").innerHTML=ev.map(e=>"<li>"+e+"</li>").join("");
+  } else document.getElementById("epEvSec").style.display="none";
+  const rise=Math.min(10, lv+(p[order[0]]<35?2:1));
+  document.getElementById("epDrop").innerHTML="<s>LEVEL "+lv+"</s> ↑ LEVEL "+rise;
+  document.getElementById("epWarnBody").innerHTML=epParas("지금 패턴이 반복되면 두 사람의 거리는 더 벌어져요.\n관계를 무너뜨리는 건 큰 사건이 아니라 방치입니다.");
+}
+
+/* 검사 완료: 원본 산출 로직 그대로 + 프로파일 렌더 */
+showResult=function(){
+  let raw=0; QUESTIONS.forEach((q,qi)=>{ raw+=qPoints(q,answers[qi]); });
+  let lv = Math.min(10, Math.max(1, 1+Math.round((raw-MINSUM)/(MAXSUM-MINSUM)*9)));
+  const danger = hasDanger();
+  if(danger) lv = Math.min(10, lv+1);
+  let typeKey;
+  if(danger) typeKey="DANGER";
+  else if(lv<=2) typeKey="STABLE";
+  else { const tp=computeType(); typeKey=tp.type || "STABLE"; }
+  saveResult(`LEVEL ${lv}/10 · ${(RISK_TYPES[typeKey]||{}).name||""}`, collectSelectedTexts());
+  renderResult(lv, typeKey);
+  epRender(epProfile(), lv, {ev:epEvidence(), type:typeKey});
+};
+
+/* 미리보기: ?lv=6&type=CONFLICT — 유형 표본 프로파일 */
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(!q.has("lv")&&!q.has("preview")) return;
+  const lv=Math.min(10, Math.max(1, parseInt(q.get("lv"))||5));
+  let type=(q.get("type")||"").toUpperCase();
+  if(!RISK_TYPES[type]) type = lv<=2 ? "STABLE" : "COOL";
+  const base=Math.max(12,100-lv*9);
+  const DIP={COOL:["comm","affection"],CONFLICT:["resil"],AVOID:["resil","comm"],TRUST:["trust"],
+             BORED:["affection"],FUTURE:["future"],BREAKUP:["comm","affection","future"],STABLE:[],DANGER:[]};
+  const p={}; Object.keys(EP_LABEL).forEach(k=>{ p[k]=Math.max(8,base-((DIP[type]||[]).includes(k)?28:0)); });
+  epRender(p,lv,{type:type,ev:[]});
+})();
 </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>썸 / 짝사랑 성사율 계산하기 | CLAVIS</title>
+<title>썸 / 짝사랑 정밀 진단 | CLAVIS 감정 프로파일링</title>
 <link rel="preconnect" href="https://fastly.jsdelivr.net" crossorigin />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -125,6 +125,42 @@
   .share-ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;transition:transform .15s}
   .share-item:active .share-ic{transform:scale(.92)}
   .sheet-close{width:100%;background:var(--bg-2);border:1px solid var(--card-bd);color:var(--ink-2);font-family:inherit;font-size:15px;font-weight:600;padding:14px;border-radius:12px;cursor:pointer}
+/* ── 감정 프로파일링 ── */
+.ep{margin:24px 0 4px;text-align:left;word-break:keep-all}
+.ep-sec{background:var(--card);border:1px solid var(--card-bd);border-radius:16px;padding:20px 18px;margin-bottom:14px}
+.ep-h{font-size:17px;letter-spacing:.01em;font-weight:800;color:var(--ink);margin-bottom:14px;display:flex;align-items:center}
+.ep-h::before{content:"";width:4px;height:15px;border-radius:2px;background:var(--rose);margin-right:9px}
+.ep-warn .ep-h::before{background:#e5738c}
+.ep-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.ep-lab{width:68px;flex:none;font-size:13px;font-weight:700;color:var(--ink-2)}
+.ep-track{flex:1;height:11px;border-radius:99px;background:var(--bg-2);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(60,20,30,.08)}
+.ep-fill{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--rose-2),var(--rose));width:0;transition:width .9s cubic-bezier(.2,.7,.2,1)}
+.ep-val{width:30px;flex:none;text-align:right;font-size:13px;font-weight:800;color:var(--ink)}
+.ep-row.low .ep-lab,.ep-row.low .ep-val{color:var(--rose)}
+.ep-note{margin-top:10px;font-size:12px;color:var(--muted)}
+.ep-body{font-size:14.5px;color:var(--ink-2);line-height:1.75}
+.ep-body .rp{display:block}
+.ep-body .rp+.rp{margin-top:.4em}
+.ep-ev{margin:0;padding:0;list-style:none}
+.ep-ev li{position:relative;padding-left:14px;font-size:13.5px;color:var(--ink-2);line-height:1.6}
+.ep-ev li+li{margin-top:8px}
+.ep-ev li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:99px;background:var(--rose)}
+.ep-ev b{color:var(--ink)}
+.ep-day{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.1em;color:#fff;background:var(--rose);border-radius:999px;padding:4px 10px;margin-bottom:10px}
+.ep-why{font-size:12.5px;color:var(--rose);font-weight:700;margin-bottom:6px}
+.ep-rxt{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:8px}
+.ep-lock{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--bg-2);font-size:12.5px;color:var(--ink-2)}
+.ep-warn{border-color:#3a2230;background:#2b1720}
+.ep-warn .ep-body{text-align:center;color:#d9b8c0}
+.ep-warn .ep-h{color:#f2aebc}
+.ep-drop{font-size:26px;font-weight:800;color:#ff9eb0;margin:2px 0 8px;text-align:center}
+.ep-warn .ep-drop s{color:#9c7a85}
+.ep-drop s{color:var(--ink-2);font-weight:800;margin-right:8px}
+.ep-head{text-align:center;margin:2px 0 18px}
+.ep-eyebrow{font-family:var(--serif);font-style:italic;font-weight:600;font-size:12.5px;letter-spacing:.24em;color:var(--rose);margin-bottom:5px}
+.ep-title{font-size:20px;font-weight:800;letter-spacing:.05em;color:var(--ink)}
+.ep-sub{margin-top:7px;font-size:12px;color:var(--muted);word-break:keep-all;padding:0 14px}
+.ep-head::after{content:"";display:block;width:36px;height:2px;border-radius:2px;background:var(--rose);margin:12px auto 0}
 </style>
 </head>
 <body>
@@ -160,7 +196,7 @@
     <div class="gauge">
       <svg viewBox="0 0 216 216"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#e591a4"/><stop offset="100%" stop-color="#d76b86"/></linearGradient></defs>
         <circle class="track" cx="108" cy="108" r="96"/><circle class="bar" id="gaugeBar" cx="108" cy="108" r="96"/></svg>
-      <div class="center"><div class="pct"><span id="pctNum">0</span><small>%</small></div><div class="pl">성사 가능성</div></div>
+      <div class="center"><div class="pct"><span id="pctNum">0</span><small>%</small></div><div class="pl">제대로 했을 때 성사 가능성</div></div>
     </div>
     <h2 class="rtitle" id="rtitle"></h2>
     <div class="rbody" id="rbody"></div>
@@ -175,6 +211,28 @@
       </div>
       <div class="type-body" id="typeBody"></div>
     </div>
+
+    <!-- 감정 프로파일링 -->
+    <div class="ep" id="epRoot" style="display:none">
+      <div class="ep-sec">
+        <div class="ep-head">
+          <div class="ep-eyebrow">CLAVIS</div>
+          <div class="ep-title">감정 프로파일링</div>
+          <div class="ep-sub">관계 구도, 감정을 정밀하게 분석하여<br>상대의 심리와 행동을 컨트롤하는 클래비스의 체계</div>
+        </div>
+        <div id="epBars"></div>
+      </div>
+      <div class="ep-sec" id="epEvSec">
+        <div class="ep-h">당신의 답에서 찾은 근거</div>
+        <ul class="ep-ev" id="epEv"></ul>
+      </div>
+      <div class="ep-sec ep-warn" id="epWarnSec">
+        <div class="ep-h">이대로 두면</div>
+        <div class="ep-drop" id="epDrop"></div>
+        <div class="ep-body" id="epWarnBody"></div>
+      </div>
+    </div>
+
     <p class="cta-line" id="ctaLine"></p>
     <div class="actions">
       <a class="btn" id="consultBtn" target="_top">1:1 맞춤상담 신청하기</a>
@@ -555,6 +613,85 @@ async function copyToClipboard(t){ try{ await navigator.clipboard.writeText(t); 
 async function copyLink(){ const d=shareData(); const ok=await copyToClipboard(`${d.text} ${d.url}`); toast(ok?"링크가 복사되었습니다":"복사에 실패했습니다"); closeShare(); }
 function toast(m){ const t=document.getElementById("toast"); t.textContent=m; t.classList.add("show"); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove("show"),2200); }
 (function loadKakao(){ if(!KAKAO_JS_KEY) return; const s=document.createElement("script"); s.src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js"; s.crossOrigin="anonymous"; s.onload=()=>{ try{ if(window.Kakao&&!window.Kakao.isInitialized()) window.Kakao.init(KAKAO_JS_KEY); }catch(e){} }; document.head.appendChild(s); })();
+</script>
+<script>
+/* ═══ 감정 프로파일링 (v2 전용) ═══  지표 5개(높을수록 좋음) · 판정마다 답변 인용
+   이성기류·적극성·관계 밀도·진전도는 기존 판별 함수를 그대로 정규화해 노출한다. */
+const EP_LABEL={vibe:"이성기류",init:"적극성",dens:"관계 밀도",rom:"진전도",cond:"상황 조건"};
+
+function epPicked(qi,txt){ const q=QUESTIONS[qi]; if(!q) return false;
+  const oi=q.opts.findIndex(o=>o[0].indexOf(txt)>=0); if(oi<0) return false;
+  const a=answers[qi]; return Array.isArray(a)?a.includes(oi):a===oi; }
+function epNorm(raw,lo,hi){ return Math.round(Math.max(5,Math.min(99,(raw-lo)/(hi-lo)*100))); }
+
+function epProfile(){
+  let cRaw=0,cLo=0,cHi=0;
+  [20,22,23].forEach(qi=>{ const q=QUESTIONS[qi], b=qBounds(q);       // 연애 가능 상태 · 장애물 · 접점
+    cRaw+=qPoints(q,answers[qi]); cLo+=b[0]; cHi+=b[1]; });
+  return { vibe:epNorm(objectiveRomance(),0,5), init:epNorm(partnerInitiative(),0,6),
+           dens:epNorm(closeness(),0,15), rom:epNorm(romanceScore(),0,12),
+           cond:epNorm(cRaw,cLo,cHi) };
+}
+
+function epEvidence(){
+  const pos=[],neg=[];
+  if(epPicked(4,"상대가 먼저 다시")) pos.push("<b>「끊기면 상대가 먼저 다시 연락」</b> — 이 신호는 예의가 아니라 관심이에요.");
+  if(epPicked(6,"외모·이성적 매력")) pos.push("<b>「외모·매력을 칭찬」</b> — 친구에게는 잘 쓰지 않는 언어예요.");
+  if(epPicked(19,"이성적 호감을 여러 번")) pos.push("<b>「이성적 호감을 여러 번 표현」</b> — 해석이 필요 없는 수준의 신호예요.");
+  if(epPicked(14,"은근히")) pos.push("<b>「연애 얘기에 \'우리\'를 대입」</b> — 상대도 이 관계의 다음 장을 상상하고 있어요.");
+  if(epPicked(3,"느리거나")||epPicked(3,"단답")) neg.push("<b>「답장이 느리고 단답」</b> — 지금은 밀어붙일 타이밍이 아니라는 신호예요.");
+  if(epPicked(18,"자주 그런다")||epPicked(18,"몇 번 있다")) neg.push("<b>「친구로 선을 그은 적 있음」</b> — 프레임을 바꾸는 건 고백이 아니라 반 발짝의 누적이에요.");
+  if(epPicked(20,"사귀는 사람이 있다")) neg.push("<b>「상대에게 애인이 있음」</b> — 지금 움직이면 잃는 것만 있어요. 멈춤도 전략이에요.");
+  if(epPicked(10,"아직 시도해본 적 없다")&&epPicked(7,"아직 없다")) neg.push("<b>「진도가 전부 내 쪽에서 멈춰 있음」</b> — 브레이크를 밟고 있는 건 상대가 아니라 나예요.");
+  if(epPicked(1,"상대 텐션이 낮아졌다")||epPicked(1,"대화가 끊겼다")) neg.push("<b>「최근 온도가 내려감」</b> — 식은 게 아니라 확신을 잃었을 가능성부터 봐야 해요.");
+  const out=[]; if(pos[0]) out.push(pos[0]); if(neg[0]) out.push(neg[0]);
+  if(pos[1]) out.push(pos[1]); else if(neg[1]) out.push(neg[1]);
+  return out.slice(0,3);
+}
+
+function epParas(t){ return t.split("\n\n").map(p=>'<span class="rp">'+p.replace(/\n/g,"<br>")+"</span>").join(""); }
+
+function epRender(p,pct,opts){
+  opts=opts||{};
+  document.getElementById("epRoot").style.display="block";
+  const order=Object.keys(p).sort((a,b)=>p[a]-p[b]);
+  document.getElementById("epBars").innerHTML=Object.keys(EP_LABEL).map(k=>
+    '<div class="ep-row'+(k===order[0]?" low":"")+'"><span class="ep-lab">'+EP_LABEL[k]+'</span>'+
+    '<span class="ep-track"><span class="ep-fill" data-w="'+p[k]+'"></span></span>'+
+    '<span class="ep-val">'+p[k]+"</span></div>").join("");
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    document.querySelectorAll("#epBars .ep-fill").forEach(el=>el.style.width=el.dataset.w+"%"); }));
+  setTimeout(()=>{ document.querySelectorAll("#epBars .ep-fill").forEach(el=>el.style.width=el.dataset.w+"%"); },450);
+  const ev=opts.ev||[];
+  if(ev.length){ document.getElementById("epEvSec").style.display="";
+    document.getElementById("epEv").innerHTML=ev.map(e=>"<li>"+e+"</li>").join("");
+  } else document.getElementById("epEvSec").style.display="none";
+  const cut=Math.max(8,Math.round((100-p.init)*.18+(100-p.dens)*.08));
+  const low=Math.max(5,pct-cut);
+  document.getElementById("epDrop").innerHTML="<s>"+pct+"%</s> ↓ "+low+"%";
+  document.getElementById("epWarnBody").innerHTML=epParas("지금 온도 그대로 두면 이 관계는 서서히 식어가요.\n썸이 끝나는 건 거절당해서가 아니라, 그냥 멈춰 있어서예요.");
+}
+
+/* 검사 완료: 원본 산출 로직 그대로 + 프로파일 렌더 */
+showResult=function(){
+  let raw=0; QUESTIONS.forEach((q,qi)=>{ raw+=qPoints(q,answers[qi]); });
+  let pct=15+Math.round((raw-MINSUM)/(MAXSUM-MINSUM)*84); pct=Math.max(15,Math.min(99,pct));
+  const typeKey=computeCrushType(pct);
+  saveResult(`${pct}% / ${CRUSH_TYPES[typeKey].name}`, collectSelectedTexts());
+  renderResult(pct, typeKey);
+  epRender(epProfile(), pct, {ev:epEvidence(), type:typeKey});
+};
+
+/* 미리보기: ?pct=70&type=SCOUTING — 유형 표본 프로파일 */
+(function(){
+  const q=new URLSearchParams(location.search);
+  if(!q.has("pct")&&!q.has("preview")) return;
+  let v=parseInt(q.get("pct")); if(isNaN(v)) v=74; v=Math.max(15,Math.min(99,v));
+  let t=(q.get("type")||"").toUpperCase(); if(!CRUSH_TYPES[t]) t = v>=85?"ALMOST":"SCOUTING";
+  const DIP={FRIEND:["vibe","rom"],HESITANT:["rom"],UNEVEN:["init"],RIVAL:["cond"],REKINDLE:["init","vibe"]};
+  const p={}; Object.keys(EP_LABEL).forEach(k=>{ p[k]=Math.max(8,Math.min(95,v-((DIP[t]||[]).includes(k)?26:0)+(k==="dens"?4:0))); });
+  epRender(p,v,{type:t,ev:[]});
+})();
 </script>
 </body>
 </html>
