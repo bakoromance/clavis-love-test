@@ -327,6 +327,7 @@
 
 <script>
 const CONSULT_URL = "https://clavis.love/";
+let LAST_SCORE=null;   /* 결과 확정값 — 공유 문구가 카운트업 중간값을 읽지 않게 한다 */
 const KAKAO_JS_KEY = "";
 /* Google 설문지 저장 (entry 번호 채우면 활성화) */
 const FORM_ACTION = "";
@@ -488,7 +489,7 @@ function renderResult(score){
   go("result");
   const bar=document.getElementById("gaugeBar"), r=96, c=2*Math.PI*r;
   bar.style.strokeDasharray=c; bar.style.strokeDashoffset=c;
-  const numEl=document.getElementById("pctNum");
+  const numEl=document.getElementById("pctNum"); LAST_SCORE=score;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{ bar.style.strokeDashoffset=c*(1-score/100); }));
   let dur=1400,start=performance.now();
   function tick(now){ const p=Math.min(1,(now-start)/dur),e=1-Math.pow(1-p,3); numEl.textContent=Math.round(score*e); if(p<1) requestAnimationFrame(tick); else numEl.textContent=score; }
@@ -507,7 +508,10 @@ function restart(){ idx=0; answers.forEach((a,i)=>answers[i]=QUESTIONS[i].type==
   try{ localStorage.removeItem(EP_KEY); }catch(e){}
   go("intro"); }
 
-function shareData(){ const s=document.getElementById("pctNum").textContent; return { title:"재회 가능성 알아보기 | CLAVIS", text:`나의 재회 가능성은 ${s}%! 당신도 측정해보세요.`, url:location.href }; }
+/* 공유 문구는 확정 점수를 쓴다 — 카운트업 중에 누르면 중간 숫자가 나간다.
+   URL도 파라미터를 떼고 넘긴다 — ?pct=가 붙은 채 공유되면 받은 사람이 문항을 안 풀고 남의 결과지를 본다. */
+function shareURL(){ return location.origin+location.pathname; }
+function shareData(){ const s=LAST_SCORE!=null?LAST_SCORE:document.getElementById("pctNum").textContent; return { title:"재회 가능성 알아보기 | CLAVIS", text:`나의 재회 가능성은 ${s}%! 당신도 측정해보세요.`, url:shareURL() }; }
 function shareResult(){ document.getElementById("shareSheet").classList.add("show"); document.body.style.overflow="hidden"; }
 function closeShare(){ document.getElementById("shareSheet").classList.remove("show"); document.body.style.overflow=""; }
 async function shareNative(){ const d=shareData(); if(navigator.share){ try{ await navigator.share(d); closeShare(); return; }catch(e){ if(e&&e.name==="AbortError") return; } } await copyToClipboard(`${d.text} ${d.url}`); toast("이 기기는 기본 공유를 지원하지 않아 링크를 복사했어요"); closeShare(); }

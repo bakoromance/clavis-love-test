@@ -278,6 +278,7 @@
 
 <script>
 const CONSULT_URL = "https://clavis.love/";
+let LAST_LV=null;   /* 결과 확정값 — 공유 문구가 카운트업 중간값을 읽지 않게 한다 */
 const KAKAO_JS_KEY = "";
 /* Google 설문지 저장 (entry 번호 채우면 활성화) */
 const FORM_ACTION = "";
@@ -452,7 +453,7 @@ function renderResult(lv, typeKey){
   const T=RISK_TYPES[typeKey] || RISK_TYPES.STABLE;
   const color = RISK_COLORS[lv-1];
   const band = LEVELS[Math.min(LEVELS.length-1, Math.ceil(lv/2)-1)]; // 10단계 → 5밴드 설명
-  const numEl=document.getElementById("lvNum"); numEl.textContent=lv; numEl.style.color=color;
+  const numEl=document.getElementById("lvNum"); LAST_LV=lv; numEl.textContent=lv; numEl.style.color=color;
   document.getElementById("lvSub").textContent=`위험도 10단계 중 현재 ${lv}단계`;
   const hero=document.getElementById("rHero");
   hero.style.background=`linear-gradient(165deg, ${color}26, var(--surface) 72%)`;
@@ -502,7 +503,9 @@ function showResult(){
 })();
 function restart(){ idx=0; QUESTIONS.forEach((q,i)=>answers[i]=isMulti(q)?[]:null); go("intro"); }
 
-function shareData(){ const lv=document.getElementById("lvNum").textContent; return { title:"관계 위험레벨 측정 | CLAVIS", text:`나의 관계 위험레벨은 LEVEL ${lv}/10! 당신도 측정해보세요.`, url:location.href }; }
+/* 공유 URL은 파라미터를 떼고 넘긴다 — ?lv=가 붙은 채 공유되면 받은 사람이 문항을 안 풀고 남의 결과지를 본다. */
+function shareURL(){ return location.origin+location.pathname; }
+function shareData(){ const lv=LAST_LV!=null?LAST_LV:document.getElementById("lvNum").textContent; return { title:"관계 위험레벨 측정 | CLAVIS", text:`나의 관계 위험레벨은 LEVEL ${lv}/10! 당신도 측정해보세요.`, url:shareURL() }; }
 function shareResult(){ document.getElementById("shareSheet").classList.add("show"); document.body.style.overflow="hidden"; }
 function closeShare(){ document.getElementById("shareSheet").classList.remove("show"); document.body.style.overflow=""; }
 async function shareNative(){ const d=shareData(); if(navigator.share){ try{ await navigator.share(d); closeShare(); return; }catch(e){ if(e&&e.name==="AbortError") return; } } await copyToClipboard(`${d.text} ${d.url}`); toast("이 기기는 기본 공유를 지원하지 않아 링크를 복사했어요"); closeShare(); }
