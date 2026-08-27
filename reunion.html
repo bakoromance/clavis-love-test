@@ -195,6 +195,8 @@
 .ep-title{font-size:20px;font-weight:800;letter-spacing:.05em;color:var(--ink)}
 .ep-sub{margin-top:7px;font-size:12px;color:var(--muted);word-break:keep-all;padding:0 14px}
 .ep-head::after{content:"";display:block;width:36px;height:2px;border-radius:2px;background:var(--gold);margin:12px auto 0}
+.ep-stale{margin-top:12px;text-align:center;font-size:12px;color:var(--ink-2);line-height:1.6;word-break:keep-all}
+.ep-relink{background:none;border:0;padding:0;font:inherit;color:var(--gold);font-weight:800;text-decoration:underline;cursor:pointer}
 .ep-aid{margin-top:14px;text-align:center;font-family:"Noto Serif KR","Nanum Myeongjo",serif;font-size:12.5px;color:var(--ink-2);line-height:1.7;word-break:keep-all}
 </style>
 </head>
@@ -651,12 +653,21 @@ function epRxFor(p,day){
   return {k, ...EP_RX[k][pk[1]]};
 }
 function epMsToMidnight(){ const n=new Date(), m=new Date(n); m.setHours(24,0,0,0); return m-n; }
+let _epCtx=null;   // 화면에 그려진 처방 상태 — 자정 갱신 판단용
 function epTick(){ const el=document.getElementById("epTimer"); if(!el) return;
+  if(_epCtx && _epCtx.live){          // 날짜가 바뀌면 새로고침 없이 그날 처방으로 교체
+    const st=epLoad();
+    if(st){ const d=epDayOf(st);
+      if(d!==_epCtx.day){ epRender(st.prof, st.score, d, {ev:st.ev, type:st.type, live:true}); return; } }
+  }
   const s=Math.max(0,Math.floor(epMsToMidnight()/1000));
   const p=n=>(n<10?"0":"")+n;
   el.textContent=p(Math.floor(s/3600))+":"+p(Math.floor(s%3600/60))+":"+p(s%60); }
 function epSave(o){ try{ localStorage.setItem(EP_KEY, JSON.stringify(o)); }catch(e){} }
-function epLoad(){ try{ return JSON.parse(localStorage.getItem(EP_KEY)||"null"); }catch(e){ return null; } }
+function epLoad(){ try{ const o=JSON.parse(localStorage.getItem(EP_KEY)||"null");
+    if(!o||!o.prof||typeof o.score!=="number"||!o.t0) return null;
+    if(Object.keys(EP_LABEL).some(k=>typeof o.prof[k]!=="number")) return null;   // 손상 데이터 폐기
+    return o; }catch(e){ return null; } }
 function epDayOf(st){ const d0=new Date(st.t0); d0.setHours(0,0,0,0);
   const n=new Date(); n.setHours(0,0,0,0); return Math.floor((n-d0)/86400000)+1; }
 
@@ -664,6 +675,7 @@ function epParas(t){ return t.split("\n\n").map(p=>'<span class="rp">'+p.replace
 
 function epRender(p,score,day,opts){
   opts=opts||{};
+  _epCtx={day:Math.max(1,day||1), live:!!opts.live};
   document.getElementById("epRoot").style.display="block";
   const order=Object.keys(p).sort((a,b)=>p[a]-p[b]);
   document.getElementById("epBars").innerHTML=Object.keys(EP_LABEL).map(k=>
@@ -684,6 +696,7 @@ function epRender(p,score,day,opts){
   let h='<div class="ep-dayrow"><span class="ep-day">'+(d===1?"진단 첫날":"진단 "+d+"일째")+"</span></div>";
   h+='<div class="ep-rxt">'+rx.t+'</div><div class="ep-body">'+epParas(rx.b)+"</div>";
   h+='<div class="ep-lock"><span>내일의 처방은 자정에 도착</span><span class="ep-timer" id="epTimer"></span></div>';
+  if(d>14) h+='<div class="ep-stale">마지막 진단에서 '+d+'일이 지났어요. 상황이 달라졌다면 <button class="ep-relink" onclick="restart()">다시 진단하기</button></div>';
   h+='<div class="ep-aid">상담을 통해, 내 상황에 맞는<br>더 정교한 행동지침을 받아보실 수 있습니다.</div>';
   document.getElementById("epRxBody").innerHTML=h;
   clearInterval(window._epT); epTick(); window._epT=setInterval(epTick,1000);
@@ -701,7 +714,7 @@ showResult=function(){
   const p=epProfile(), ev=epEvidence(), tk=epType(p);
   epSave({t0:Date.now(), score:score, prof:p, ev:ev, type:tk});
   renderResult(score);
-  epRender(p,score,1,{ev:ev,type:tk});
+  epRender(p,score,1,{ev:ev,type:tk,live:true});
 };
 
 /* 미리보기: ?pct=63&day=3&type=RUSH — 실답변이 없으므로 유형 표본 프로파일 사용 */
@@ -725,7 +738,7 @@ showResult=function(){
   if(q.has("pct")||q.has("preview")) return;
   const st=epLoad(); if(!st) return;
   renderResult(st.score);
-  epRender(st.prof, st.score, epDayOf(st), {ev:st.ev, type:st.type});
+  epRender(st.prof, st.score, epDayOf(st), {ev:st.ev, type:st.type, live:true});
 })();
 </script>
 </body>
