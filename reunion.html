@@ -502,7 +502,10 @@ function showResult(){
 /* ★ 결과지 바로보기(미리보기): ?pct=63  (재회 가능성 10~100) */
 (function(){ const p=new URLSearchParams(location.search); if(!p.has("pct")&&!p.has("preview")) return;
   let v=parseInt(p.get("pct")); if(isNaN(v)) v=65; v=Math.max(10,Math.min(100,v)); renderResult(v); })();
-function restart(){ idx=0; answers.forEach((a,i)=>answers[i]=QUESTIONS[i].type==="multi"?[]:null); go("intro"); }
+function restart(){ idx=0; answers.forEach((a,i)=>answers[i]=QUESTIONS[i].type==="multi"?[]:null);
+  /* 저장된 프로파일도 같이 비운다 — 안 그러면 중간에 그만두고 다시 들어왔을 때 옛 결과지가 열린다 */
+  try{ localStorage.removeItem(EP_KEY); }catch(e){}
+  go("intro"); }
 
 function shareData(){ const s=document.getElementById("pctNum").textContent; return { title:"재회 가능성 알아보기 | CLAVIS", text:`나의 재회 가능성은 ${s}%! 당신도 측정해보세요.`, url:location.href }; }
 function shareResult(){ document.getElementById("shareSheet").classList.add("show"); document.body.style.overflow="hidden"; }
@@ -531,7 +534,7 @@ function epNorm(raw,lo,hi){ return Math.round(Math.max(5,Math.min(99,(raw-lo)/(h
 function epProfile(){
   let w=0;                                              // 상대온도
   if(epPicked(7,"힘든 시기")||epPicked(7,"똑같이")) w+=2;
-  if(epPicked(7,"바쁘다")||epPicked(7,"잘 모르겠다")) w+=1;
+  if(epPicked(7,"바빠")||epPicked(7,"잘 모르겠다")) w+=1;
   if(epPicked(15,"다시 사귈")) w+=3;
   if(epPicked(15,"다시 만나")) w+=2;
   if(epPicked(15,"근황에 대해 먼저")) w+=2;
