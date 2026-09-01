@@ -52,9 +52,9 @@
   .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink-2);font-weight:600}
   .btn.ghost:hover{background:#fff}
   /* 상담 CTA — 은은한 발광(구원의 빛): 숨 쉬듯 번지는 글로우 + 천천히 지나가는 광택. 재생 감소 설정 시 정지 */
-  #consultBtn{position:relative;overflow:hidden;isolation:isolate;box-shadow:0 0 0 1px rgba(229,145,164,.45),0 0 18px 2px rgba(229,145,164,.55);animation:ctaGlow 3.2s ease-in-out infinite}
-  #consultBtn::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 38%,rgba(255,228,235,.26) 50%,transparent 62%);transform:translateX(-130%);animation:ctaSheen 4.8s ease-in-out infinite}
-  @keyframes ctaGlow{0%,100%{box-shadow:0 0 0 1px rgba(229,145,164,.45),0 0 14px 1px rgba(229,145,164,.55)}50%{box-shadow:0 0 0 1px rgba(229,145,164,.45),0 0 30px 6px rgba(229,145,164,.55)}}
+  #consultBtn{position:relative;overflow:hidden;isolation:isolate;box-shadow:0 0 0 1px rgba(255,222,170,.8),0 0 18px 2px rgba(255,196,120,.62);animation:ctaGlow 3.2s ease-in-out infinite}
+  #consultBtn::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 38%,rgba(255,255,255,.4) 50%,transparent 62%);transform:translateX(-130%);animation:ctaSheen 4.8s ease-in-out infinite}
+  @keyframes ctaGlow{0%,100%{box-shadow:0 0 0 1px rgba(255,222,170,.8),0 0 16px 2px rgba(255,196,120,.62)}50%{box-shadow:0 0 0 1px rgba(255,222,170,.8),0 0 38px 10px rgba(255,196,120,.62)}}
   @keyframes ctaSheen{0%{transform:translateX(-130%)}45%,100%{transform:translateX(130%)}}
   @media (prefers-reduced-motion:reduce){#consultBtn,#consultBtn::after{animation:none}}
 
@@ -119,7 +119,7 @@
   .type-body{margin-top:6px;padding-top:16px;border-top:1px solid rgba(106,90,96,.16);text-align:left;font-size:13.5px;line-height:1.85;color:var(--ink-2)}
   .type-body .rp{display:block;white-space:pre-line}
   .type-body .rp + .rp{margin-top:.4em}
-  #result .cta-line{font-size:15px;font-weight:700;margin-bottom:14px}
+  #result .cta-line{font-size:15px;font-weight:700;margin:13px 0 14px}
   #result .actions{display:flex;flex-direction:column;gap:11px}
   #result .restart{margin-top:22px}
   #result .restart button{background:none;border:none;color:var(--muted);font-family:inherit;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
