@@ -25,7 +25,7 @@
 <link rel="stylesheet" as="style" crossorigin
   href="https://fastly.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 <link rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Noto+Serif+KR:wght@500;600&display=swap" />
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" />
 <style>
   :root{
     --bg:#f6eef0; --bg-2:#f1e6e9; --card:#ffffff; --card-bd:#ecdde1;
@@ -162,7 +162,6 @@
 .ep-lock{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--bg-2);font-size:12.5px;color:var(--ink-2)}
 .ep-warn{border-color:#3a2230;background:#2b1720}
 .ep-warn .ep-body{text-align:center;color:#d9b8c0}
-.ep-aid{margin-top:14px;text-align:center;font-family:"Noto Serif KR","Nanum Myeongjo",serif;font-size:12.5px;color:#d9b8c0;opacity:.85;line-height:1.7;word-break:keep-all}
 .ep-warn .ep-h{color:#f2aebc}
 .ep-drop{font-size:26px;font-weight:800;color:#ff9eb0;margin:2px 0 8px;text-align:center}
 .ep-warn .ep-drop s{color:#9c7a85}
@@ -661,7 +660,6 @@ function epRender(p,pct,opts){
   const low=Math.max(5,pct-cut);
   document.getElementById("epDrop").innerHTML="<s>"+pct+"%</s> ↓ "+low+"%";
   document.getElementById("epWarnBody").innerHTML=epParas("지금 온도 그대로 두면 이 관계는 서서히 식어가요.\n썸이 끝나는 건 거절당해서가 아니라, 그냥 멈춰 있어서예요.");
-  document.getElementById("epWarnBody").innerHTML+='<div class="ep-aid">상담을 통해, 내 상황에 맞는<br>더 정교한 행동지침을 받아보실 수 있습니다.</div>';
 }
 
 /* 검사 완료: 원본 산출 로직 그대로 + 프로파일 렌더 */
@@ -681,7 +679,12 @@ showResult=function(){
   let v=parseInt(q.get("pct")); if(isNaN(v)) v=74; v=Math.max(15,Math.min(99,v));
   let t=(q.get("type")||"").toUpperCase(); if(!CRUSH_TYPES[t]) t = v>=85?"ALMOST":"SCOUTING";
   const DIP={FRIEND:["vibe","rom"],HESITANT:["rom"],UNEVEN:["init"],RIVAL:["cond"],REKINDLE:["init","vibe"]};
-  const p={}; Object.keys(EP_LABEL).forEach(k=>{ p[k]=Math.max(8,Math.min(95,v-((DIP[t]||[]).includes(k)?26:0)+(k==="dens"?4:0))); });
+  /* 표본 프로파일: 지표마다 굴곡을 주고(평준화 금지), 유형의 약점 지표는 확실히 낮게. pct·type으로 고정(같은 링크=같은 결과) */
+  const OFF=[12,-9,7,-15,3], seed=(v*31+t.length*13)%OFF.length, sc=Math.min(1,(100-v)/20,v/20);  // 극단값 근처에서는 굴곡 폭을 줄여 상·하한에서 뭉치지 않게
+  const p={}; Object.keys(EP_LABEL).forEach((k,i)=>{
+    const off=Math.round(OFF[(i+seed)%OFF.length]*sc), jit=((v*5+i*13)%7)-3;
+    const dip=(DIP[t]||[]).includes(k);
+    p[k]=Math.max(8,Math.min(96, v+(dip? -Math.round(v*.5)+Math.round(off/2) : off)+jit)); });  // 약점 지표는 기준값에 비례해 깎는다(바닥에서 뭉치지 않게)
   epRender(p,v,{type:t});
 })();
 </script>

@@ -703,14 +703,16 @@ showResult=function(){
   const q=new URLSearchParams(location.search);
   if(!q.has("pct")&&!q.has("preview")) return;
   let v=parseInt(q.get("pct")); if(isNaN(v)) v=65; v=Math.max(10,Math.min(100,v));
-  const SYNTH={ OPEN:{warm:78,signal:72,restraint:74,recovery:68,link:62},
-    RUSH:{warm:68,signal:64,restraint:28,recovery:38,link:55},
-    QUIET:{warm:34,signal:28,restraint:76,recovery:72,link:48},
-    REBUILD:{warm:30,signal:24,restraint:36,recovery:33,link:40} };
+  /* 표본 프로파일: 지표마다 굴곡 (구도 판별축 상대=(온도+신호)/2, 나=(대응+회복)/2 기준 55는 유지) */
+  const SYNTH={ OPEN:{warm:84,signal:63,restraint:71,recovery:89,link:52},
+    RUSH:{warm:76,signal:57,restraint:19,recovery:46,link:64},
+    QUIET:{warm:27,signal:42,restraint:85,recovery:63,link:49},
+    REBUILD:{warm:35,signal:18,restraint:44,recovery:26,link:53} };
   let tk=(q.get("type")||"").toUpperCase();
   if(!SYNTH[tk]) tk = v>=70?"OPEN" : v>=50?"RUSH" : v>=35?"QUIET" : "REBUILD";
   const day=Math.max(1,Math.min(31,parseInt(q.get("day"))||1));
-  epRender(SYNTH[tk],v,day,{type:tk});
+  const prof={}; Object.keys(SYNTH[tk]).forEach((k,i)=>{ prof[k]=Math.max(8,Math.min(96,SYNTH[tk][k]+((v*5+i*7)%9)-4)); });  // pct별 소폭 변주(±4)
+  epRender(prof,v,day,{type:tk});
 })();
 
 /* 재방문: 진단 기록이 있으면 결과지가 바로 열린다 — 처방은 날짜에 맞춰 자동 갱신 */
