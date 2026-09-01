@@ -187,11 +187,6 @@
 .ep-body{font-size:14.5px;color:var(--ink-2);line-height:1.75}
 .ep-body .rp{display:block}
 .ep-body .rp+.rp{margin-top:.4em}
-.ep-ev{margin:0;padding:0;list-style:none}
-.ep-ev li{position:relative;padding-left:14px;font-size:13.5px;color:var(--ink-2);line-height:1.6}
-.ep-ev li+li{margin-top:8px}
-.ep-ev li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:99px;background:var(--gold)}
-.ep-ev b{color:var(--ink)}
 .ep-dayrow{display:flex;flex-direction:column;align-items:center;gap:7px;margin-bottom:14px;text-align:center}
 .ep-day{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.1em;color:#fff;background:var(--gold);border-radius:999px;padding:4px 10px}
 .ep-why{font-size:12.5px;color:var(--gold);font-weight:700}
@@ -291,10 +286,6 @@
         <div class="ep-h">지금의 상황</div>
         <div class="ep-name" id="epTypeName"></div>
         <div class="ep-body" id="epTypeBody"></div>
-      </div>
-      <div class="ep-sec" id="epEvSec">
-        <div class="ep-h">당신의 답에서 찾은 근거</div>
-        <ul class="ep-ev" id="epEv"></ul>
       </div>
       <div class="ep-sec ep-rx">
         <div class="ep-h">오늘의 처방</div>
@@ -619,27 +610,6 @@ const EP_TYPES={
 function epType(p){ const opp=(p.warm+p.signal)/2, me=(p.restraint+p.recovery)/2;
   return opp>=55 ? (me>=55?"OPEN":"RUSH") : (me>=55?"QUIET":"REBUILD"); }
 
-function epEvidence(){
-  const pos=[],neg=[];
-  if(epPicked(15,"다시 사귈")) pos.push("<b>「다시 사귈 수 있음을 암시」</b> — 문이 잠기지 않았다는 가장 강한 신호예요.");
-  if(epPicked(15,"근황에 대해 먼저")) pos.push("<b>「내 근황을 먼저 물어봄」</b> — 상대의 시선이 아직 나를 향해 있어요.");
-  if(epPicked(16,"원망하고")) pos.push("<b>「나를 원망하고 화를 냄」</b> — 미움은 무관심보다 온도가 높아요. 감정이 남아 있다는 뜻이에요.");
-  if((answers[5]||[]).length>=3) pos.push("<b>연결점 "+(answers[5]||[]).length+"개</b> — 다시 닿을 다리가 충분히 남아 있어요.");
-  if(epPicked(7,"힘든 시기")) pos.push("<b>「상대가 힘든 시기를 보내는 중」</b> — 마음이 흔들리기 쉬운 시기예요. 단, 파고드는 순간 경계로 바뀌어요.");
-  if(epPicked(2,"장문톡")) neg.push("<b>「마음을 담은 장문톡 보내기」</b> — 진심이 지금은 압박으로 읽히고 있어요.");
-  if(epPicked(2,"집 앞")) neg.push("<b>「집 앞에 찾아가기」</b> — 상대의 경계심을 가장 크게 올린 행동이에요.");
-  if(epPicked(2,"설득")) neg.push("<b>「계속 설득해보기」</b> — 설득이 반복될수록 상대는 결정을 굳혀요.");
-  if(epPicked(11,"연락할 때마다")||epPicked(11,"2번 이상")) neg.push("<b>「이별 당시 얘기를 다시 꺼냄」</b> — 대화가 과거로 돌아갈수록 온도가 떨어져요.");
-  if(epPicked(12,"연락할 때마다")) neg.push("<b>「연락할 때마다 재회 얘기」</b> — 답을 재촉당한 쪽은 문을 닫게 돼요.");
-  if(epPicked(10,"항상 내 마음")) neg.push("<b>「항상 마음을 표현함」</b> — 마음이 클수록 표현은 아껴야 하는 구간이에요.");
-  if(epPicked(15,"어떤 반응도 없었음")) neg.push("<b>「어떤 반응도 없었음」</b> — 무반응은 거절이 아니라, 지금은 다가갈 때가 아니라는 표시예요.");
-  if(epPicked(16,"읽씹")) neg.push("<b>「종종 읽씹·안읽씹」</b> — 지금은 연락 자체를 줄이라는 신호예요.");
-  if(epPicked(8,"아무 것도 하지 않았다")) neg.push("<b>「무기력하게 보낸 시간」</b> — 그 사람의 마음보다 내 회복이 먼저예요. 처방이 여기서 시작해요.");
-  const out=[]; if(pos[0]) out.push(pos[0]); if(neg[0]) out.push(neg[0]);
-  if(neg[1]) out.push(neg[1]); else if(pos[1]) out.push(pos[1]);
-  return out.slice(0,3);
-}
-
 const EP_RX={
   warm:[ {t:"상대 근황을 캐지 않기", b:"오늘 하루, 스토리·프로필 확인을 멈추세요.\n온도는 지켜본다고 오르지 않습니다. 내 쪽 신호가 바뀌어야 오릅니다."},
          {t:"우연을 설계하지 않기", b:"만들어낸 우연은 상대에게 부담으로 읽힙니다.\n접촉은 온도가 오른 뒤로 미루세요."},
@@ -673,7 +643,7 @@ function epTick(){ const el=document.getElementById("epTimer"); if(!el) return;
   if(_epCtx && _epCtx.live){          // 날짜가 바뀌면 새로고침 없이 그날 처방으로 교체
     const st=epLoad();
     if(st){ const d=epDayOf(st);
-      if(d!==_epCtx.day){ epRender(st.prof, st.score, d, {ev:st.ev, type:st.type, live:true}); return; } }
+      if(d!==_epCtx.day){ epRender(st.prof, st.score, d, {type:st.type, live:true}); return; } }
   }
   const s=Math.max(0,Math.floor(epMsToMidnight()/1000));
   const p=n=>(n<10?"0":"")+n;
@@ -703,10 +673,6 @@ function epRender(p,score,day,opts){
   const tk=opts.type||epType(p), T=EP_TYPES[tk];
   document.getElementById("epTypeName").textContent=T.name;
   document.getElementById("epTypeBody").innerHTML=epParas(T.body);
-  const ev=opts.ev||[];
-  if(ev.length){ document.getElementById("epEvSec").style.display="";
-    document.getElementById("epEv").innerHTML=ev.map(e=>"<li>"+e+"</li>").join("");
-  } else document.getElementById("epEvSec").style.display="none";
   const d=Math.max(1,day||1), rx=epRxFor(p,d);
   let h='<div class="ep-dayrow"><span class="ep-day">'+(d===1?"진단 첫날":"진단 "+d+"일째")+"</span></div>";
   h+='<div class="ep-rxt">'+rx.t+'</div><div class="ep-body">'+epParas(rx.b)+"</div>";
@@ -726,10 +692,10 @@ const _epShowResult=showResult;
 showResult=function(){
   const score=computeScore();
   saveResult(score, collectSelectedTexts());
-  const p=epProfile(), ev=epEvidence(), tk=epType(p);
-  epSave({t0:Date.now(), score:score, prof:p, ev:ev, type:tk});
+  const p=epProfile(), tk=epType(p);
+  epSave({t0:Date.now(), score:score, prof:p, type:tk});
   renderResult(score);
-  epRender(p,score,1,{ev:ev,type:tk,live:true});
+  epRender(p,score,1,{type:tk,live:true});
 };
 
 /* 미리보기: ?pct=63&day=3&type=RUSH — 실답변이 없으므로 유형 표본 프로파일 사용 */
@@ -744,7 +710,7 @@ showResult=function(){
   let tk=(q.get("type")||"").toUpperCase();
   if(!SYNTH[tk]) tk = v>=70?"OPEN" : v>=50?"RUSH" : v>=35?"QUIET" : "REBUILD";
   const day=Math.max(1,Math.min(31,parseInt(q.get("day"))||1));
-  epRender(SYNTH[tk],v,day,{type:tk,ev:[]});
+  epRender(SYNTH[tk],v,day,{type:tk});
 })();
 
 /* 재방문: 진단 기록이 있으면 결과지가 바로 열린다 — 처방은 날짜에 맞춰 자동 갱신 */
@@ -753,7 +719,7 @@ showResult=function(){
   if(q.has("pct")||q.has("preview")) return;
   const st=epLoad(); if(!st) return;
   renderResult(st.score);
-  epRender(st.prof, st.score, epDayOf(st), {ev:st.ev, type:st.type, live:true});
+  epRender(st.prof, st.score, epDayOf(st), {type:st.type, live:true});
 })();
 </script>
 </body>
