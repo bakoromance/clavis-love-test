@@ -59,6 +59,12 @@
   .btn:disabled{background:var(--btn-off);color:var(--btn-off-ink);cursor:not-allowed}
   .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink-2);font-weight:600}
   .btn.ghost:hover{background:#fff}
+  /* 상담 CTA — 은은한 발광(구원의 빛): 숨 쉬듯 번지는 글로우 + 천천히 지나가는 광택. 재생 감소 설정 시 정지 */
+  #consultBtn{position:relative;overflow:hidden;isolation:isolate;box-shadow:0 0 0 1px rgba(200,174,110,.45),0 0 18px 2px rgba(200,174,110,.55);animation:ctaGlow 3.2s ease-in-out infinite}
+  #consultBtn::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 38%,rgba(255,244,214,.28) 50%,transparent 62%);transform:translateX(-130%);animation:ctaSheen 4.8s ease-in-out infinite}
+  @keyframes ctaGlow{0%,100%{box-shadow:0 0 0 1px rgba(200,174,110,.45),0 0 14px 1px rgba(200,174,110,.55)}50%{box-shadow:0 0 0 1px rgba(200,174,110,.45),0 0 30px 6px rgba(200,174,110,.55)}}
+  @keyframes ctaSheen{0%{transform:translateX(-130%)}45%,100%{transform:translateX(130%)}}
+  @media (prefers-reduced-motion:reduce){#consultBtn,#consultBtn::after{animation:none}}
   .serif-n{font-family:var(--serif)}
 
   /* ============ INTRO ============ */
