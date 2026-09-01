@@ -165,11 +165,6 @@
 .ep-body{font-size:14.5px;color:var(--text-dim);line-height:1.75}
 .ep-body .rp{display:block}
 .ep-body .rp+.rp{margin-top:.4em}
-.ep-ev{margin:0;padding:0;list-style:none}
-.ep-ev li{position:relative;padding-left:14px;font-size:13.5px;color:var(--text-dim);line-height:1.6}
-.ep-ev li+li{margin-top:8px}
-.ep-ev li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:99px;background:var(--accent)}
-.ep-ev b{color:var(--text)}
 .ep-day{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.1em;color:var(--on-accent);background:var(--accent);border-radius:999px;padding:4px 10px;margin-bottom:10px}
 .ep-why{font-size:12.5px;color:var(--accent-2);font-weight:700;margin-bottom:6px}
 .ep-rxt{font-size:18px;font-weight:800;color:var(--text);margin-bottom:8px}
@@ -251,10 +246,6 @@
           <div class="ep-sub">관계 구도, 감정을 정밀하게 분석하여<br>상대의 심리와 행동을 컨트롤하는 클래비스의 체계</div>
         </div>
         <div id="epBars"></div>
-      </div>
-      <div class="ep-sec" id="epEvSec">
-        <div class="ep-h">당신의 답에서 찾은 근거</div>
-        <ul class="ep-ev" id="epEv"></ul>
       </div>
     </div>
 
@@ -551,25 +542,6 @@ function epProfile(){
   return p;
 }
 
-function epEvidence(){
-  const pos=[],neg=[];
-  const prot=(answers[17]||[]).filter(i=>QUESTIONS[17].opts[i][2]!=="solo").length;
-  if(prot>=2) pos.push("<b>관계를 지키는 힘 "+prot+"개</b> — 무너뜨리는 힘만큼, 지키는 힘도 실재해요.");
-  if(epPicked(4,"잘 조율한다")) pos.push("<b>「다퉈도 잘 조율한다」</b> — 회복의 바탕이 아직 살아 있어요.");
-  if(epPicked(7,"여전하다")||epPicked(7,"더 늘었다")) pos.push("<b>「애정 표현이 유지되고 있다」</b> — 온도의 뿌리는 아직 마르지 않았어요.");
-  if(epPicked(2,"내가 이어가지 않으면")) neg.push("<b>「내가 이어가야 이어지는 대화」</b> — 대화의 온도가 한쪽에서만 나오고 있어요.");
-  if(epPicked(4,"비슷한 문제로 반복")) neg.push("<b>「같은 문제로 반복되는 다툼」</b> — 갈등의 내용이 아니라 구조가 문제라는 신호예요.");
-  if(epPicked(6,"말로만 인정")||epPicked(6,"내 탓으로")) neg.push("<b>「사과가 반복을 못 멈춤」</b> — 말의 문제가 아니라 패턴의 문제예요.");
-  if(epPicked(9,"가족·친구처럼만")) neg.push("<b>「가족·친구처럼만 느껴짐」</b> — 편안함이 설렘을 대체하기 시작했어요.");
-  if(epPicked(10,"혼자인 느낌")) neg.push("<b>「연애 중인데도 혼자인 느낌」</b> — 가장 먼저 돌봐야 할 신호예요.");
-  if(epPicked(11,"크게 깨진 사건")) neg.push("<b>「신뢰가 크게 깨진 사건」</b> — 감정 회복보다 신뢰 회복이 먼저인 이유예요.");
-  if(epPicked(15,"말을 돌리거나 회피")) neg.push("<b>「미래 얘기를 회피함」</b> — 거절이 아니라 부담일 수 있어요. 확인이 필요한 지점이에요.");
-  if(epPicked(16,"진지하게 한 번")||epPicked(16,"여러 번 반복")) neg.push("<b>「이별 얘기가 실제로 나옴」</b> — 감정 호소보다 냉정한 설계가 필요한 단계예요.");
-  const out=[]; if(pos[0]) out.push(pos[0]); if(neg[0]) out.push(neg[0]);
-  if(neg[1]) out.push(neg[1]); else if(pos[1]) out.push(pos[1]);
-  return out.slice(0,3);
-}
-
 function epParas(t){ return t.split("\n\n").map(p=>'<span class="rp">'+p.replace(/\n/g,"<br>")+"</span>").join(""); }
 
 function epRender(p,lv,opts){
@@ -584,10 +556,6 @@ function epRender(p,lv,opts){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     document.querySelectorAll("#epBars .ep-fill").forEach(el=>el.style.width=el.dataset.w+"%"); }));
   setTimeout(()=>{ document.querySelectorAll("#epBars .ep-fill").forEach(el=>el.style.width=el.dataset.w+"%"); },450);
-  const ev=opts.ev||[];
-  if(ev.length){ document.getElementById("epEvSec").style.display="";
-    document.getElementById("epEv").innerHTML=ev.map(e=>"<li>"+e+"</li>").join("");
-  } else document.getElementById("epEvSec").style.display="none";
   const rise=Math.min(10, lv+(p[order[0]]<35?2:1));
   document.getElementById("epDrop").innerHTML="<s>LEVEL "+lv+"</s> ↑ LEVEL "+rise;
   document.getElementById("epWarnBody").innerHTML=epParas("지금 패턴이 반복되면 두 사람의 거리는 더 벌어져요.\n관계를 무너뜨리는 건 큰 사건이 아니라 방치입니다.");
@@ -605,7 +573,7 @@ showResult=function(){
   else { const tp=computeType(); typeKey=tp.type || "STABLE"; }
   saveResult(`LEVEL ${lv}/10 · ${(RISK_TYPES[typeKey]||{}).name||""}`, collectSelectedTexts());
   renderResult(lv, typeKey);
-  epRender(epProfile(), lv, {ev:epEvidence(), type:typeKey});
+  epRender(epProfile(), lv, {type:typeKey});
 };
 
 /* 미리보기: ?lv=6&type=CONFLICT — 유형 표본 프로파일 */
@@ -619,7 +587,7 @@ showResult=function(){
   const DIP={COOL:["comm","affection"],CONFLICT:["resil"],AVOID:["resil","comm"],TRUST:["trust"],
              BORED:["affection"],FUTURE:["future"],BREAKUP:["comm","affection","future"],STABLE:[],DANGER:[]};
   const p={}; Object.keys(EP_LABEL).forEach(k=>{ p[k]=Math.max(8,base-((DIP[type]||[]).includes(k)?28:0)); });
-  epRender(p,lv,{type:type,ev:[]});
+  epRender(p,lv,{type:type});
 })();
 </script>
 </body>

@@ -156,11 +156,6 @@
 .ep-body{font-size:14.5px;color:var(--ink-2);line-height:1.75}
 .ep-body .rp{display:block}
 .ep-body .rp+.rp{margin-top:.4em}
-.ep-ev{margin:0;padding:0;list-style:none}
-.ep-ev li{position:relative;padding-left:14px;font-size:13.5px;color:var(--ink-2);line-height:1.6}
-.ep-ev li+li{margin-top:8px}
-.ep-ev li::before{content:"";position:absolute;left:0;top:9px;width:5px;height:5px;border-radius:99px;background:var(--rose)}
-.ep-ev b{color:var(--ink)}
 .ep-day{display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.1em;color:#fff;background:var(--rose);border-radius:999px;padding:4px 10px;margin-bottom:10px}
 .ep-why{font-size:12.5px;color:var(--rose);font-weight:700;margin-bottom:6px}
 .ep-rxt{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:8px}
@@ -236,10 +231,6 @@
           <div class="ep-sub">관계 구도, 감정을 정밀하게 분석하여<br>상대의 심리와 행동을 컨트롤하는 클래비스의 체계</div>
         </div>
         <div id="epBars"></div>
-      </div>
-      <div class="ep-sec" id="epEvSec">
-        <div class="ep-h">당신의 답에서 찾은 근거</div>
-        <ul class="ep-ev" id="epEv"></ul>
       </div>
       <div class="ep-sec ep-warn" id="epWarnSec">
         <div class="ep-h">이대로 두면</div>
@@ -652,22 +643,6 @@ function epProfile(){
            cond:epNorm(cRaw,cLo,cHi) };
 }
 
-function epEvidence(){
-  const pos=[],neg=[];
-  if(epPicked(4,"상대가 먼저 다시")) pos.push("<b>「끊기면 상대가 먼저 다시 연락」</b> — 이 신호는 예의가 아니라 관심이에요.");
-  if(epPicked(6,"외모·이성적 매력")) pos.push("<b>「외모·매력을 칭찬」</b> — 친구에게는 잘 쓰지 않는 언어예요.");
-  if(epPicked(19,"이성적 호감을 여러 번")) pos.push("<b>「이성적 호감을 여러 번 표현」</b> — 해석이 필요 없는 수준의 신호예요.");
-  if(epPicked(14,"은근히")) pos.push("<b>「연애 얘기에 \'우리\'를 대입」</b> — 상대도 이 관계의 다음 장을 상상하고 있어요.");
-  if(epPicked(3,"느리거나")||epPicked(3,"단답")) neg.push("<b>「답장이 느리고 단답」</b> — 지금은 밀어붙일 타이밍이 아니라는 신호예요.");
-  if(epPicked(18,"자주 그런다")||epPicked(18,"몇 번 있다")) neg.push("<b>「친구로 선을 그은 적 있음」</b> — 프레임을 바꾸는 건 고백이 아니라 반 발짝의 누적이에요.");
-  if(epPicked(20,"사귀는 사람이 있다")) neg.push("<b>「상대에게 애인이 있음」</b> — 지금 움직이면 잃는 것만 있어요. 멈춤도 전략이에요.");
-  if(epPicked(10,"아직 시도해본 적 없다")&&epPicked(7,"아직 없다")) neg.push("<b>「진도가 전부 내 쪽에서 멈춰 있음」</b> — 브레이크를 밟고 있는 건 상대가 아니라 나예요.");
-  if(epPicked(1,"상대 텐션이 낮아졌다")||epPicked(1,"대화가 끊겼다")) neg.push("<b>「최근 온도가 내려감」</b> — 식은 게 아니라 확신을 잃었을 가능성부터 봐야 해요.");
-  const out=[]; if(pos[0]) out.push(pos[0]); if(neg[0]) out.push(neg[0]);
-  if(pos[1]) out.push(pos[1]); else if(neg[1]) out.push(neg[1]);
-  return out.slice(0,3);
-}
-
 function epParas(t){ return t.split("\n\n").map(p=>'<span class="rp">'+p.replace(/\n/g,"<br>")+"</span>").join(""); }
 
 function epRender(p,pct,opts){
@@ -681,10 +656,6 @@ function epRender(p,pct,opts){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     document.querySelectorAll("#epBars .ep-fill").forEach(el=>el.style.width=el.dataset.w+"%"); }));
   setTimeout(()=>{ document.querySelectorAll("#epBars .ep-fill").forEach(el=>el.style.width=el.dataset.w+"%"); },450);
-  const ev=opts.ev||[];
-  if(ev.length){ document.getElementById("epEvSec").style.display="";
-    document.getElementById("epEv").innerHTML=ev.map(e=>"<li>"+e+"</li>").join("");
-  } else document.getElementById("epEvSec").style.display="none";
   const cut=Math.max(8,Math.round((100-p.init)*.18+(100-p.dens)*.08));
   const low=Math.max(5,pct-cut);
   document.getElementById("epDrop").innerHTML="<s>"+pct+"%</s> ↓ "+low+"%";
@@ -698,7 +669,7 @@ showResult=function(){
   const typeKey=computeCrushType(pct);
   saveResult(`${pct}% / ${CRUSH_TYPES[typeKey].name}`, collectSelectedTexts());
   renderResult(pct, typeKey);
-  epRender(epProfile(), pct, {ev:epEvidence(), type:typeKey});
+  epRender(epProfile(), pct, {type:typeKey});
 };
 
 /* 미리보기: ?pct=70&type=SCOUTING — 유형 표본 프로파일 */
@@ -709,7 +680,7 @@ showResult=function(){
   let t=(q.get("type")||"").toUpperCase(); if(!CRUSH_TYPES[t]) t = v>=85?"ALMOST":"SCOUTING";
   const DIP={FRIEND:["vibe","rom"],HESITANT:["rom"],UNEVEN:["init"],RIVAL:["cond"],REKINDLE:["init","vibe"]};
   const p={}; Object.keys(EP_LABEL).forEach(k=>{ p[k]=Math.max(8,Math.min(95,v-((DIP[t]||[]).includes(k)?26:0)+(k==="dens"?4:0))); });
-  epRender(p,v,{type:t,ev:[]});
+  epRender(p,v,{type:t});
 })();
 </script>
 </body>
