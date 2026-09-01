@@ -25,7 +25,7 @@
 <link rel="stylesheet" as="style" crossorigin
   href="https://fastly.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 <link rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Nanum+Myeongjo:wght@400;700;800&display=swap" />
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Serif+KR:wght@500;600&display=swap" />
 <style>
   :root{
     --bg:#1f1e1d;--bg-2:#262624;--surface:#2b2a28;--surface-2:#323130;--border:#3a3936;--border-2:#4a4844;
@@ -171,6 +171,7 @@
 .ep-lock{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--surface-2);font-size:12.5px;color:var(--text-dim)}
 .ep-warn{border-color:rgba(217,84,78,.4);background:rgba(217,84,78,.08)}
 .ep-warn .ep-body{text-align:center}
+.ep-aid{margin-top:14px;text-align:center;font-family:"Noto Serif KR","Nanum Myeongjo",serif;font-size:12.5px;color:var(--text-dim);line-height:1.7;word-break:keep-all}
 .ep-warn .ep-h{color:#e08a84}
 .ep-drop{font-size:24px;font-weight:800;color:#e08a84;margin:2px 0 8px;text-align:center}
 .ep-drop s{color:var(--text-dim);font-weight:800;margin-right:8px}
@@ -559,6 +560,7 @@ function epRender(p,lv,opts){
   const rise=Math.min(10, lv+(p[order[0]]<35?2:1));
   document.getElementById("epDrop").innerHTML="<s>LEVEL "+lv+"</s> ↑ LEVEL "+rise;
   document.getElementById("epWarnBody").innerHTML=epParas("지금 패턴이 반복되면 두 사람의 거리는 더 벌어져요.\n관계를 무너뜨리는 건 큰 사건이 아니라 방치입니다.");
+  document.getElementById("epWarnBody").innerHTML+='<div class="ep-aid">상담을 통해, 내 상황에 맞는<br>더 정교한 행동지침을 받아보실 수 있습니다.</div>';
 }
 
 /* 검사 완료: 원본 산출 로직 그대로 + 프로파일 렌더 */
